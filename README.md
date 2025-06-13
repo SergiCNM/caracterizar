@@ -25,7 +25,7 @@ With **Caracterizar**, you can:
 ### Windows
 
 ```bash
-git clone https://github.com/yourusername/Caracterizar.git
+git clone https://github.com/SergiCNM/Caracterizar.git
 cd Caracterizar
 pip install -r requirements.txt
 python main.py
@@ -34,7 +34,7 @@ python main.py
 ### Linux / Unix
 
 ```bash
-git clone https://github.com/yourusername/Caracterizar.git
+git clone https://github.com/SergiCNM/Caracterizar.git
 cd Caracterizar
 pip install -r requirements.txt
 python3 main.py
@@ -43,7 +43,7 @@ python3 main.py
 ### MacOS
 
 ```bash
-git clone https://github.com/yourusername/Caracterizar.git
+git clone https://github.com/SergiCNM/Caracterizar.git
 cd Caracterizar
 pip install -r requirements.txt
 python3 main.py
