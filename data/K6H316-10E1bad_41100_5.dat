@@ -1,0 +1,62 @@
+<BEG GLOBAL>
+	Process[s]	K6H316-10E1bad_41100_5
+	Lot[s]	K6H316
+	Wafer[s]	10E1
+	Mask[s]	LINDA
+	Operator[s]	default
+	Date[s]	24/04/2023
+	Time[s]	10:20:19
+	WaferInfo[s]	
+<END GLOBAL>
+<BEG>	WAFER (10E1)
+	<BEG>	DIE (0 0)
+		<BEG>	MODULE (0.0 0.0)
+			<BEG>	MODTEST (TEST_test)
+				<BEG PARMS>
+					status	meas_warning
+					message	Contact OK! Impossible to program chip register and pixel register.
+				<END PARMS>
+				<END>	MODTEST (TEST_test)
+			<END>	MODULE (0.0 0.0)
+		<END>	DIE (0 0)
+		<BEG>	DIE (11 -14)
+			<BEG>	MODULE (0.0 0.0)
+				<BEG>	MODTEST (TEST_test)
+					<BEG PARMS>
+						status	meas_success
+						message	
+					<END PARMS>
+					<END>	MODTEST (TEST_test)
+				<END>	MODULE (0.0 0.0)
+			<END>	DIE (11 -14)
+			<BEG>	DIE (0 -14)
+				<BEG>	MODULE (0.0 0.0)
+					<BEG>	MODTEST (TEST_test)
+						<BEG PARMS>
+							status	meas_warning
+							message	Contact OK! Impossible to program chip register and pixel register.
+						<END PARMS>
+						<END>	MODTEST (TEST_test)
+					<END>	MODULE (0.0 0.0)
+				<END>	DIE (0 -14)
+				<BEG>	DIE (-10 -14)
+					<BEG>	MODULE (0.0 0.0)
+						<BEG>	MODTEST (TEST_test)
+							<BEG PARMS>
+								status	meas_warning
+								message	Contact OK! Impossible to program chip register and pixel register.
+							<END PARMS>
+							<END>	MODTEST (TEST_test)
+						<END>	MODULE (0.0 0.0)
+					<END>	DIE (-10 -14)
+					<BEG>	DIE (0 -29)
+						<BEG>	MODULE (0.0 0.0)
+							<BEG>	MODTEST (TEST_test)
+								<BEG PARMS>
+									status	meas_warning
+									message	Contact OK! Impossible to program chip register and pixel register.
+								<END PARMS>
+								<END>	MODTEST (TEST_test)
+							<END>	MODULE (0.0 0.0)
+						<END>	DIE (0 -29)
+				<END>	WAFER (10E1)

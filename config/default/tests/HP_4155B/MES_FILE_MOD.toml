@@ -1,0 +1,20 @@
+title = "HP4155 MES parameters"
+
+[parameters]
+INTEGRATION = "SHOR"
+NET = "NET1"
+NET_UPDATE = "NET2"
+UPDATE_COUNT = 50
+TEST_NAMES = ""
+
+[options]
+INTEGRATION = "SHOR,MED,LONG"
+
+[units]
+
+[help]
+INTEGRATION = "Integration time"
+NET = "Network to save data"
+NET_UPDATE = "Network to update data"
+UPDATE_COUNT = "Updates every N points"
+TEST_NAME = "Test names (MES FILEs) separated by comma"

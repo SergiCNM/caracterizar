@@ -1,0 +1,21 @@
+title = "EAD parameters"
+
+[parameters]
+WAFERMAP = true
+HISTOGRAM = true
+PLOT = true
+DATA = true
+
+[units]
+WAFERMAP = ""
+HISTOGRAM = ""
+PLOT = ""
+DATA = ""
+
+[options]
+
+[help]
+WAFERMAP = "Print wafermap"
+HISTOGRAM = "Print histogram"
+PLOT = "Create plot"
+DATA = "Print data table information"

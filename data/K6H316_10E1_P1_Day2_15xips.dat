@@ -1,0 +1,162 @@
+<BEG GLOBAL>
+	Process[s]	K6H316_10E1_P1_Day2_15xips
+	Lot[s]	K6H316
+	Wafer[s]	10E1
+	Mask[s]	LINDA
+	Operator[s]	default
+	Date[s]	27/04/2023
+	Time[s]	15:16:50
+	WaferInfo[s]	
+<END GLOBAL>
+<BEG>	WAFER (10E1)
+	<BEG>	DIE (0 0)
+		<BEG>	MODULE (0.0 0.0)
+			<BEG>	MODTEST (TEST_test)
+				<BEG PARMS>
+					status	meas_warning
+					message	Contact OK! Impossible to program chip register and pixel register.
+				<END PARMS>
+				<END>	MODTEST (TEST_test)
+			<END>	MODULE (0.0 0.0)
+		<END>	DIE (0 0)
+		<BEG>	DIE (4 -3)
+			<BEG>	MODULE (0.0 0.0)
+				<BEG>	MODTEST (TEST_test)
+					<BEG PARMS>
+						status	meas_warning
+						message	Contact OK! Impossible to program chip register and pixel register.
+					<END PARMS>
+					<END>	MODTEST (TEST_test)
+				<END>	MODULE (0.0 0.0)
+			<END>	DIE (4 -3)
+			<BEG>	DIE (-3 -3)
+				<BEG>	MODULE (0.0 0.0)
+					<BEG>	MODTEST (TEST_test)
+						<BEG PARMS>
+							status	meas_warning
+							message	Contact OK! Impossible to program chip register and pixel register.
+						<END PARMS>
+						<END>	MODTEST (TEST_test)
+					<END>	MODULE (0.0 0.0)
+				<END>	DIE (-3 -3)
+				<BEG>	DIE (-7 -4)
+					<BEG>	MODULE (0.0 0.0)
+						<BEG>	MODTEST (TEST_test)
+							<BEG PARMS>
+								status	meas_warning
+								message	Contact OK! Impossible to program chip register and pixel register.
+							<END PARMS>
+							<END>	MODTEST (TEST_test)
+						<END>	MODULE (0.0 0.0)
+					<END>	DIE (-7 -4)
+					<BEG>	DIE (8 -9)
+						<BEG>	MODULE (0.0 0.0)
+							<BEG>	MODTEST (TEST_test)
+								<BEG PARMS>
+									status	meas_warning
+									message	Contact OK! Impossible to program chip register and pixel register.
+								<END PARMS>
+								<END>	MODTEST (TEST_test)
+							<END>	MODULE (0.0 0.0)
+						<END>	DIE (8 -9)
+						<BEG>	DIE (-7 -9)
+							<BEG>	MODULE (0.0 0.0)
+								<BEG>	MODTEST (TEST_test)
+									<BEG PARMS>
+										status	meas_warning
+										message	Contact OK! Impossible to program chip register and pixel register.
+									<END PARMS>
+									<END>	MODTEST (TEST_test)
+								<END>	MODULE (0.0 0.0)
+							<END>	DIE (-7 -9)
+							<BEG>	DIE (-4 -10)
+								<BEG>	MODULE (0.0 0.0)
+									<BEG>	MODTEST (TEST_test)
+										<BEG PARMS>
+											status	meas_warning
+											message	Contact OK! Impossible to program chip register and pixel register.
+										<END PARMS>
+										<END>	MODTEST (TEST_test)
+									<END>	MODULE (0.0 0.0)
+								<END>	DIE (-4 -10)
+								<BEG>	DIE (11 -14)
+									<BEG>	MODULE (0.0 0.0)
+										<BEG>	MODTEST (TEST_test)
+											<BEG PARMS>
+												status	meas_warning
+												message	Contact OK! Impossible to program chip register and pixel register.
+											<END PARMS>
+											<END>	MODTEST (TEST_test)
+										<END>	MODULE (0.0 0.0)
+									<END>	DIE (11 -14)
+									<BEG>	DIE (5 -14)
+										<BEG>	MODULE (0.0 0.0)
+											<BEG>	MODTEST (TEST_test)
+												<BEG PARMS>
+													status	meas_warning
+													message	Contact OK! Impossible to program chip register and pixel register.
+												<END PARMS>
+												<END>	MODTEST (TEST_test)
+											<END>	MODULE (0.0 0.0)
+										<END>	DIE (5 -14)
+										<BEG>	DIE (-10 -14)
+											<BEG>	MODULE (0.0 0.0)
+												<BEG>	MODTEST (TEST_test)
+													<BEG PARMS>
+														status	meas_warning
+														message	Contact OK! Impossible to program chip register and pixel register.
+													<END PARMS>
+													<END>	MODTEST (TEST_test)
+												<END>	MODULE (0.0 0.0)
+											<END>	DIE (-10 -14)
+											<BEG>	DIE (-1 -19)
+												<BEG>	MODULE (0.0 0.0)
+													<BEG>	MODTEST (TEST_test)
+														<BEG PARMS>
+															status	meas_warning
+															message	Contact OK! Impossible to program chip register and pixel register.
+														<END PARMS>
+														<END>	MODTEST (TEST_test)
+													<END>	MODULE (0.0 0.0)
+												<END>	DIE (-1 -19)
+												<BEG>	DIE (-4 -20)
+													<BEG>	MODULE (0.0 0.0)
+														<BEG>	MODTEST (TEST_test)
+															<BEG PARMS>
+																status	meas_warning
+																message	Contact OK! Impossible to program chip register and pixel register.
+															<END PARMS>
+															<END>	MODTEST (TEST_test)
+														<END>	MODULE (0.0 0.0)
+													<END>	DIE (-4 -20)
+													<BEG>	DIE (-9 -20)
+														<BEG>	MODULE (0.0 0.0)
+															<BEG>	MODTEST (TEST_test)
+																<BEG PARMS>
+																	status	meas_warning
+																	message	Contact OK! Impossible to program chip register and pixel register.
+																<END PARMS>
+																<END>	MODTEST (TEST_test)
+															<END>	MODULE (0.0 0.0)
+														<END>	DIE (-9 -20)
+														<BEG>	DIE (4 -27)
+															<BEG>	MODULE (0.0 0.0)
+																<BEG>	MODTEST (TEST_test)
+																	<BEG PARMS>
+																		status	meas_warning
+																		message	Contact OK! Impossible to program chip register and pixel register.
+																	<END PARMS>
+																	<END>	MODTEST (TEST_test)
+																<END>	MODULE (0.0 0.0)
+															<END>	DIE (4 -27)
+															<BEG>	DIE (0 -29)
+																<BEG>	MODULE (0.0 0.0)
+																	<BEG>	MODTEST (TEST_test)
+																		<BEG PARMS>
+																			status	meas_warning
+																			message	Contact OK! Impossible to program chip register and pixel register.
+																		<END PARMS>
+																		<END>	MODTEST (TEST_test)
+																	<END>	MODULE (0.0 0.0)
+																<END>	DIE (0 -29)
+														<END>	WAFER (10E1)

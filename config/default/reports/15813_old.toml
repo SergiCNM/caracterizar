@@ -1,0 +1,16 @@
+[15813]
+	[15813.15813-1]
+		[15813.15813-1."cmax(pF)"]
+		method = "f-spread"
+		lna = true
+		autolimits = false
+		limmin = 400
+		limmax = 800
+		chunks = 16
+		[15813.15813-1."cmin(pF)"]
+		method = "k-sigma"
+		lna = true
+		autolimits = false
+		limmin = 10
+		limmax = 200
+		chunks = 16

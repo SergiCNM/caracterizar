@@ -1,0 +1,49 @@
+title = "IV TEMP parameters"
+
+[parameters]
+ROUTE_TERM = "FRONT"
+FOUR_TERMINAL = true
+MEAS_SWEEP = true
+MEAS_SOURCE = "CURR"
+MEAS_SENSE = "RES"
+START = 0.0001
+STOP = 0.001
+STEP = 0.0001
+COMPLIANCE = 1000.0
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 0.0
+LIGHT = false
+LIGHT_TIME = 0.0
+VOLT_RANGE = "AUTO"
+CURR_RANGE = "AUTO"
+TEMP_LIST = "25, 30, 25"
+HYSTERESIS_TEMP = false
+STABLE_TIME = 5
+
+[options]
+VOLT_RANGE = "AUTO,0.2,2,20,200,1000"
+CURR_RANGE = "AUTO,10e-9,100e-9,1e-6,10e-6,100e-6,1e-3,10e-3,100e-3,1"
+ROUTE_TERM = "FRONT,REAR"
+MEAS_SOURCE = "VOLT,CURR"
+MEAS_SENSE = "CURR,RES"
+
+[units]
+START = "V or A"
+STOP = "V or A"
+STEP = "V or A"
+COMPLIANCE = "mA or mV"
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+RANGE = "V"
+TEMP_LIST = "ºC"
+STABLE_TIME = "s"
+
+[help]
+START = "Start voltage"
+STOP = "Stop voltage"
+TEMP_LIST = "Temperature list"
+STABLE_TIME = "Time to wait after reach temperature setpoint"
+MEAS_SWEEP = "Spot or Sweep measurement. Spot apply START value"
+FOUR_TERMINAL = "Two or four terminal measurements"

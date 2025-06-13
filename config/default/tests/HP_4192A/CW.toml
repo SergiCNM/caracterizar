@@ -1,0 +1,23 @@
+title = "CV parameters"
+
+[parameters]
+START = 1
+STOP = 1000
+STEP = 1
+SPOT = -5
+OSC = 30
+CIRCUIT_MODE = "Parallel"
+AVERAGE = true
+
+[options]
+CIRCUIT_MODE = "Parallel,Series"
+
+[units]
+START = "kHz"
+STOP = "kHz"
+STEP = "kHz"
+SPOT = "V"
+OSC = "mV"
+
+[help]
+START = "Start voltage"

@@ -1,0 +1,15 @@
+title = "Test parameters"
+
+[parameters]
+WORKSPACE_NAME = "SIAM"
+GROUP = "SOLARMEMS"
+TEST_PRESET_GROUP_NAME = "Solarmems"
+
+[options]
+
+[units]
+
+[help]
+WORKSPACE_NAME = "Workspace name"
+GROUP = "Group name"
+TEST_PRESET_GROUP_NAME = "Test preset group name"

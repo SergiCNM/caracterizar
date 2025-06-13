@@ -1,0 +1,36 @@
+title = "IV parameters"
+
+[parameters]
+START = 0.0
+STOP = -25.0
+STEP = -5.0
+COMPLIANCE = 0.01
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 0.0
+LIGHT = false
+LIGHT_TIME = 0.0
+RANGE = "1000"
+ROUTE_TERM = "REAR"
+MEAS_SOURCE = "VOLT"
+MEAS_SENSE = "CURR"
+
+[options]
+RANGE = "AUTO,0.2,2,20,200,1000"
+ROUTE_TERM = "FRONT,REAR"
+MEAS_SOURCE = "VOLT,CURR"
+MEAS_SENSE = "CURR,RES"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+COMPLIANCE = "mA"
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+RANGE = "V"
+
+[help]
+START = "Start voltage"
+STOP = "Stop voltage"

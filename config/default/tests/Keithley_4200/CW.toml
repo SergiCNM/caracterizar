@@ -1,0 +1,65 @@
+title = "CW parameters"
+
+[parameters]
+START = 1.0
+STOP = 200.0
+BIAS = -5.0
+OSC = 100
+SWEEP_DELAY = 0.0
+CIRCUIT_MODE = "Parallel"
+SPEED = "Normal"
+CORRECTION_OPEN = false
+CORRECTION_SHORT = false
+CORRECTION_LOAD = false
+CORRECTION_CABLE = "1.5"
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 0.0
+LIGHT = false
+LIGHT_TIME = 3
+TEMPERATURE = 22.0
+AREA = 960400
+FIMS = 4.1
+PERMITTIVITY = 3.9
+SERIAL_RES = false
+
+[options]
+CIRCUIT_MODE = "Parallel,Series"
+SPEED = "Fast,Normal,Quiet"
+CORRECTION_CABLE = "0,1.5,3.0,4.0,5.0,6.0,7.0"
+
+[units]
+START = "kHz"
+STOP = "kHz"
+STEP = "kHz"
+BIAS = "V"
+OSC = "mV"
+SWEEP_DELAY = "s"
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+TEMPERATURE = "°C"
+AREA = "um²"
+
+[help]
+START = "Start frequency"
+STOP = "Stop frequency"
+BIAS = "Bias voltage"
+OSC = "Oscillation voltage"
+SWEEP_DELAY = "Sweep delay in seconds"
+CIRCUIT_MODE = "Circuit mode"
+SPEED = "Speed: 0 - fast, 1 - normal, 2 - quiet, 3 - custom"
+CORRECTION_OPEN = "Open correction"
+CORRECTION_SHORT = "Short correction"
+CORRECTION_LOAD = "Load correction"
+CORRECTION_CABLE = "Cable correction compensation: 0 (None), 1.5, 3.0, 4.0, 5.0, 6.0, 7.0"
+HYSTERESIS = "Hysteresis"
+HYSTERESIS_TIME = "Hysteresis time"
+WAIT_TIME = "Wait time"
+LIGHT = "Light on/off"
+LIGHT_TIME = "Light time"
+TEMPERATURE = "Temperature"
+AREA = "Area"
+FIMS = "FIMS"
+PERMITTIVITY = "Permittivity"
+SERIAL_RES = "Calculate Serial resistance"

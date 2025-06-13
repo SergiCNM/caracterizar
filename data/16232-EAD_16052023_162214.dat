@@ -1,0 +1,14 @@
+<BEG GLOBAL>
+	Process[s]	16232-EAD
+	Lot[s]	16232
+	Wafer[s]	2
+	Mask[s]	EAD
+	Operator[s]	default
+	Date[s]	16/05/2023
+	Time[s]	16:22:14
+	WaferInfo[s]	
+<END GLOBAL>
+<BEG>	WAFER (2)
+	<BEG>	DIE (0 0)
+		<BEG>	MODULE (0 0)
+			<BEG>	MODTEST (IV_test)

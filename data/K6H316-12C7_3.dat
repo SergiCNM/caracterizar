@@ -1,0 +1,22 @@
+<BEG GLOBAL>
+	Process[s]	K6H316-12C7_3
+	Lot[s]	K6H316
+	Wafer[s]	12C7
+	Mask[s]	LINDA
+	Operator[s]	default
+	Date[s]	21/04/2023
+	Time[s]	12:32:25
+	WaferInfo[s]	
+<END GLOBAL>
+<BEG>	WAFER (12C7)
+	<BEG>	DIE (0 0)
+		<BEG>	MODULE (0.0 0.0)
+			<BEG>	MODTEST (TEST_test)
+				<BEG PARMS>
+					status	meas_warning
+					message	Contact OK! Impossible to program chip register and pixel register.
+				<END PARMS>
+				<END>	MODTEST (TEST_test)
+			<END>	MODULE (0.0 0.0)
+		<END>	DIE (0 0)
+<END>	WAFER (12C7)

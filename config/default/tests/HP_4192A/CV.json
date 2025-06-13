@@ -1,0 +1,22 @@
+{
+	"START" : 5,
+	"STOP" : -5,
+	"STEP" : 0.2,
+	"FREQ" : 100,
+	"OSC" : 30,
+	"PN" : 1,
+	"CIRCUIT_MODE" : "Parallel",
+	"NOT_CHANGE": true,
+	"AVERAGE" : false,
+	"HYSTERESIS" : false,
+	"HYSTERESIS_TIME" : 1,
+	"WAIT_TIME" : 0,
+	"LIGHT": false,
+	"LIGHT_TIME" : 3,
+	"TEMPERATURE" : 22.0,
+	"AREA" : 960400,
+	"FIMS" : 4.1, 
+	"PERMITTIVITY" : 3.9,
+	"SERIAL_RES" : false
+	
+}

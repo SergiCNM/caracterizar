@@ -1,0 +1,60 @@
+title = "CV parameters"
+
+[parameters]
+START = 5.0
+STOP = -5
+STEP = -0.25
+FREQ = 10
+OSC = 500
+PN = 1.0
+CIRCUIT_MODE = "Parallel"
+NOT_CHANGE = false
+AVERAGE = false
+HYSTERESIS = true
+HYSTERESIS_TIME = 1
+WAIT_TIME = 0.0
+LIGHT = false
+LIGHT_TIME = 3
+TEMPERATURE = 22.0
+AREA = 960400
+FIMS = 4.1
+PERMITTIVITY = 3.9
+SERIAL_RES = false
+CALCULATE_PARAMS = true
+
+[options]
+CIRCUIT_MODE = "Parallel,Series,Auto"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+FREQ = "kHz"
+OSC = "mV"
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+TEMPERATURE = "°C"
+AREA = "um²"
+
+[help]
+START = "Start voltage"
+STOP = "Stop voltage"
+STEP = "Step voltage"
+FREQ = "Frequency"
+OSC = "Oscillation voltage"
+PN = "Pulse number"
+CIRCUIT_MODE = "Circuit mode"
+NOT_CHANGE = "Not change voltage"
+AVERAGE = "Calculate average"
+HYSTERESIS = "Hysteresis"
+HYSTERESIS_TIME = "Hysteresis time"
+WAIT_TIME = "Wait time"
+LIGHT = "Light on/off"
+LIGHT_TIME = "Light time"
+TEMPERATURE = "Temperature"
+AREA = "Area"
+FIMS = "FIMS"
+PERMITTIVITY = "Permittivity"
+SERIAL_RES = "Calculate Serial resistance"
+CALCULATE_PARAMS = "Calculate parameters"

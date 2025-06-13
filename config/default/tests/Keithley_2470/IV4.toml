@@ -1,0 +1,33 @@
+title = "IV 4 terminal parameters"
+
+[parameters]
+START = 0.0
+STOP = 1.5
+STEP = 0.02
+COMPLIANCE = 1000.0
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 0.0
+LIGHT = false
+LIGHT_TIME = 0.0
+RANGE = "AUTO"
+ROUTE_TERM = "FRONT"
+
+
+[options]
+RANGE = "AUTO,0.2,2,20,200,1000"
+ROUTE_TERM = "FRONT,REAR"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+COMPLIANCE = "mA"
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+RANGE = "V"
+
+[help]
+START = "Start voltage"
+STOP = "Stop voltage"

@@ -1,0 +1,40 @@
+title = "EAD parameters"
+
+[parameters]
+WAFERMAP = true
+HISTOGRAM = true
+PLOT = true
+DATA = true
+COMPARATIVE = false
+DATA_FORWARD_FOLDER = "forward"
+DATA_REVERSE_FOLDER = "reverse"
+PLOT_FORWARD_FOLDER = "plots_forward"
+PLOT_REVERSE_FOLDER = "plots_reverse"
+COMPARATIVE_FOLDER = "comparative"
+
+[units]
+WAFERMAP = ""
+HISTOGRAM = ""
+PLOT = ""
+DATA = ""
+COMPARATIVE = ""
+DATA_FORWARD_FOLDER = ""
+DATA_REVERSE_FOLDER = ""
+PLOT_FORWARD_FOLDER = ""
+PLOT_REVERSE_FOLDER = ""
+COMPARATIVE_FOLDER = ""
+
+[options]
+
+[help]
+WAFERMAP = "Print wafermap"
+HISTOGRAM = "Print histogram"
+PLOT = "Create plot"
+DATA = "Print data table information"
+COMPARATIVE = "Make a comparative between wafers"
+DATA_FORWARD_FOLDER = "Folder extract data"
+DATA_REVERSE_FOLDER = "Folder extract data"
+IMAGE_FOLDER = "Folder extract photos"
+PLOT_FORWARD_FOLDER = "Folder extract plots forward"
+PLOT_REVERSE_FOLDER = "Folder extract plots reverse"
+COMPARATIVE_FOLDER = "Folder extract comparative"

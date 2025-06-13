@@ -1,0 +1,543 @@
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|prep subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|cvt  subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|loca subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2959|post subsetted
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|gasp subsetting not needed
+25-05-26 12:17:14|WARNING|1992|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|name subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2959|glyf subsetted
+25-05-26 12:17:14|INFO|1992|_prune_post_subset|2997|head pruned
+25-05-26 12:17:14|INFO|1992|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0]
+25-05-26 12:17:14|INFO|1992|_prune_post_subset|2997|glyf pruned
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2795|maxp pruned
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2795|cmap pruned
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2779|kern dropped
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2795|post pruned
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2779|GDEF dropped
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2779|GPOS dropped
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2779|GSUB dropped
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2795|name pruned
+25-05-26 12:17:14|INFO|1992|_prune_pre_subset|2795|glyf pruned
+25-05-26 12:17:14|INFO|1992|_closure_glyphs|2835|Added gid0 to subset
+25-05-26 12:17:14|INFO|1992|_closure_glyphs|2843|Added first four glyphs to subset
+25-05-26 12:17:14|INFO|1992|_closure_glyphs|2884|Closing glyph list over 'glyf': 22 glyphs before
+25-05-26 12:17:14|INFO|1992|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'P', 'a', 'b', 'braceleft', 'braceright', 'e', 'eight', 'five', 'four', 'g', 'n', 'nine', 'nonmarkingreturn', 'one', 'seven', 'six', 'space', 'three', 'two', 'zero']
+25-05-26 12:17:14|INFO|1992|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 51, 68, 69, 72, 74, 81, 94, 96]
+25-05-26 12:17:14|INFO|1992|_closure_glyphs|2889|Closed glyph list over 'glyf': 22 glyphs after
+25-05-26 12:17:14|INFO|1992|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'P', 'a', 'b', 'braceleft', 'braceright', 'e', 'eight', 'five', 'four', 'g', 'n', 'nine', 'nonmarkingreturn', 'one', 'seven', 'six', 'space', 'three', 'two', 'zero']
+25-05-26 12:17:14|INFO|1992|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 51, 68, 69, 72, 74, 81, 94, 96]
+25-05-26 12:17:14|INFO|1992|_closure_glyphs|2939|Retaining 22 glyphs
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|head subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|hhea subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|maxp subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|OS/2 subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2959|hmtx subsetted
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2959|cmap subsetted
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|fpgm subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|prep subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|cvt  subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|loca subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2959|post subsetted
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|gasp subsetting not needed
+25-05-26 12:17:14|WARNING|1992|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2948|name subsetting not needed
+25-05-26 12:17:14|INFO|1992|_subset_glyphs|2959|glyf subsetted
+25-05-26 12:17:14|INFO|1992|_prune_post_subset|2997|head pruned
+25-05-26 12:17:14|INFO|1992|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0]
+25-05-26 12:17:14|INFO|1992|_prune_post_subset|2997|glyf pruned
+25-05-28 10:43:32|INFO|1992|closeEvent|2092|Test Status: IDLE
+25-05-28 10:53:13|INFO|25356|__init__|212|Multithreading with maximum 12 threads
+25-05-28 11:00:53|INFO|25356|closeEvent|2092|Test Status: IDLE
+25-05-28 11:16:22|INFO|24680|__init__|212|Multithreading with maximum 12 threads
+25-05-28 11:16:53|INFO|24680|closeEvent|2092|Test Status: IDLE
+25-05-28 11:41:50|INFO|8696|__init__|212|Multithreading with maximum 12 threads
+25-05-28 11:42:58|INFO|8696|closeEvent|2092|Test Status: IDLE
+25-05-28 12:08:35|INFO|25840|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:09:15|INFO|25840|closeEvent|2092|Test Status: IDLE
+25-05-28 12:11:12|INFO|24240|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:11:38|INFO|24240|closeEvent|2092|Test Status: IDLE
+25-05-28 12:14:32|INFO|12636|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:16:30|INFO|12636|closeEvent|2092|Test Status: IDLE
+25-05-28 12:16:46|INFO|25604|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:18:20|INFO|25604|closeEvent|2092|Test Status: IDLE
+25-05-28 12:18:33|INFO|17936|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:19:08|INFO|17936|closeEvent|2092|Test Status: IDLE
+25-05-28 12:20:14|INFO|18872|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:26:04|INFO|18872|closeEvent|2092|Test Status: IDLE
+25-05-28 12:26:14|INFO|19428|__init__|212|Multithreading with maximum 12 threads
+25-05-28 12:28:28|INFO|19428|closeEvent|2092|Test Status: FINISHED
+25-05-28 16:32:59|INFO|16704|__init__|212|Multithreading with maximum 12 threads
+25-05-28 16:33:13|INFO|16704|closeEvent|2092|Test Status: IDLE
+25-05-28 16:57:09|INFO|18860|__init__|212|Multithreading with maximum 12 threads
+25-05-28 16:58:12|INFO|18860|closeEvent|2092|Test Status: IDLE
+25-05-28 17:02:27|INFO|25016|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:04:04|INFO|25016|closeEvent|2092|Test Status: IDLE
+25-05-28 17:06:09|INFO|17000|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:06:55|INFO|17000|closeEvent|2092|Test Status: IDLE
+25-05-28 17:08:56|INFO|21492|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:09:14|INFO|21492|closeEvent|2092|Test Status: IDLE
+25-05-28 17:16:13|INFO|22512|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:26:58|INFO|22512|closeEvent|2092|Test Status: IDLE
+25-05-28 17:28:50|INFO|21420|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:28:56|INFO|21420|closeEvent|2094|Test Status: IDLE
+25-05-28 17:30:12|INFO|4024|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:30:35|INFO|4024|closeEvent|2094|Test Status: IDLE
+25-05-28 17:32:45|INFO|25480|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:32:57|INFO|25480|closeEvent|2094|Test Status: IDLE
+25-05-28 17:33:19|INFO|23648|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:33:27|INFO|23648|closeEvent|2094|Test Status: IDLE
+25-05-28 17:35:04|INFO|24256|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:35:32|INFO|24256|closeEvent|2094|Test Status: IDLE
+25-05-28 17:39:34|INFO|3936|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:39:42|INFO|3936|closeEvent|2095|Test Status: IDLE
+25-05-28 17:40:21|INFO|7364|__init__|212|Multithreading with maximum 12 threads
+25-05-28 17:41:01|INFO|7364|closeEvent|2095|Test Status: IDLE
+25-05-29 09:41:57|INFO|23532|__init__|212|Multithreading with maximum 12 threads
+25-05-29 09:44:23|INFO|23532|closeEvent|2097|Test Status: IDLE
+25-05-29 14:49:32|INFO|24448|__init__|212|Multithreading with maximum 12 threads
+25-05-29 15:33:08|INFO|24448|closeEvent|2097|Test Status: IDLE
+25-05-29 15:33:20|INFO|2692|__init__|212|Multithreading with maximum 12 threads
+25-05-29 15:33:54|INFO|2692|closeEvent|2097|Test Status: IDLE
+25-05-29 15:39:01|INFO|27556|__init__|212|Multithreading with maximum 12 threads
+25-05-29 15:39:25|INFO|27556|closeEvent|2097|Test Status: IDLE
+25-05-29 15:40:07|INFO|7100|__init__|212|Multithreading with maximum 12 threads
+25-05-29 15:40:32|INFO|7100|closeEvent|2097|Test Status: IDLE
+25-05-30 10:42:21|INFO|18008|__init__|212|Multithreading with maximum 12 threads
+25-05-30 10:46:50|INFO|18008|closeEvent|2097|Test Status: IDLE
+25-05-30 10:47:07|INFO|13652|__init__|212|Multithreading with maximum 12 threads
+25-05-30 10:47:28|INFO|13652|closeEvent|2097|Test Status: IDLE
+25-05-30 10:49:39|INFO|14996|__init__|212|Multithreading with maximum 12 threads
+25-05-30 10:50:05|INFO|14996|closeEvent|2097|Test Status: IDLE
+25-05-30 10:50:54|INFO|4824|__init__|212|Multithreading with maximum 12 threads
+25-05-30 10:51:07|INFO|4824|closeEvent|2097|Test Status: IDLE
+25-05-30 10:52:16|INFO|13592|__init__|212|Multithreading with maximum 12 threads
+25-05-30 10:54:43|INFO|13592|closeEvent|2097|Test Status: IDLE
+25-05-30 10:55:18|INFO|13292|__init__|212|Multithreading with maximum 12 threads
+25-05-30 11:18:18|INFO|13292|closeEvent|2097|Test Status: IDLE
+25-05-30 11:20:04|INFO|1936|__init__|212|Multithreading with maximum 12 threads
+25-05-30 11:21:10|INFO|1936|closeEvent|2097|Test Status: IDLE
+25-05-30 11:26:24|INFO|3976|__init__|212|Multithreading with maximum 12 threads
+25-05-30 11:30:37|INFO|3976|closeEvent|2097|Test Status: IDLE
+25-05-30 11:31:16|INFO|19680|__init__|212|Multithreading with maximum 12 threads
+25-05-30 11:38:29|INFO|19680|closeEvent|2097|Test Status: IDLE
+25-05-30 15:37:45|INFO|22284|__init__|212|Multithreading with maximum 12 threads
+25-05-30 15:38:19|INFO|22284|closeEvent|2097|Test Status: IDLE
+25-06-02 10:39:45|INFO|4124|__init__|212|Multithreading with maximum 12 threads
+25-06-02 10:42:05|INFO|4124|closeEvent|2097|Test Status: IDLE
+25-06-02 10:47:14|INFO|20228|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:00:24|INFO|20228|closeEvent|2097|Test Status: IDLE
+25-06-02 11:00:35|INFO|21500|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:04:26|INFO|21500|closeEvent|2097|Test Status: IDLE
+25-06-02 11:04:36|INFO|19564|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:09:07|INFO|19564|closeEvent|2097|Test Status: IDLE
+25-06-02 11:09:26|INFO|11884|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:13:20|INFO|11884|closeEvent|2097|Test Status: IDLE
+25-06-02 11:13:37|INFO|15264|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:16:01|INFO|15264|closeEvent|2097|Test Status: IDLE
+25-06-02 11:16:20|INFO|21400|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:19:47|INFO|21400|closeEvent|2097|Test Status: IDLE
+25-06-02 11:20:38|INFO|20200|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:21:14|INFO|20200|closeEvent|2097|Test Status: IDLE
+25-06-02 11:22:09|INFO|4756|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:23:15|INFO|4756|closeEvent|2097|Test Status: IDLE
+25-06-02 11:27:36|INFO|24432|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:28:28|INFO|24432|closeEvent|2097|Test Status: IDLE
+25-06-02 11:29:59|INFO|12488|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:31:58|INFO|12488|closeEvent|2097|Test Status: IDLE
+25-06-02 11:32:11|INFO|3008|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:32:39|INFO|3008|closeEvent|2097|Test Status: IDLE
+25-06-02 11:37:07|INFO|20196|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:39:15|INFO|20196|closeEvent|2097|Test Status: IDLE
+25-06-02 11:39:40|INFO|16064|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:39:42|INFO|16064|closeEvent|2097|Test Status: IDLE
+25-06-02 11:40:08|INFO|22792|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:41:20|INFO|22792|closeEvent|2097|Test Status: IDLE
+25-06-02 11:43:02|INFO|17336|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:44:45|INFO|17336|closeEvent|2097|Test Status: IDLE
+25-06-02 11:46:38|INFO|23260|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:47:41|INFO|23260|closeEvent|2097|Test Status: IDLE
+25-06-02 11:53:31|INFO|23840|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:55:53|INFO|23840|closeEvent|2097|Test Status: IDLE
+25-06-02 11:57:06|INFO|22232|__init__|212|Multithreading with maximum 12 threads
+25-06-02 11:58:52|INFO|22232|closeEvent|2097|Test Status: IDLE
+25-06-02 11:59:15|INFO|18288|__init__|212|Multithreading with maximum 12 threads
+25-06-02 12:00:16|INFO|18288|closeEvent|2097|Test Status: IDLE
+25-06-02 12:00:33|INFO|12136|__init__|212|Multithreading with maximum 12 threads
+25-06-02 12:02:22|INFO|12136|closeEvent|2097|Test Status: IDLE
+25-06-02 12:10:17|INFO|11992|__init__|212|Multithreading with maximum 12 threads
+25-06-02 12:20:34|INFO|11992|closeEvent|2097|Test Status: IDLE
+25-06-02 12:20:53|INFO|25456|__init__|212|Multithreading with maximum 12 threads
+25-06-02 12:21:43|INFO|25456|closeEvent|2097|Test Status: IDLE
+25-06-02 12:22:09|INFO|15604|__init__|212|Multithreading with maximum 12 threads
+25-06-02 12:23:13|INFO|15604|closeEvent|2097|Test Status: IDLE
+25-06-02 12:25:57|INFO|25316|__init__|212|Multithreading with maximum 12 threads
+25-06-02 12:28:15|INFO|25316|closeEvent|2097|Test Status: IDLE
+25-06-02 14:39:08|INFO|13596|__init__|212|Multithreading with maximum 12 threads
+25-06-02 14:39:49|INFO|13596|closeEvent|2097|Test Status: IDLE
+25-06-02 14:45:21|INFO|21260|__init__|212|Multithreading with maximum 12 threads
+25-06-02 14:46:44|INFO|21260|closeEvent|2099|Test Status: IDLE
+25-06-02 14:47:16|INFO|23580|__init__|212|Multithreading with maximum 12 threads
+25-06-02 14:50:04|INFO|23580|closeEvent|2099|Test Status: IDLE
+25-06-02 14:50:17|INFO|8620|__init__|212|Multithreading with maximum 12 threads
+25-06-02 14:58:05|INFO|8620|closeEvent|2099|Test Status: IDLE
+25-06-02 15:35:22|INFO|22652|__init__|212|Multithreading with maximum 12 threads
+25-06-02 15:36:20|INFO|22652|closeEvent|2101|Test Status: IDLE
+25-06-02 15:36:35|INFO|10108|__init__|212|Multithreading with maximum 12 threads
+25-06-02 15:36:57|INFO|10108|closeEvent|2101|Test Status: IDLE
+25-06-02 15:38:05|INFO|24204|__init__|212|Multithreading with maximum 12 threads
+25-06-02 15:39:09|INFO|24204|closeEvent|2103|Test Status: IDLE
+25-06-02 15:39:21|INFO|20824|__init__|212|Multithreading with maximum 12 threads
+25-06-02 15:39:28|INFO|20824|closeEvent|2103|Test Status: IDLE
+25-06-02 15:45:42|INFO|19960|__init__|214|Multithreading with maximum 12 threads
+25-06-02 15:46:13|INFO|19960|closeEvent|2106|Test Status: IDLE
+25-06-02 15:46:25|INFO|8864|__init__|214|Multithreading with maximum 12 threads
+25-06-02 15:46:32|INFO|8864|closeEvent|2106|Test Status: IDLE
+25-06-02 15:50:00|INFO|20100|__init__|214|Multithreading with maximum 12 threads
+25-06-02 15:50:51|INFO|25024|__init__|214|Multithreading with maximum 12 threads
+25-06-02 15:52:30|INFO|22572|__init__|214|Multithreading with maximum 12 threads
+25-06-02 15:52:51|INFO|22572|closeEvent|2106|Test Status: IDLE
+25-06-02 15:54:14|INFO|23988|__init__|214|Multithreading with maximum 12 threads
+25-06-02 15:54:45|INFO|23988|closeEvent|2108|Test Status: IDLE
+25-06-02 16:00:48|INFO|18148|__init__|214|Multithreading with maximum 12 threads
+25-06-02 16:01:11|INFO|18148|closeEvent|2108|Test Status: IDLE
+25-06-02 16:01:25|INFO|11612|__init__|214|Multithreading with maximum 12 threads
+25-06-02 16:01:35|INFO|11612|closeEvent|2108|Test Status: IDLE
+25-06-02 16:02:10|INFO|19516|__init__|214|Multithreading with maximum 12 threads
+25-06-02 16:02:26|INFO|19516|closeEvent|2108|Test Status: IDLE
+25-06-03 09:49:29|INFO|19888|__init__|214|Multithreading with maximum 12 threads
+25-06-03 09:50:54|INFO|19888|closeEvent|2108|Test Status: IDLE
+25-06-03 09:51:24|INFO|16612|__init__|214|Multithreading with maximum 12 threads
+25-06-03 09:52:28|INFO|16612|closeEvent|2108|Test Status: IDLE
+25-06-03 09:53:45|INFO|25788|__init__|214|Multithreading with maximum 12 threads
+25-06-03 09:58:50|INFO|25788|closeEvent|2108|Test Status: IDLE
+25-06-03 09:59:08|INFO|14812|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:02:04|INFO|14812|closeEvent|2108|Test Status: IDLE
+25-06-03 10:02:55|INFO|24460|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:03:50|INFO|24460|closeEvent|2108|Test Status: IDLE
+25-06-03 10:08:39|INFO|16832|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:10:26|INFO|16832|closeEvent|2108|Test Status: IDLE
+25-06-03 10:12:38|INFO|12868|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:13:42|INFO|12868|closeEvent|2108|Test Status: IDLE
+25-06-03 10:14:49|INFO|5480|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:26:51|INFO|5480|closeEvent|2108|Test Status: IDLE
+25-06-03 10:40:33|INFO|23060|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:42:29|INFO|23060|closeEvent|2108|Test Status: IDLE
+25-06-03 10:46:22|INFO|26620|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:47:07|INFO|26620|closeEvent|2108|Test Status: IDLE
+25-06-03 10:48:36|INFO|23228|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:49:16|INFO|23228|closeEvent|2108|Test Status: IDLE
+25-06-03 10:49:44|INFO|10528|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:50:31|INFO|10528|closeEvent|2108|Test Status: IDLE
+25-06-03 10:51:53|INFO|18152|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:52:37|INFO|18152|closeEvent|2108|Test Status: IDLE
+25-06-03 10:53:21|INFO|25568|__init__|214|Multithreading with maximum 12 threads
+25-06-03 10:53:54|INFO|25568|closeEvent|2108|Test Status: IDLE
+25-06-03 11:02:00|INFO|23384|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:06:07|INFO|23384|closeEvent|2108|Test Status: IDLE
+25-06-03 11:07:11|INFO|23172|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:08:04|INFO|23172|closeEvent|2108|Test Status: IDLE
+25-06-03 11:15:34|INFO|2272|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:17:04|INFO|2272|closeEvent|2108|Test Status: IDLE
+25-06-03 11:19:08|INFO|25776|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:20:38|INFO|25776|closeEvent|2108|Test Status: IDLE
+25-06-03 11:21:11|INFO|13768|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:21:46|INFO|13768|closeEvent|2108|Test Status: IDLE
+25-06-03 11:25:40|INFO|20788|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:26:55|INFO|20788|closeEvent|2108|Test Status: IDLE
+25-06-03 11:27:11|INFO|11588|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:32:50|INFO|11588|closeEvent|2108|Test Status: IDLE
+25-06-03 11:34:41|INFO|8956|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:37:35|INFO|8956|closeEvent|2108|Test Status: IDLE
+25-06-03 11:37:50|INFO|26236|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:38:59|INFO|26236|closeEvent|2108|Test Status: IDLE
+25-06-03 11:39:10|INFO|14144|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:40:24|INFO|14144|closeEvent|2108|Test Status: IDLE
+25-06-03 11:40:36|INFO|28444|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:41:05|INFO|28444|closeEvent|2108|Test Status: IDLE
+25-06-03 11:41:48|INFO|16972|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:42:42|INFO|16972|closeEvent|2108|Test Status: IDLE
+25-06-03 11:44:02|INFO|28724|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:47:09|INFO|28724|closeEvent|2108|Test Status: IDLE
+25-06-03 11:47:27|INFO|28632|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:48:22|INFO|28632|closeEvent|2108|Test Status: IDLE
+25-06-03 11:52:10|INFO|27128|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:53:16|INFO|27128|closeEvent|2108|Test Status: IDLE
+25-06-03 11:53:32|INFO|3416|__init__|214|Multithreading with maximum 12 threads
+25-06-03 11:55:19|INFO|3416|closeEvent|2108|Test Status: IDLE
+25-06-03 11:55:42|INFO|29288|__init__|214|Multithreading with maximum 12 threads
+25-06-03 12:24:07|INFO|29288|closeEvent|2108|Test Status: IDLE
+25-06-03 21:53:50|INFO|11208|__init__|214|Multithreading with maximum 12 threads
+25-06-03 21:54:36|INFO|11208|closeEvent|2108|Test Status: IDLE
+25-06-03 22:04:35|INFO|11300|__init__|214|Multithreading with maximum 12 threads
+25-06-03 22:18:29|INFO|11300|closeEvent|2108|Test Status: IDLE
+25-06-04 10:54:39|INFO|15600|__init__|214|Multithreading with maximum 12 threads
+25-06-04 11:35:48|INFO|15600|closeEvent|2108|Test Status: IDLE
+25-06-04 13:48:22|INFO|16844|__init__|215|Multithreading with maximum 12 threads
+25-06-04 13:48:28|INFO|16844|closeEvent|2109|Test Status: IDLE
+25-06-04 13:50:03|INFO|17272|__init__|214|Multithreading with maximum 12 threads
+25-06-04 13:50:31|INFO|17272|closeEvent|2108|Test Status: IDLE
+25-06-05 09:54:45|INFO|22160|__init__|214|Multithreading with maximum 12 threads
+25-06-05 09:56:47|INFO|22160|closeEvent|2108|Test Status: IDLE
+25-06-05 09:58:11|INFO|19964|__init__|214|Multithreading with maximum 12 threads
+25-06-05 09:58:27|INFO|19964|closeEvent|2108|Test Status: IDLE
+25-06-05 09:58:58|INFO|25200|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:00:13|INFO|25200|closeEvent|2108|Test Status: IDLE
+25-06-05 10:15:11|INFO|2760|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:15:18|INFO|2760|closeEvent|2108|Test Status: IDLE
+25-06-05 10:17:09|INFO|21020|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:17:48|INFO|21020|closeEvent|2108|Test Status: IDLE
+25-06-05 10:18:07|INFO|13240|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:18:18|INFO|13240|closeEvent|2108|Test Status: IDLE
+25-06-05 10:18:47|INFO|22880|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:19:31|INFO|22880|closeEvent|2108|Test Status: IDLE
+25-06-05 10:20:27|INFO|13348|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:24:15|INFO|13348|closeEvent|2108|Test Status: IDLE
+25-06-05 10:26:12|INFO|20912|__init__|214|Multithreading with maximum 12 threads
+25-06-05 10:26:37|INFO|20912|closeEvent|2108|Test Status: IDLE
+25-06-05 11:46:17|INFO|25760|__init__|214|Multithreading with maximum 12 threads
+25-06-05 11:46:49|INFO|25760|closeEvent|2108|Test Status: IDLE
+25-06-05 11:48:32|INFO|27584|__init__|215|Multithreading with maximum 12 threads
+25-06-05 11:48:50|INFO|27584|closeEvent|2109|Test Status: IDLE
+25-06-05 11:50:10|INFO|22732|__init__|215|Multithreading with maximum 12 threads
+25-06-05 11:51:44|INFO|22732|closeEvent|2109|Test Status: IDLE
+25-06-05 15:39:47|INFO|26608|__init__|215|Multithreading with maximum 12 threads
+25-06-05 15:41:45|INFO|26608|closeEvent|2109|Test Status: IDLE
+25-06-05 15:42:00|INFO|29844|__init__|215|Multithreading with maximum 12 threads
+25-06-05 15:42:36|INFO|29844|closeEvent|2109|Test Status: IDLE
+25-06-05 15:42:45|INFO|28784|__init__|215|Multithreading with maximum 12 threads
+25-06-05 15:43:15|INFO|28784|closeEvent|2109|Test Status: IDLE
+25-06-05 16:00:15|INFO|18728|__init__|215|Multithreading with maximum 12 threads
+25-06-05 16:02:54|INFO|18728|closeEvent|2109|Test Status: IDLE
+25-06-06 09:11:44|INFO|18508|__init__|215|Multithreading with maximum 12 threads
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|maxp pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|cmap pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|kern dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|post pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GDEF dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GPOS dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GSUB dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|MATH dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|name pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|glyf pruned
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2835|Added gid0 to subset
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2843|Added first four glyphs to subset
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2884|Closing glyph list over 'glyf': 61 glyphs before
+25-06-06 09:53:40|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'B', 'C', 'E', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'S', 'T', 'V', 'W', 'Y', 'a', 'aacute', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'f', 'five', 'four', 'g', 'h', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'p', 'period', 'r', 's', 'seven', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'uni03BC', 'v', 'w', 'z', 'zero']
+25-06-06 09:53:40|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 37, 38, 40, 43, 44, 47, 48, 49, 50, 51, 53, 54, 55, 57, 58, 60, 68, 69, 70, 71, 72, 73, 74, 75, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 93, 94, 96, 163, 802, 821]
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2889|Closed glyph list over 'glyf': 62 glyphs after
+25-06-06 09:53:40|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'B', 'C', 'E', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'S', 'T', 'V', 'W', 'Y', 'a', 'aacute', 'acute', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'f', 'five', 'four', 'g', 'h', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'p', 'period', 'r', 's', 'seven', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'uni03BC', 'v', 'w', 'z', 'zero']
+25-06-06 09:53:40|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 37, 38, 40, 43, 44, 47, 48, 49, 50, 51, 53, 54, 55, 57, 58, 60, 68, 69, 70, 71, 72, 73, 74, 75, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 93, 94, 96, 118, 163, 802, 821]
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2939|Retaining 62 glyphs
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|head subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|hhea subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|maxp subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|OS/2 subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|hmtx subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|cmap subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|fpgm subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|prep subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|cvt  subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|loca subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|post subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|gasp subsetting not needed
+25-06-06 09:53:40|WARNING|18508|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|name subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|glyf subsetted
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2997|head pruned
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0, 1, 7]
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2997|glyf pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|maxp pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|cmap pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|kern dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|post pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GDEF dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GPOS dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GSUB dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|name pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|glyf pruned
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2835|Added gid0 to subset
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2843|Added first four glyphs to subset
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2884|Closing glyph list over 'glyf': 62 glyphs before
+25-06-06 09:53:40|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'T', 'U', 'W', 'a', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'five', 'four', 'h', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'parenleft', 'parenright', 'percent', 'period', 'periodcentered', 'plus', 'r', 'rho', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'twosuperior', 'u', 'underscore', 'v', 'zero']
+25-06-06 09:53:40|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 8, 11, 12, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 53, 55, 56, 58, 66, 68, 69, 70, 71, 72, 75, 76, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89, 94, 96, 116, 121, 802, 826]
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2889|Closed glyph list over 'glyf': 62 glyphs after
+25-06-06 09:53:40|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'T', 'U', 'W', 'a', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'five', 'four', 'h', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'parenleft', 'parenright', 'percent', 'period', 'periodcentered', 'plus', 'r', 'rho', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'twosuperior', 'u', 'underscore', 'v', 'zero']
+25-06-06 09:53:40|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 8, 11, 12, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 53, 55, 56, 58, 66, 68, 69, 70, 71, 72, 75, 76, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89, 94, 96, 116, 121, 802, 826]
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2939|Retaining 62 glyphs
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|head subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|hhea subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|maxp subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|OS/2 subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|hmtx subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|cmap subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|fpgm subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|prep subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|cvt  subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|loca subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|post subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|gasp subsetting not needed
+25-06-06 09:53:40|WARNING|18508|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|name subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|glyf subsetted
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2997|head pruned
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0, 1, 7]
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2997|glyf pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|maxp pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|cmap pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|kern dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|post pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GDEF dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GPOS dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2779|GSUB dropped
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|name pruned
+25-06-06 09:53:40|INFO|18508|_prune_pre_subset|2795|glyf pruned
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2835|Added gid0 to subset
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2843|Added first four glyphs to subset
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2884|Closing glyph list over 'glyf': 22 glyphs before
+25-06-06 09:53:40|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'P', 'a', 'b', 'braceleft', 'braceright', 'e', 'eight', 'five', 'four', 'g', 'n', 'nine', 'nonmarkingreturn', 'one', 'seven', 'six', 'space', 'three', 'two', 'zero']
+25-06-06 09:53:40|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 51, 68, 69, 72, 74, 81, 94, 96]
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2889|Closed glyph list over 'glyf': 22 glyphs after
+25-06-06 09:53:40|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'P', 'a', 'b', 'braceleft', 'braceright', 'e', 'eight', 'five', 'four', 'g', 'n', 'nine', 'nonmarkingreturn', 'one', 'seven', 'six', 'space', 'three', 'two', 'zero']
+25-06-06 09:53:40|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 51, 68, 69, 72, 74, 81, 94, 96]
+25-06-06 09:53:40|INFO|18508|_closure_glyphs|2939|Retaining 22 glyphs
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|head subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|hhea subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|maxp subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|OS/2 subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|hmtx subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|cmap subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|fpgm subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|prep subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|cvt  subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|loca subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|post subsetted
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|gasp subsetting not needed
+25-06-06 09:53:40|WARNING|18508|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2948|name subsetting not needed
+25-06-06 09:53:40|INFO|18508|_subset_glyphs|2959|glyf subsetted
+25-06-06 09:53:40|INFO|18508|_prune_post_subset|2997|head pruned
+25-06-06 09:53:41|INFO|18508|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0]
+25-06-06 09:53:41|INFO|18508|_prune_post_subset|2997|glyf pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|maxp pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|cmap pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|kern dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|post pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GDEF dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GPOS dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GSUB dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|MATH dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|name pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|glyf pruned
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2835|Added gid0 to subset
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2843|Added first four glyphs to subset
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2884|Closing glyph list over 'glyf': 61 glyphs before
+25-06-06 10:00:23|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'B', 'C', 'E', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'S', 'T', 'V', 'W', 'Y', 'a', 'aacute', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'f', 'five', 'four', 'g', 'h', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'p', 'period', 'r', 's', 'seven', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'uni03BC', 'v', 'w', 'z', 'zero']
+25-06-06 10:00:23|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 37, 38, 40, 43, 44, 47, 48, 49, 50, 51, 53, 54, 55, 57, 58, 60, 68, 69, 70, 71, 72, 73, 74, 75, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 93, 94, 96, 163, 802, 821]
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2889|Closed glyph list over 'glyf': 62 glyphs after
+25-06-06 10:00:23|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'B', 'C', 'E', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'S', 'T', 'V', 'W', 'Y', 'a', 'aacute', 'acute', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'f', 'five', 'four', 'g', 'h', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'p', 'period', 'r', 's', 'seven', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'uni03BC', 'v', 'w', 'z', 'zero']
+25-06-06 10:00:23|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 37, 38, 40, 43, 44, 47, 48, 49, 50, 51, 53, 54, 55, 57, 58, 60, 68, 69, 70, 71, 72, 73, 74, 75, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 93, 94, 96, 118, 163, 802, 821]
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2939|Retaining 62 glyphs
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|head subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|hhea subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|maxp subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|OS/2 subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|hmtx subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|cmap subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|fpgm subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|prep subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|cvt  subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|loca subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|post subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|gasp subsetting not needed
+25-06-06 10:00:23|WARNING|18508|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|name subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|glyf subsetted
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2997|head pruned
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0, 1, 7]
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2997|glyf pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|maxp pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|cmap pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|kern dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|post pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GDEF dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GPOS dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GSUB dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|name pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|glyf pruned
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2835|Added gid0 to subset
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2843|Added first four glyphs to subset
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2884|Closing glyph list over 'glyf': 62 glyphs before
+25-06-06 10:00:23|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'T', 'U', 'W', 'a', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'five', 'four', 'h', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'parenleft', 'parenright', 'percent', 'period', 'periodcentered', 'plus', 'r', 'rho', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'twosuperior', 'u', 'underscore', 'v', 'zero']
+25-06-06 10:00:23|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 8, 11, 12, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 53, 55, 56, 58, 66, 68, 69, 70, 71, 72, 75, 76, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89, 94, 96, 116, 121, 802, 826]
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2889|Closed glyph list over 'glyf': 62 glyphs after
+25-06-06 10:00:23|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'O', 'Omega', 'P', 'R', 'T', 'U', 'W', 'a', 'b', 'braceleft', 'braceright', 'c', 'colon', 'd', 'e', 'eight', 'five', 'four', 'h', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'nonmarkingreturn', 'o', 'one', 'parenleft', 'parenright', 'percent', 'period', 'periodcentered', 'plus', 'r', 'rho', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'twosuperior', 'u', 'underscore', 'v', 'zero']
+25-06-06 10:00:23|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 8, 11, 12, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 53, 55, 56, 58, 66, 68, 69, 70, 71, 72, 75, 76, 78, 79, 80, 81, 82, 85, 86, 87, 88, 89, 94, 96, 116, 121, 802, 826]
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2939|Retaining 62 glyphs
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|head subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|hhea subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|maxp subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|OS/2 subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|hmtx subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|cmap subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|fpgm subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|prep subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|cvt  subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|loca subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|post subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|gasp subsetting not needed
+25-06-06 10:00:23|WARNING|18508|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|name subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|glyf subsetted
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2997|head pruned
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0, 1, 7]
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2997|glyf pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|maxp pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|cmap pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|kern dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|post pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GDEF dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GPOS dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2779|GSUB dropped
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|name pruned
+25-06-06 10:00:23|INFO|18508|_prune_pre_subset|2795|glyf pruned
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2835|Added gid0 to subset
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2843|Added first four glyphs to subset
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2884|Closing glyph list over 'glyf': 22 glyphs before
+25-06-06 10:00:23|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'P', 'a', 'b', 'braceleft', 'braceright', 'e', 'eight', 'five', 'four', 'g', 'n', 'nine', 'nonmarkingreturn', 'one', 'seven', 'six', 'space', 'three', 'two', 'zero']
+25-06-06 10:00:23|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 51, 68, 69, 72, 74, 81, 94, 96]
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2889|Closed glyph list over 'glyf': 22 glyphs after
+25-06-06 10:00:23|INFO|18508|_log_glyphs|444|Glyph names: ['.notdef', '.null', 'P', 'a', 'b', 'braceleft', 'braceright', 'e', 'eight', 'five', 'four', 'g', 'n', 'nine', 'nonmarkingreturn', 'one', 'seven', 'six', 'space', 'three', 'two', 'zero']
+25-06-06 10:00:23|INFO|18508|_log_glyphs|447|Glyph IDs:   [0, 1, 2, 3, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 51, 68, 69, 72, 74, 81, 94, 96]
+25-06-06 10:00:23|INFO|18508|_closure_glyphs|2939|Retaining 22 glyphs
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|head subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|hhea subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|maxp subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|OS/2 subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|hmtx subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|cmap subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|fpgm subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|prep subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|cvt  subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|loca subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|post subsetted
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|gasp subsetting not needed
+25-06-06 10:00:23|WARNING|18508|_subset_glyphs|2963|FFTM NOT subset; don't know how to subset; dropped
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2948|name subsetting not needed
+25-06-06 10:00:23|INFO|18508|_subset_glyphs|2959|glyf subsetted
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2997|head pruned
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0]
+25-06-06 10:00:23|INFO|18508|_prune_post_subset|2997|glyf pruned
+25-06-06 11:58:20|INFO|18508|closeEvent|2109|Test Status: IDLE
+25-06-06 11:59:00|INFO|5560|__init__|215|Multithreading with maximum 12 threads
+25-06-06 12:00:28|INFO|5560|closeEvent|2109|Test Status: IDLE
+25-06-06 12:01:37|INFO|21008|__init__|215|Multithreading with maximum 12 threads
+25-06-06 12:13:29|INFO|21008|closeEvent|2109|Test Status: IDLE
+25-06-06 12:13:47|INFO|2304|__init__|215|Multithreading with maximum 12 threads
+25-06-06 12:15:21|INFO|2304|closeEvent|2109|Test Status: IDLE
+25-06-06 12:17:06|INFO|21264|__init__|215|Multithreading with maximum 12 threads
+25-06-06 21:31:28|INFO|19676|__init__|215|Multithreading with maximum 12 threads
+25-06-06 21:32:13|INFO|19676|closeEvent|2109|Test Status: IDLE
+25-06-12 10:41:34|INFO|22152|__init__|215|Multithreading with maximum 12 threads
+25-06-12 11:30:08|INFO|19524|__init__|215|Multithreading with maximum 12 threads
+25-06-12 15:52:12|INFO|13872|__init__|215|Multithreading with maximum 12 threads
+25-06-12 15:58:05|INFO|13872|closeEvent|2109|Test Status: IDLE

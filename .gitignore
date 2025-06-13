@@ -1,0 +1,30 @@
+# Entornos virtuales
+venv/
+DeepDetection-env/
+
+# Resultados y archivos temporales
+results/
+proves/
+
+# Archivos generados por Qt Designer
+*.ui
+*.qrc
+*.so
+
+# Archivos requirements auxiliares
+requirements_*.txt
+
+# Archivo readme.txt en la carpeta raíz
+readme.txt
+
+# Archivos .dat en la carpeta raíz
+/*.dat
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,54 @@
+title = "CW parameters"
+
+[parameters]
+START = 1.0
+STOP = 100.0
+NUM_POINTS = 100
+LOGFREQ = false
+VOLTAGE = 5
+OSC = 500
+APERTURE = "5"
+POINT_AVERAGE = false
+AVERAGE_POINTS = 8
+SWEEP_AVERAGE = false
+AVERAGE_SWEEPS = 8
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 5.0
+LIGHT = false
+LIGHT_TIME = 1
+TEMPERATURE = 22.5
+AREA = 960400
+FIMS = 4.1
+PERMITTIVITY = 3.9
+SERIAL_RES = false
+GRAPH1 = "CP"
+GRAPH2 = "G"
+
+[options]
+APERTURE = "1,2,3,4,5"
+GRAPH1 = "CS,CP"
+GRAPH2 = "NONE,G"
+
+[units]
+START = "kHz"
+STOP = "kHz"
+STEP = "kHz"
+VOLTAGE = "V"
+OSC = "mV"
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+TEMPERATURE = "°C"
+AREA = "um²"
+
+[help]
+START = "Start frequency from 20Hz to 20MHz"
+STOP = "Stop frequency from 20Hz to 20MHz"
+LOGFREQ = "Set Log freq, else Lin freq is selected"
+VOLTAGE = "Voltage from -40V to 40V"
+OSC = "Oscillation voltage from 5mV to 1000mV"
+NUM_POINTS = "Number of points from 2 to 1601"
+AVERAGE_POINTS = "Number of points to average from 1 to 999"
+AVERAGE_SWEEPS = "Number of sweeps to average from 1 to 999"
+APERTURE = "Measurement speed. 1 is the fastest setting."

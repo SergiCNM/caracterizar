@@ -1,0 +1,57 @@
+title = "Caracterizar"
+version = "2.1.0"
+author = "Sergi Sànchez"
+
+[defaults]
+debugmode = true
+darkmode = false
+estepa = false
+txtprocess = "11234-12"
+txtlot = "11234"
+txtwafer = "12"
+txtmask = "CNM004"
+txttemperature = "24.5"
+txthumidity = "45"
+
+[dirs]
+base = "config"
+instruments = "instruments"
+tests = "tests"
+probers = "probers"
+wafermaps = "wafermaps"
+results = "results"
+reports = "reports"
+
+[files]
+plot = "lecturas.txt"
+process = "process.txt"
+import_report = "report_import"
+
+[mecao]
+loadStart = true
+host = "opter6"
+port = "5432"
+user = "joaquin"
+database = "mecao"
+password = ""
+autocommit = false
+
+[estepa]
+method = "k-sigma"
+lna = false
+autolimits = false
+limmin = 0
+limmax = 50
+chunks = 16
+
+[labs]
+mysqlhost = "localhost"
+mysqluser = "root"
+mysqlpassword = "Mysql123"
+mysqldatabase = "labs_new"
+
+[reports]
+title = "TLM REPORT"
+subtitle = "18398"
+date = "MAY 2025"
+author = "Sergi Sànchez"

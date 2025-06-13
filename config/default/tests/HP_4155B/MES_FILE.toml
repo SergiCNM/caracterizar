@@ -1,0 +1,26 @@
+title = "HP4155 MES parameters"
+
+[parameters]
+INTEGRATION = "SHOR"
+NET = "NET1"
+NET_UPDATE = "NET2"
+UPDATE_COUNT = 50
+MOVE_FILES = true
+DISK_FOLDER = "D:\\USERS\\ssanchez"
+FITXERS_FOLDER = "\\fitxers3\\fitxers\\siam-hp4155\\sergi"
+TEST_NAMES = ""
+
+[options]
+INTEGRATION = "SHOR,MED,LONG"
+
+[units]
+
+[help]
+INTEGRATION = "Integration time"
+NET = "Network to save data"
+NET_UPDATE = "Network to update data"
+UPDATE_COUNT = "Updates every N points"
+MOVE_FILES = "Move files from fitxers to another folder"
+DISK_FOLDER = "Folder to move data"
+FITXERS_FOLDER = "Folder to save data (NET1)"
+TEST_NAME = "Test names (MES FILEs) separated by comma"

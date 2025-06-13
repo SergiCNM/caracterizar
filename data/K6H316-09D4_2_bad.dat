@@ -1,0 +1,142 @@
+<BEG GLOBAL>
+	Process[s]	K6H316-09D4_2_bad
+	Lot[s]	K6H316
+	Wafer[s]	09D4
+	Mask[s]	LINDA
+	Operator[s]	default
+	Date[s]	20/04/2023
+	Time[s]	09:50:18
+	WaferInfo[s]	
+<END GLOBAL>
+<BEG>	WAFER (09D4)
+	<BEG>	DIE (0 0)
+		<BEG>	MODULE (0.0 0.0)
+			<BEG>	MODTEST (TEST_test)
+				<BEG PARMS>
+					status	meas_success
+					message	
+				<END PARMS>
+				<END>	MODTEST (TEST_test)
+			<END>	MODULE (0.0 0.0)
+		<END>	DIE (0 0)
+		<BEG>	DIE (-2 -5)
+			<BEG>	MODULE (0.0 0.0)
+				<BEG>	MODTEST (TEST_test)
+					<BEG PARMS>
+						status	meas_success
+						message	
+					<END PARMS>
+					<END>	MODTEST (TEST_test)
+				<END>	MODULE (0.0 0.0)
+			<END>	DIE (-2 -5)
+			<BEG>	DIE (-2 -10)
+				<BEG>	MODULE (0.0 0.0)
+					<BEG>	MODTEST (TEST_test)
+						<BEG PARMS>
+							status	meas_success
+							message	
+						<END PARMS>
+						<END>	MODTEST (TEST_test)
+					<END>	MODULE (0.0 0.0)
+				<END>	DIE (-2 -10)
+				<BEG>	DIE (6 -10)
+					<BEG>	MODULE (0.0 0.0)
+						<BEG>	MODTEST (TEST_test)
+							<BEG PARMS>
+								status	meas_warning
+								message	Contact OK! Impossible to program chip register and pixel register.
+							<END PARMS>
+							<END>	MODTEST (TEST_test)
+						<END>	MODULE (0.0 0.0)
+					<END>	DIE (6 -10)
+					<BEG>	DIE (13 -11)
+						<BEG>	MODULE (0.0 0.0)
+							<BEG>	MODTEST (TEST_test)
+								<BEG PARMS>
+									status	meas_warning
+									message	Contact OK! Impossible to program chip register and pixel register.
+								<END PARMS>
+								<END>	MODTEST (TEST_test)
+							<END>	MODULE (0.0 0.0)
+						<END>	DIE (13 -11)
+						<BEG>	DIE (8 -11)
+							<BEG>	MODULE (0.0 0.0)
+								<BEG>	MODTEST (TEST_test)
+									<BEG PARMS>
+										status	meas_warning
+										message	Contact OK! Impossible to program chip register and pixel register.
+									<END PARMS>
+									<END>	MODTEST (TEST_test)
+								<END>	MODULE (0.0 0.0)
+							<END>	DIE (8 -11)
+							<BEG>	DIE (5 -11)
+								<BEG>	MODULE (0.0 0.0)
+									<BEG>	MODTEST (TEST_test)
+										<BEG PARMS>
+											status	meas_warning
+											message	Contact OK! Wafer test fail. Touchdown or tension/current fail.
+										<END PARMS>
+										<END>	MODTEST (TEST_test)
+									<END>	MODULE (0.0 0.0)
+								<END>	DIE (5 -11)
+								<BEG>	DIE (4 -11)
+									<BEG>	MODULE (0.0 0.0)
+										<BEG>	MODTEST (TEST_test)
+											<BEG PARMS>
+												status	meas_success
+												message	
+											<END PARMS>
+											<END>	MODTEST (TEST_test)
+										<END>	MODULE (0.0 0.0)
+									<END>	DIE (4 -11)
+									<BEG>	DIE (2 -11)
+										<BEG>	MODULE (0.0 0.0)
+											<BEG>	MODTEST (TEST_test)
+												<BEG PARMS>
+													status	meas_warning
+													message	Contact OK! Impossible to program chip register and pixel register.
+												<END PARMS>
+												<END>	MODTEST (TEST_test)
+											<END>	MODULE (0.0 0.0)
+										<END>	DIE (2 -11)
+										<BEG>	DIE (-2 -11)
+											<BEG>	MODULE (0.0 0.0)
+												<BEG>	MODTEST (TEST_test)
+													<BEG PARMS>
+														status	meas_warning
+														message	Contact OK! Impossible to program chip register and pixel register.
+													<END PARMS>
+													<END>	MODTEST (TEST_test)
+												<END>	MODULE (0.0 0.0)
+											<END>	DIE (-2 -11)
+											<BEG>	DIE (-7 -11)
+												<BEG>	MODULE (0.0 0.0)
+													<BEG>	MODTEST (TEST_test)
+														<BEG PARMS>
+															status	meas_warning
+															message	Contact OK! Impossible to program chip register and pixel register.
+														<END PARMS>
+														<END>	MODTEST (TEST_test)
+													<END>	MODULE (0.0 0.0)
+												<END>	DIE (-7 -11)
+												<BEG>	DIE (-8 -11)
+													<BEG>	MODULE (0.0 0.0)
+														<BEG>	MODTEST (TEST_test)
+															<BEG PARMS>
+																status	meas_warning
+																message	Contact OK! Impossible to program chip register and pixel register.
+															<END PARMS>
+															<END>	MODTEST (TEST_test)
+														<END>	MODULE (0.0 0.0)
+													<END>	DIE (-8 -11)
+													<BEG>	DIE (-9 -13)
+														<BEG>	MODULE (0.0 0.0)
+															<BEG>	MODTEST (TEST_test)
+																<BEG PARMS>
+																	status	meas_success
+																	message	
+																<END PARMS>
+																<END>	MODTEST (TEST_test)
+															<END>	MODULE (0.0 0.0)
+														<END>	DIE (-9 -13)
+												<END>	WAFER (09D4)
