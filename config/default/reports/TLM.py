@@ -397,7 +397,10 @@ class TLM(FPDF):
                         p_scaled = p * len(data) * bin_width
 
                         # Dibujar la curva ajustada
-                        ax1.plot(x, p_scaled, 'r--', linewidth=2, label=f"Normal fit: μ={mu:.2f}, σ={std:.2f}")
+                        if abs(estadistica.median)<1E20:
+                            ax1.plot(x, p_scaled, 'r--', linewidth=2, label=f"Normal fit: μ={mu:.2f}, σ={std:.2f}")
+                        else:
+                            ax1.plot(x, p_scaled, 'r--', linewidth=2, label="Normal fit: Overflow")
 
                         # Etiquetas
                         ax1.set_xlabel(parameter)
@@ -436,87 +439,125 @@ class TLM(FPDF):
             x = np.array(d)
             y = np.array(means)
 
-            # Ajuste lineal: y = m*x + b
-            m, b = np.polyfit(x, y, 1)
-            fit_line = m * x + b
+            # Filtrar los valores válidos: eliminar los marcados como -9e+99
+            threshold_error = -1e+50  # margen por si acaso
+            valid_indices = y > threshold_error
+            invalid_indices = ~valid_indices  # inverso
 
-            # Crear figura
-            fig = Figure(figsize=(6, 4), dpi=300)
-            ax = fig.add_subplot(111)
-            ax.scatter(x, y, color="blue", label="Data")
-            ax.plot(x, fit_line, color="red", linestyle="--", label=f"Fit: y = {m:.2f}x + {b:.2f}")
-            ax.set_title(wafer + " - Mean R vs. Ring Diameter")
-            ax.set_xlabel("Ring Diameter (d)")
-            ax.set_ylabel("Resistance (R)")
-            ax.grid(True)
-            ax.legend()
+            # Realizar ajuste solo con los válidos
+            x_valid = x[valid_indices]
+            y_valid = y[valid_indices]
 
-            # Texto con ecuación dentro del plot
-            # text = f"y = {m:.2f}x + {b:.2f}"
-            # ax.text(0.05, 0.95, text, transform=ax.transAxes, fontsize=10, verticalalignment='top')
+            if len(x_valid) >= 2:
+                # Ajuste lineal: y = m*x + b
+                m, b = np.polyfit(x_valid, y_valid, 1)
+                fit_line = m * x + b
 
-            # Convertir a imagen para FPDF
-            canvas = FigureCanvas(fig)
-            canvas.draw()
-            img = Image.fromarray(np.asarray(canvas.buffer_rgba()))
-            matplotlib.pyplot.close(fig)
+                # Crear figura
+                fig = Figure(figsize=(6, 4), dpi=300)
+                ax = fig.add_subplot(111)
+                # ax.scatter(x, y, color="blue", label="Data")
+                # Dibujar los puntos válidos (azul)
+                ax.scatter(x_valid, y_valid, color="blue", label="Valid Data")
 
-            # Tabla de valores h(d) y g(d)
-            h_dict = {
-                4: 0.026317308317, 10: 0.064538521138, 15: 0.095310179804, 20: 0.125163142954,
-                25: 0.154150679827, 30: 0.182321556794, 40: 0.236388778064, 50: 0.287682072452,
-                60: 0.336472236621, 70: 0.382992252256, 80: 0.427444014827, 100: 0.510825623766
-            }
-            g_dict = {
-                4: 0.013160173160, 10: 0.012916666667, 15: 0.012727272727, 20: 0.012549019608,
-                25: 0.012380952381, 30: 0.012222222222, 40: 0.011929824561, 50: 0.011666666667,
-                60: 0.011428571429, 70: 0.011212121212, 80: 0.011014492754, 100: 0.010666666667
-            }
+                # Dibujar los puntos inválidos (rojo)
+                ax.scatter(x[invalid_indices], y[invalid_indices], color="red", label="Discarded Data")
 
-            # Crear matrices para regresión
-            H = np.array([h_dict[val] for val in d])
-            G = np.array([g_dict[val] for val in d])
-            Y = np.array(means)
+                ax.plot(x, fit_line, color="red", linestyle="--", label=f"Fit: y = {m:.2f}x + {b:.2f}")
+                ax.set_title(wafer + " - Mean R vs. Ring Diameter")
+                ax.set_xlabel("Ring Diameter (d)")
+                ax.set_ylabel("Resistance (R)")
+                ax.grid(True)
+                ax.legend()
 
-            # Diseño de matriz (X): columnas h y g
-            X = np.column_stack((H, G))
+                # Texto con ecuación dentro del plot
+                # text = f"y = {m:.2f}x + {b:.2f}"
+                # ax.text(0.05, 0.95, text, transform=ax.transAxes, fontsize=10, verticalalignment='top')
 
-            # Resolución por mínimos cuadrados
-            coeffs, residuals, rank, s = np.linalg.lstsq(X, Y, rcond=None)
-            A, B = coeffs
+                # Convertir a imagen para FPDF
+                canvas = FigureCanvas(fig)
+                canvas.draw()
+                img = Image.fromarray(np.asarray(canvas.buffer_rgba()))
+                matplotlib.pyplot.close(fig)
 
-            # Cálculo de Rsh y Lt
-            Rsh = 2 * np.pi * A
-            Lt = B / A
+                # Tabla de valores h(d) y g(d)
+                h_dict = {
+                    4: 0.026317308317, 10: 0.064538521138, 15: 0.095310179804, 20: 0.125163142954,
+                    25: 0.154150679827, 30: 0.182321556794, 40: 0.236388778064, 50: 0.287682072452,
+                    60: 0.336472236621, 70: 0.382992252256, 80: 0.427444014827, 100: 0.510825623766
+                }
+                g_dict = {
+                    4: 0.013160173160, 10: 0.012916666667, 15: 0.012727272727, 20: 0.012549019608,
+                    25: 0.012380952381, 30: 0.012222222222, 40: 0.011929824561, 50: 0.011666666667,
+                    60: 0.011428571429, 70: 0.011212121212, 80: 0.011014492754, 100: 0.010666666667
+                }
 
-            # Resultados
-            print(f"A = {A:.2f}")
-            print(f"B = {B:.2f}")
-            print(f"Rsh = {Rsh:.2f} Ω")
-            print(f"Lt = {Lt:.2f} μm")
-            Rc = Rsh * Lt ** 2
-            # Rc in Ω·cm²
-            Rc = Rc * 1E-8  # convert to Ω·cm²
-            print(f"Rc = {Rc:.4f} Ω·cm²")
-            # calc ρ(Ωcm) like ρ = Rsh * 0,0003
-            p = Rsh * 0.0003
-            print(f"ρ = {p:.4f} Ω·cm")
-            # Crear tabla
-            self.set_x(10)
-            x_texto = 20
-            self.set_y(30)
-            self.set_font('DejaVu', 'B', 10)
-            self.text(x_texto, 35, wafer)
-            self.set_font('DejaVu', '', 9)
-            self.text(x_texto, 55, "A: " + str("{:.2f}".format(A)) + " Ω")
-            self.text(x_texto, 60, "B: " + str("{:.2f}".format(B)) + " Ω")
-            self.text(x_texto, 65, "Rsh: " + str("{:.4f}".format(Rsh)) + " Ω")
-            self.text(x_texto, 70, "Lt: " + str("{:.4f}".format(Lt)) + " μm")
-            self.set_font('DejaVu', 'B', 9)
-            # Rc and p in cientific notation
-            self.text(x_texto, 75, "Rc: " + str("{:.2e}".format(Rc)) + " Ω·cm²")
-            self.text(x_texto, 80, "ρ: " + str("{:.2e}".format(p)) + " Ω·cm")
+                # Crear matrices para regresión
+                # H = np.array([h_dict[val] for val in d])
+                # G = np.array([g_dict[val] for val in d])
+                # Y = np.array(means)
+                H = np.array([h_dict[val] for val in x_valid])
+                G = np.array([g_dict[val] for val in x_valid])
+                Y = np.array(y_valid)
 
+                # Diseño de matriz (X): columnas h y g
+                X = np.column_stack((H, G))
+
+                # Resolución por mínimos cuadrados
+                coeffs, residuals, rank, s = np.linalg.lstsq(X, Y, rcond=None)
+                A, B = coeffs
+
+                # Cálculo de Rsh y Lt
+                Rsh = 2 * np.pi * A
+                Lt = B / A
+
+                # Resultados
+                print(f"A = {A:.2e}")
+                print(f"B = {B:.2e}")
+                print(f"Rsh = {Rsh:.2e} Ω")
+                print(f"Lt = {Lt:.2f} μm")
+                Rc = Rsh * Lt ** 2
+                # Rc in Ω·cm²
+                Rc = Rc * 1E-8  # convert to Ω·cm²
+                print(f"Rc = {Rc:.4e} Ω·cm²")
+                # calc ρ(Ωcm) like ρ = Rsh * 0,0003
+                p = Rsh * 0.0003
+                print(f"ρ = {p:.4e} Ω·cm")
+                # Crear tabla
+                self.set_x(10)
+                x_texto = 20
+                self.set_y(30)
+                self.set_font('DejaVu', 'B', 10)
+                self.text(x_texto, 35, wafer)
+                self.set_font('DejaVu', '', 9)
+                self.text(x_texto, 55, "A: " + str("{:.2e}".format(A)) + " Ω")
+                self.text(x_texto, 60, "B: " + str("{:.2e}".format(B)) + " Ω")
+                self.text(x_texto, 65, "Rsh: " + str("{:.4e}".format(Rsh)) + " Ω")
+                self.text(x_texto, 70, "Lt: " + str("{:.4f}".format(Lt)) + " μm")
+                self.set_font('DejaVu', 'B', 9)
+                # Rc and p in cientific notation
+                self.text(x_texto, 75, "Rc: " + str("{:.2e}".format(Rc)) + " Ω·cm²")
+                self.text(x_texto, 80, "ρ: " + str("{:.2e}".format(p)) + " Ω·cm")
+
+            else:
+                # Si no hay suficientes datos válidos
+                print("ERROR: No valid data points for fitting.")
+
+                # Puedes hacer un plot solo con los puntos descartados
+                fig = Figure(figsize=(6, 4), dpi=300)
+                ax = fig.add_subplot(111)
+
+                ax.scatter(x[invalid_indices], y[invalid_indices], color="red", label="Discarded Data")
+                ax.set_title(wafer + " - Not enough valid data")
+                ax.set_xlabel("Ring Diameter (d)")
+                ax.set_ylabel("Resistance (R)")
+                ax.grid(True)
+                ax.legend()
+
+                canvas = FigureCanvas(fig)
+                canvas.draw()
+                img = Image.fromarray(np.asarray(canvas.buffer_rgba()))
+                matplotlib.pyplot.close(fig)
 
             # Insertar en el PDF
             if left:
