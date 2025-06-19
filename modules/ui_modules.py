@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'modulesVWBiOT.ui'
+## Form generated from reading UI file 'modulesXmjqyF.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -23,9 +23,9 @@ class Ui_ModulesWindow(object):
     def setupUi(self, ModulesWindow):
         if not ModulesWindow.objectName():
             ModulesWindow.setObjectName(u"ModulesWindow")
-        ModulesWindow.resize(800, 400)
-        ModulesWindow.setMinimumSize(QSize(800, 400))
-        ModulesWindow.setMaximumSize(QSize(800, 400))
+        ModulesWindow.resize(1050, 410)
+        ModulesWindow.setMinimumSize(QSize(1050, 410))
+        ModulesWindow.setMaximumSize(QSize(1050, 420))
         ModulesWindow.setStyleSheet(u"")
         self.centralwidget = QWidget(ModulesWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -269,7 +269,7 @@ class Ui_ModulesWindow(object):
 
         self.verticalLayoutWidget_3 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
-        self.verticalLayoutWidget_3.setGeometry(QRect(10, 70, 70, 311))
+        self.verticalLayoutWidget_3.setGeometry(QRect(10, 70, 70, 318))
         self.verticalLayout_4 = QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setSizeConstraint(QLayout.SetNoConstraint)
@@ -773,7 +773,7 @@ class Ui_ModulesWindow(object):
 
         self.verticalLayoutWidget_10 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_10.setObjectName(u"verticalLayoutWidget_10")
-        self.verticalLayoutWidget_10.setGeometry(QRect(270, 70, 70, 311))
+        self.verticalLayoutWidget_10.setGeometry(QRect(270, 70, 70, 318))
         self.verticalLayout_10 = QVBoxLayout(self.verticalLayoutWidget_10)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
         self.verticalLayout_10.setSizeConstraint(QLayout.SetNoConstraint)
@@ -857,7 +857,7 @@ class Ui_ModulesWindow(object):
 
         self.verticalLayoutWidget_11 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_11.setObjectName(u"verticalLayoutWidget_11")
-        self.verticalLayoutWidget_11.setGeometry(QRect(530, 70, 70, 311))
+        self.verticalLayoutWidget_11.setGeometry(QRect(530, 70, 70, 318))
         self.verticalLayout_11 = QVBoxLayout(self.verticalLayoutWidget_11)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
         self.verticalLayout_11.setSizeConstraint(QLayout.SetNoConstraint)
@@ -939,6 +939,300 @@ class Ui_ModulesWindow(object):
 
         self.verticalLayout_11.addWidget(self.txtN30)
 
+        self.verticalLayoutWidget_12 = QWidget(self.centralwidget)
+        self.verticalLayoutWidget_12.setObjectName(u"verticalLayoutWidget_12")
+        self.verticalLayoutWidget_12.setGeometry(QRect(790, 70, 70, 318))
+        self.verticalLayout_12 = QVBoxLayout(self.verticalLayoutWidget_12)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setSizeConstraint(QLayout.SetNoConstraint)
+        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.label_44 = QLabel(self.verticalLayoutWidget_12)
+        self.label_44.setObjectName(u"label_44")
+        self.label_44.setMaximumSize(QSize(16777215, 16777215))
+        self.label_44.setFont(font)
+        self.label_44.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+
+        self.verticalLayout_12.addWidget(self.label_44)
+
+        self.txtN31 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN31.setObjectName(u"txtN31")
+        self.txtN31.setMinimumSize(QSize(0, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN31)
+
+        self.txtN32 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN32.setObjectName(u"txtN32")
+        self.txtN32.setMinimumSize(QSize(0, 24))
+        self.txtN32.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN32)
+
+        self.txtN33 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN33.setObjectName(u"txtN33")
+        self.txtN33.setMinimumSize(QSize(0, 24))
+        self.txtN33.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN33)
+
+        self.txtN34 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN34.setObjectName(u"txtN34")
+        self.txtN34.setMinimumSize(QSize(0, 24))
+        self.txtN34.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN34)
+
+        self.txtN35 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN35.setObjectName(u"txtN35")
+        self.txtN35.setMinimumSize(QSize(0, 24))
+        self.txtN35.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN35)
+
+        self.txtN36 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN36.setObjectName(u"txtN36")
+        self.txtN36.setMinimumSize(QSize(0, 24))
+        self.txtN36.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN36)
+
+        self.txtN37 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN37.setObjectName(u"txtN37")
+        self.txtN37.setMinimumSize(QSize(0, 24))
+        self.txtN37.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN37)
+
+        self.txtN38 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN38.setObjectName(u"txtN38")
+        self.txtN38.setMinimumSize(QSize(0, 24))
+        self.txtN38.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN38)
+
+        self.txtN39 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN39.setObjectName(u"txtN39")
+        self.txtN39.setMinimumSize(QSize(0, 24))
+        self.txtN39.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN39)
+
+        self.txtN40 = QLineEdit(self.verticalLayoutWidget_12)
+        self.txtN40.setObjectName(u"txtN40")
+        self.txtN40.setMinimumSize(QSize(0, 24))
+        self.txtN40.setMaximumSize(QSize(16777215, 24))
+
+        self.verticalLayout_12.addWidget(self.txtN40)
+
+        self.verticalLayoutWidget_13 = QWidget(self.centralwidget)
+        self.verticalLayoutWidget_13.setObjectName(u"verticalLayoutWidget_13")
+        self.verticalLayoutWidget_13.setGeometry(QRect(860, 70, 91, 311))
+        self.verticalLayout_13 = QVBoxLayout(self.verticalLayoutWidget_13)
+        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.verticalLayout_13.setSizeConstraint(QLayout.SetNoConstraint)
+        self.verticalLayout_13.setContentsMargins(0, 0, 0, 0)
+        self.label_45 = QLabel(self.verticalLayoutWidget_13)
+        self.label_45.setObjectName(u"label_45")
+        self.label_45.setMaximumSize(QSize(16777215, 16))
+        self.label_45.setFont(font)
+        self.label_45.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+
+        self.verticalLayout_13.addWidget(self.label_45)
+
+        self.txtX31 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX31.setObjectName(u"txtX31")
+        self.txtX31.setMaximumSize(QSize(85, 16777215))
+        self.txtX31.setDecimals(6)
+        self.txtX31.setMinimum(-999999.989999999990687)
+        self.txtX31.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX31)
+
+        self.txtX32 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX32.setObjectName(u"txtX32")
+        self.txtX32.setMaximumSize(QSize(85, 16777215))
+        self.txtX32.setDecimals(6)
+        self.txtX32.setMinimum(-999999.989999999990687)
+        self.txtX32.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX32)
+
+        self.txtX33 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX33.setObjectName(u"txtX33")
+        self.txtX33.setMaximumSize(QSize(85, 16777215))
+        self.txtX33.setDecimals(6)
+        self.txtX33.setMinimum(-999999.989999999990687)
+        self.txtX33.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX33)
+
+        self.txtX34 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX34.setObjectName(u"txtX34")
+        self.txtX34.setMaximumSize(QSize(85, 16777215))
+        self.txtX34.setDecimals(6)
+        self.txtX34.setMinimum(-999999.989999999990687)
+        self.txtX34.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX34)
+
+        self.txtX35 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX35.setObjectName(u"txtX35")
+        self.txtX35.setMaximumSize(QSize(85, 16777215))
+        self.txtX35.setDecimals(6)
+        self.txtX35.setMinimum(-999999.989999999990687)
+        self.txtX35.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX35)
+
+        self.txtX36 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX36.setObjectName(u"txtX36")
+        self.txtX36.setMaximumSize(QSize(85, 16777215))
+        self.txtX36.setDecimals(6)
+        self.txtX36.setMinimum(-999999.989999999990687)
+        self.txtX36.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX36)
+
+        self.txtX37 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX37.setObjectName(u"txtX37")
+        self.txtX37.setMaximumSize(QSize(85, 16777215))
+        self.txtX37.setDecimals(6)
+        self.txtX37.setMinimum(-999999.989999999990687)
+        self.txtX37.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX37)
+
+        self.txtX38 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX38.setObjectName(u"txtX38")
+        self.txtX38.setMaximumSize(QSize(85, 16777215))
+        self.txtX38.setDecimals(6)
+        self.txtX38.setMinimum(-999999.989999999990687)
+        self.txtX38.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX38)
+
+        self.txtX39 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX39.setObjectName(u"txtX39")
+        self.txtX39.setMaximumSize(QSize(85, 16777215))
+        self.txtX39.setDecimals(6)
+        self.txtX39.setMinimum(-999999.989999999990687)
+        self.txtX39.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX39)
+
+        self.txtX40 = QDoubleSpinBox(self.verticalLayoutWidget_13)
+        self.txtX40.setObjectName(u"txtX40")
+        self.txtX40.setMaximumSize(QSize(85, 16777215))
+        self.txtX40.setDecimals(6)
+        self.txtX40.setMinimum(-999999.989999999990687)
+        self.txtX40.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_13.addWidget(self.txtX40)
+
+        self.verticalLayoutWidget_14 = QWidget(self.centralwidget)
+        self.verticalLayoutWidget_14.setObjectName(u"verticalLayoutWidget_14")
+        self.verticalLayoutWidget_14.setGeometry(QRect(950, 70, 91, 311))
+        self.verticalLayout_14 = QVBoxLayout(self.verticalLayoutWidget_14)
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_14.setSizeConstraint(QLayout.SetNoConstraint)
+        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.label_46 = QLabel(self.verticalLayoutWidget_14)
+        self.label_46.setObjectName(u"label_46")
+        self.label_46.setMaximumSize(QSize(16777215, 16))
+        self.label_46.setFont(font)
+        self.label_46.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+
+        self.verticalLayout_14.addWidget(self.label_46)
+
+        self.txtY31 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY31.setObjectName(u"txtY31")
+        self.txtY31.setMaximumSize(QSize(85, 16777215))
+        self.txtY31.setDecimals(6)
+        self.txtY31.setMinimum(-999999.989999999990687)
+        self.txtY31.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY31)
+
+        self.txtY32 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY32.setObjectName(u"txtY32")
+        self.txtY32.setMaximumSize(QSize(85, 16777215))
+        self.txtY32.setDecimals(6)
+        self.txtY32.setMinimum(-999999.989999999990687)
+        self.txtY32.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY32)
+
+        self.txtY33 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY33.setObjectName(u"txtY33")
+        self.txtY33.setMaximumSize(QSize(85, 16777215))
+        self.txtY33.setDecimals(6)
+        self.txtY33.setMinimum(-999999.989999999990687)
+        self.txtY33.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY33)
+
+        self.txtY34 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY34.setObjectName(u"txtY34")
+        self.txtY34.setMaximumSize(QSize(85, 16777215))
+        self.txtY34.setDecimals(6)
+        self.txtY34.setMinimum(-999999.989999999990687)
+        self.txtY34.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY34)
+
+        self.txtY35 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY35.setObjectName(u"txtY35")
+        self.txtY35.setMaximumSize(QSize(85, 16777215))
+        self.txtY35.setDecimals(6)
+        self.txtY35.setMinimum(-999999.989999999990687)
+        self.txtY35.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY35)
+
+        self.txtY36 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY36.setObjectName(u"txtY36")
+        self.txtY36.setMaximumSize(QSize(85, 16777215))
+        self.txtY36.setDecimals(6)
+        self.txtY36.setMinimum(-999999.989999999990687)
+        self.txtY36.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY36)
+
+        self.txtY37 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY37.setObjectName(u"txtY37")
+        self.txtY37.setMaximumSize(QSize(85, 16777215))
+        self.txtY37.setDecimals(6)
+        self.txtY37.setMinimum(-999999.989999999990687)
+        self.txtY37.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY37)
+
+        self.txtY38 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY38.setObjectName(u"txtY38")
+        self.txtY38.setMaximumSize(QSize(85, 16777215))
+        self.txtY38.setDecimals(6)
+        self.txtY38.setMinimum(-999999.989999999990687)
+        self.txtY38.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY38)
+
+        self.txtY39 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY39.setObjectName(u"txtY39")
+        self.txtY39.setMaximumSize(QSize(85, 16777215))
+        self.txtY39.setDecimals(6)
+        self.txtY39.setMinimum(-999999.989999999990687)
+        self.txtY39.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY39)
+
+        self.txtY40 = QDoubleSpinBox(self.verticalLayoutWidget_14)
+        self.txtY40.setObjectName(u"txtY40")
+        self.txtY40.setMaximumSize(QSize(85, 16777215))
+        self.txtY40.setDecimals(6)
+        self.txtY40.setMinimum(-999999.989999999990687)
+        self.txtY40.setMaximum(999999.989999999990687)
+
+        self.verticalLayout_14.addWidget(self.txtY40)
+
         ModulesWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(ModulesWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -992,5 +1286,18 @@ class Ui_ModulesWindow(object):
         self.txtN28.setText(QCoreApplication.translate("ModulesWindow", u"Module_28", None))
         self.txtN29.setText(QCoreApplication.translate("ModulesWindow", u"Module_29", None))
         self.txtN30.setText(QCoreApplication.translate("ModulesWindow", u"Module_30", None))
+        self.label_44.setText(QCoreApplication.translate("ModulesWindow", u"Modules", None))
+        self.txtN31.setText(QCoreApplication.translate("ModulesWindow", u"Module_31", None))
+        self.txtN32.setText(QCoreApplication.translate("ModulesWindow", u"Module_32", None))
+        self.txtN33.setText(QCoreApplication.translate("ModulesWindow", u"Module_33", None))
+        self.txtN34.setText(QCoreApplication.translate("ModulesWindow", u"Module_34", None))
+        self.txtN35.setText(QCoreApplication.translate("ModulesWindow", u"Module_35", None))
+        self.txtN36.setText(QCoreApplication.translate("ModulesWindow", u"Module_36", None))
+        self.txtN37.setText(QCoreApplication.translate("ModulesWindow", u"Module_37", None))
+        self.txtN38.setText(QCoreApplication.translate("ModulesWindow", u"Module_38", None))
+        self.txtN39.setText(QCoreApplication.translate("ModulesWindow", u"Module_39", None))
+        self.txtN40.setText(QCoreApplication.translate("ModulesWindow", u"Module_40", None))
+        self.label_45.setText(QCoreApplication.translate("ModulesWindow", u"X(um)", None))
+        self.label_46.setText(QCoreApplication.translate("ModulesWindow", u"Y(um)", None))
     # retranslateUi
 

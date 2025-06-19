@@ -395,15 +395,13 @@ wafer_parameters = {\n\
 
 
 
-
-
 class ModulesWindow(QMainWindow):
     def __init__(self, WaferWindow, enable):
         QMainWindow.__init__(self)
         self.ui = Ui_ModulesWindow()
         self.ui.setupUi(self)
         global widgets
-
+        self.max_modules = 40  # max modules in wafer, if changed then change also in ui_modules.py
         widgets = self.ui
         widgets.txtNumberModules.setText(str(WaferWindow.widgets.txtNumberModules.value()))
         WaferWindow.wafer_nmodules = WaferWindow.widgets.txtNumberModules.value()
@@ -432,7 +430,7 @@ class ModulesWindow(QMainWindow):
             self.ui.centralwidget.findChild(QDoubleSpinBox,name_widget).setEnabled(True)
             name_widget = "txtN" + str(i)
             self.ui.centralwidget.findChild(QLineEdit, name_widget).setEnabled(True)
-        for i in range(int(WaferWindow.wafer_nmodules)+1,31):
+        for i in range(int(WaferWindow.wafer_nmodules)+1,self.max_modules + 1):
             name_widget = "txtX" + str(i)
             self.ui.centralwidget.findChild(QDoubleSpinBox,name_widget).setEnabled(False)
             self.ui.centralwidget.findChild(QDoubleSpinBox,name_widget).setValue(0)
@@ -482,6 +480,7 @@ class WaferWindow(QMainWindow):
         widgets = self.ui
         self.widgets = widgets
         self.moduleswindow = ""
+
         wafer = Wafer(wafer_parameters)
         self.wafer = wafer
         self.wafer_parameters = wafer_parameters
