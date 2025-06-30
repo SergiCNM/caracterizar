@@ -1,8 +1,10 @@
 # SOLARMEM test
 import os
 import sys
-from config.functions import *
 
+from config.default.instruments import Keysight_B1500LAN
+from config.functions import *
+import toml
 from datetime import datetime
 import time
 
@@ -15,8 +17,9 @@ global base_dir, tests_dir, results_dir, cartographic_measurement
 
 global Voltage, bad_devices, good_devices, defective_devices, bad_coefvar_devices
 
-path_images = '//fitxers2/fitxers/0_LAB SIAM/Solarmems/'  # MPI folder to save images
-#path_images = 'c:/photos_carto/'  
+global TEST_parameters
+
+
 
 brightness_light = 100 # brightness microscope light for light measurements
 brightness_light_photo = 4  # brightness microscope light for photos
@@ -27,24 +30,17 @@ leakage_level = 10E-9 # @3.3V
 photo_level = 5E-6 # 3.3V por cuadrante
 coefvar_level = 0.05 # 5% entre los cuadrantes del mismo chip
 
+def get_folder_photos(main):
+	global TEST_parameters
+	folder = TEST_parameters["FOLDER_IMAGES"]
+
+	return folder
+
+
 def get_folder_namefile(main):
 	folder = os.getcwd() + "/" + results_dir + "/" + username + "/" + main.ui.txtProcess.text() + "/" + main.ui.txtLot.text() + "_W" + f"{int(main.ui.txtWafer.text()):02d}" + "/" 
 	namefile = main.ui.txtLot.text() + "_W" + f"{int(main.ui.txtWafer.text()):02d}" + ".txt"
-	return folder, namefile	
-
-def solarmems_statistics(leakage_currents, photo_currents):
-	import statistics
-	
-	promedio = statistics.mean(photo_currents)
-	desvest = statistics.stdev(photo_currents)
-	coefvar = desvest/promedio
-	stability = "V"
-	if coefvar>0.05:
-		stability = "X"
-
-	return [promedio,desvest,coefvar,stability]
-
-
+	return folder, namefile
 
 def save_results_file_solarmems(main, name_sensor,leakage_currents,leakage_currents2,photo_currents,photo_currents2,params):
 	
@@ -130,9 +126,10 @@ def save_measurement_file_solarmems(main, V,I1,I2,I3,I4,mode="dark"):
 	return name_sensor
 
 def configure_meas_solarmems(B1500):
-	workspace_name = "SIAM"
-	group = "SOLARMEMS"
-	test_preset_group_name = "Solarmems"
+	global TEST_parameters
+	workspace_name = TEST_parameters["WORKSPACE_NAME"]
+	group = TEST_parameters["GROUP"]
+	test_preset_group_name = TEST_parameters["TEST_PRESET_GROUP_NAME"]
 
 	status = B1500.status_workspace()
 	if status=="CLOS":
@@ -182,7 +179,22 @@ def test_solarmems(B1500):
 
 	return [status, message, results]
 
+def load_TEST_parameters():
+    global TEST_parameters
 
+    import json
+    # default values
+    TEST_parameters = {
+        "WORKSPACE_NAME" : "SIAM",
+        "GROUP" : "SOLARMEMS",
+        "TEST_PRESET_GROUP_NAME" : "Solarmems"
+    }
+    # load from external toml file in tests_dir (if exists, if not default values)
+    filename_config = os.getcwd() + base_dir + tests_dir + '/Keysight_B1500LAN/SOLARMEMS.toml'
+    file_exists = os.path.exists(filename_config)
+    if file_exists:
+        toml_info = toml.load(filename_config)
+        TEST_parameters = toml_info["parameters"]
 
 def get_params(leakage_currents,photo_currents):
 	import statistics  # no debería hacer falta
@@ -211,7 +223,7 @@ def get_params(leakage_currents,photo_currents):
 	stability = 1
 	if abs(coefvar)>coefvar_level:
 		stability = 0
-	#promedio,desvest,coefvar,stability = solarmems_statistics(leakage_currents,photo_currents)
+
 	params.append({"name": "Mean", "value": str(promedio)})
 	params.append({"name": "DesvEst", "value": str(desvest)})
 	params.append({"name": "CoefVar", "value": str(coefvar)})
@@ -290,11 +302,14 @@ def create_file_results(main, folder, namefile):
 try:
 	# connect to B1500
 	B1500 = Keysight_B1500LAN(instruments["Keysight_B1500LAN"])
-	B1500.instrument.timeout = 200000 # bigger than test time
-	
+	B1500.instrument.timeout = 200000 # bigger than test
+	load_TEST_parameters()
+	path_images = get_folder_photos(main)
+
 	if cartographic_measurement:
 		nchips = main.waferwindow.wafer_parameters["nchips"]
 		if str(dieActual)=="1" and str(moduleActual)=="1":
+
 
 			# retval = QMessageBox.question(
 			# 	main,
@@ -370,7 +385,7 @@ try:
 					pass_stability = param["value"]
 				
 			if pass_leakage_current and pass_photo_current and pass_stability:
-				good_devices +=1
+				#good_devices +=1
 				meas_status = "meas_success"
 				message = ""
 				if not meas_status_dark:
@@ -382,11 +397,11 @@ try:
 						message = message_light
 			else:
 				if pass_leakage_current and pass_photo_current and not pass_stability:
-					bad_coefvar_devices +=1
+					#bad_coefvar_devices +=1
 					meas_status = "meas_warning"
 					message = "Bad CoefV!"
 				else:
-					defective_devices +=1
+					#defective_devices +=1
 					meas_status = "meas_error"
 					message = "Unstable device!"
 			
@@ -460,14 +475,15 @@ try:
 			# print final result
 			if dieActual == str(nchips):
 				main.prober.light("0")
-				bad_devices = defective_devices + bad_coefvar_devices
-				yield_value = good_devices /(good_devices+bad_devices) 
-				percentage_yield = str(round(yield_value*100)) + "%"
+				#bad_devices = defective_devices + bad_coefvar_devices
+				#yield_value = good_devices /(good_devices+bad_devices)
+				#percentage_yield = str(round(yield_value*100)) + "%"
 
-				main.updateTextDescription("- Defective Devices: " + str(defective_devices) + "<br />" + "- Good Devices: " + str(good_devices) + "<br />" + "- Bad CoefVar Devices: " + str(bad_coefvar_devices) + "<br />"  + "- Yield : " + percentage_yield)
+				#main.updateTextDescription("- Defective Devices: " + str(defective_devices) + "<br />" + "- Good Devices: " + str(good_devices) + "<br />" + "- Bad CoefVar Devices: " + str(bad_coefvar_devices) + "<br />"  + "- Yield : " + percentage_yield)
 
 	
 	else:
+
 		folder, namefile = get_folder_namefile(main)
 		if create_file_results(main, folder, namefile):
 			# ------------------
@@ -533,7 +549,9 @@ try:
 		else:
 			message = 'Problem creating file results!'
 			main.updateTextDescription(message,"ERROR")
-			retval = messageBox(main,"ERROR",message,"critical")
+			retval = message_user(main, "ERROR", message,
+								  "ok_error")
+			# retval = messageBox(main,"ERROR",message,"critical")
 
 
 except:

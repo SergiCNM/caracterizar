@@ -1,9 +1,10 @@
-title = "Test parameters"
+title = "SOLARMEMS test parameters"
 
 [parameters]
 WORKSPACE_NAME = "SOLARMEMS"
 GROUP = "SOLARMEMS"
 TEST_PRESET_GROUP_NAME = "Solarmems"
+FOLDER_IMAGES = "C:\\solarmems\\"
 
 [options]
 
@@ -13,3 +14,4 @@ TEST_PRESET_GROUP_NAME = "Solarmems"
 WORKSPACE_NAME = "Workspace name"
 GROUP = "Group name"
 TEST_PRESET_GROUP_NAME = "Test preset group name"
+FOLDER_IMAGES = "Folder to save images (MPI)"

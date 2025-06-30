@@ -3948,3 +3948,28 @@
 25-06-19 11:47:51|INFO|18004|_prune_post_subset|2977|OS/2 Unicode ranges pruned: [0]
 25-06-19 11:47:51|INFO|18004|_prune_post_subset|2997|glyf pruned
 25-06-19 11:53:52|INFO|18004|closeEvent|2109|Test Status: IDLE
+25-06-25 10:49:24|INFO|19644|__init__|215|Multithreading with maximum 12 threads
+25-06-25 10:50:10|INFO|19644|closeEvent|2109|Test Status: IDLE
+25-06-25 11:37:42|INFO|29808|__init__|215|Multithreading with maximum 12 threads
+25-06-25 11:52:07|INFO|29808|closeEvent|2109|Test Status: IDLE
+25-06-25 11:52:19|INFO|27960|__init__|215|Multithreading with maximum 12 threads
+25-06-25 11:53:31|INFO|27960|closeEvent|2109|Test Status: IDLE
+25-06-25 11:56:53|INFO|28576|__init__|215|Multithreading with maximum 12 threads
+25-06-25 12:01:33|INFO|28576|closeEvent|2109|Test Status: IDLE
+25-06-25 12:02:00|INFO|29248|__init__|215|Multithreading with maximum 12 threads
+25-06-25 15:14:41|INFO|29248|closeEvent|2109|Test Status: IDLE
+25-06-25 15:41:02|INFO|18208|__init__|215|Multithreading with maximum 12 threads
+25-06-25 15:42:01|INFO|18208|closeEvent|2109|Test Status: IDLE
+25-06-25 15:42:14|INFO|6268|__init__|215|Multithreading with maximum 12 threads
+25-06-25 15:57:55|INFO|5636|__init__|215|Multithreading with maximum 12 threads
+25-06-25 16:22:01|INFO|5636|closeEvent|2109|Test Status: IDLE
+25-06-26 09:48:41|INFO|14708|__init__|215|Multithreading with maximum 12 threads
+25-06-26 10:31:45|INFO|14708|closeEvent|2109|Test Status: IDLE
+25-06-26 10:32:04|INFO|5112|__init__|215|Multithreading with maximum 12 threads
+25-06-26 10:38:53|INFO|5112|closeEvent|2109|Test Status: IDLE
+25-06-26 10:39:06|INFO|19344|__init__|215|Multithreading with maximum 12 threads
+25-06-26 11:18:23|INFO|19344|closeEvent|2109|Test Status: FINISHED
+25-06-26 11:18:36|INFO|19740|__init__|215|Multithreading with maximum 12 threads
+25-06-27 12:03:07|INFO|19740|closeEvent|2109|Test Status: FINISHED
+25-06-27 12:29:32|INFO|21012|__init__|215|Multithreading with maximum 12 threads
+25-06-27 12:43:45|INFO|21012|closeEvent|2109|Test Status: IDLE

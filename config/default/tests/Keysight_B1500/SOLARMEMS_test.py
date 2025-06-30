@@ -9,11 +9,13 @@ global dieActual, moduleActual
 
 global Voltage, bad_devices, good_devices
 
+global cartographic_measurement, results_dir, username
+
 path_images = '//fitxers2/fitxers/0_LAB SIAM/'
 path_images = 'c:/photos_carto/'  
 
 
-def solarmems_statistics(leakage_currents,photo_currents):
+def solarmems_statistics(leakage_currents, photo_currents):
 	import statistics
 	
 	promedio = statistics.mean(photo_currents)
@@ -25,7 +27,8 @@ def solarmems_statistics(leakage_currents,photo_currents):
 
 	return [promedio,desvest,coefvar,stability]
 
-def save_file_solarmems(self,V,I1,I2,I3,I4,mode="dark"):
+def save_file_solarmems(main,V,I1,I2,I3,I4,mode="dark"):
+	global cartographic_measurement, results_dir, username
 	lines = []
 	# list with coord of all wafer positions
 	all_wafer_positions = ['0 0', '-1 0', '-2 0', '-3 0', '-4 0', '2 -1', '1 -1', '0 -1', '-1 -1', '-2 -1', '-3 -1', '-4 -1', '-5 -1', '-6 -1', '3 -2', '2 -2', '1 -2', '0 -2', '-1 -2', '-2 -2', '-3 -2', '-4 -2', '-5 -2', '-6 -2', '-7 -2', '4 -3', '3 -3', '2 -3', '1 -3', '0 -3', '-1 -3', '-2 -3', '-3 -3', '-4 -3', '-5 -3', '-6 -3', '-7 -3', '-8 -3', '4 -4', '3 -4', '2 -4', '1 -4', '0 -4', '-1 -4', '-2 -4', '-3 -4', '-4 -4', '-5 -4', '-6 -4', '-7 -4', '-8 -4', '5 -5', '4 -5', '3 -5', '2 -5', '1 -5', '0 -5', '-1 -5', '-2 -5', '-3 -5', '-4 -5', '-5 -5', '-6 -5', '-7 -5', '-8 -5', '-9 -5', '5 -6', '4 -6', '3 -6', '2 -6', '1 -6', '0 -6', '-1 -6', '-2 -6', '-3 -6', '-4 -6', '-5 -6', '-6 -6', '-7 -6', '-8 -6', '-9 -6', '5 -7', '3 -7', '2 -7', '1 -7', '0 -7', '-1 -7', '-2 -7', '-3 -7', '-4 -7', '-5 -7', '-6 -7', '-7 -7', '-9 -7', '5 -8', '4 -8', '3 -8', '2 -8', '1 -8', '0 -8', '-1 -8', '-2 -8', '-3 -8', '-4 -8', '-5 -8', '-6 -8', '-7 -8', '-8 -8', '-9 -8', '5 -9', '4 -9', '3 -9', '2 -9', '1 -9', '0 -9', '-1 -9', '-2 -9', '-3 -9', '-4 -9', '-5 -9', '-6 -9', '-7 -9', '-8 -9', '-9 -9', '4 -10', '3 -10', '2 -10', '1 -10', '0 -10', '-1 -10', '-2 -10', '-3 -10', '-4 -10', '-5 -10', '-6 -10', '-7 -10', '-8 -10', '4 -11', '3 -11', '2 -11', '1 -11', '0 -11', '-1 -11', '-2 -11', '-3 -11', '-4 -11', '-5 -11', '-6 -11', '-7 -11', '-8 -11', '3 -12', '2 -12', '1 -12', '0 -12', '-1 -12', '-2 -12', '-3 -12', '-4 -12', '-5 -12', '-6 -12', '-7 -12', '2 -13', '1 -13', '0 -13', '-1 -13', '-2 -13', '-3 -13', '-4 -13', '-5 -13', '-6 -13', '0 -14', '-1 -14', '-2 -14', '-3 -14', '-4 -14']
@@ -33,11 +36,11 @@ def save_file_solarmems(self,V,I1,I2,I3,I4,mode="dark"):
 	separation_char = ","
 	# construct header file
 	if cartographic_measurement:
-		column_row = self.waferwindow.wafer_parameters["wafer_positions"]
+		column_row = main.waferwindow.wafer_parameters["wafer_positions"]
 		die = int(dieActual)-1
 		if len(column_row) != len(all_wafer_positions):
 			# corrections in case diferents positions (Refs chips/All chips)
-			real_origin_chip = self.waferwindow.wafer_parameters["real_origin_chip"]
+			real_origin_chip = main.waferwindow.wafer_parameters["real_origin_chip"]
 			correction_x = int(real_origin_chip.split()[0])-int(all_wafer_real_origin_chip.split()[0])
 			correction_y = int(real_origin_chip.split()[1])-int(all_wafer_real_origin_chip.split()[1])
 			column_row_mod = []
@@ -58,7 +61,7 @@ def save_file_solarmems(self,V,I1,I2,I3,I4,mode="dark"):
 	
 	coord = column_row[die]
 	name_sensor = "S" + f"{num_sensor:03d}"
-	lines.append("Info: " + self.ui.txtProcess.text() + " " + self.ui.txtLot.text() + "_" + self.ui.txtWafer.text() + " " + self.ui.txtMask.text() + " / Device ID: " + name_sensor + " / Location: " + coord + " / Type: Standard Cell")
+	lines.append("Info: " + main.ui.txtProcess.text() + " " + main.ui.txtLot.text() + "_" + main.ui.txtWafer.text() + " " + main.ui.txtMask.text() + " / Device ID: " + name_sensor + " / Location: " + coord + " / Type: Standard Cell")
 	lines.append("V [V]; I01 [A]; I02 [A]; I03 [A]; I04 [A]")
 	# create other lines
 	for i in range(0,len(V)):
@@ -66,7 +69,7 @@ def save_file_solarmems(self,V,I1,I2,I3,I4,mode="dark"):
 		lines.append(texto)
 
 	# create folder
-	folder = os.getcwd() + "/" + results_dir + "/" + username + "/" + self.ui.txtProcess.text() + "/" + self.ui.txtLot.text() + "_W" + f"{int(self.ui.txtWafer.text()):02d}" + "/" + mode + "/" 
+	folder = os.getcwd() + "/" + results_dir + "/" + username + "/" + main.ui.txtProcess.text() + "/" + main.ui.txtLot.text() + "_W" + f"{int(main.ui.txtWafer.text()):02d}" + "/" + mode + "/"
 	if not os.path.exists(folder):
 		os.makedirs(folder)
 	namefile = folder + name_sensor + ".txt"
@@ -213,16 +216,18 @@ try:
 	
 
 	if cartographic_measurement:
-		nchips = self.waferwindow.wafer_parameters["nchips"]
+		nchips = main.waferwindow.wafer_parameters["nchips"]
 		if str(dieActual)=="1" and str(moduleActual)=="1":
-
-			retval = QMessageBox.question(
-				self,
-				"Init Keysight B1500 for measurement!",
-				"Please, configure instrument for initialization",
-                buttons=QMessageBox.Yes | QMessageBox.Cancel,
-                defaultButton=QMessageBox.Yes,
-            )
+			retval = message_user(main, "Init Keysight B1500 for measurement!",
+								  "Please, configure instrument for initialization",
+								  "yes_cancel")
+			# retval = QMessageBox.question(
+			# 	self,
+			# 	"Init Keysight B1500 for measurement!",
+			# 	"Please, configure instrument for initialization",
+            #     buttons=QMessageBox.Yes | QMessageBox.Cancel,
+            #     defaultButton=QMessageBox.Yes,
+            # )
 			if retval == QMessageBox.Yes:
 				# init B1500 for measurement
 				Voltage = []
@@ -236,23 +241,23 @@ try:
 
 		if test_status.status =="STARTED":
 			# 1) DARK MEAS
-			self.prober.light("0")
+			main.prober.light("0")
 			meas_status_dark, message_dark, I1_dark, I2_dark, I3_dark, I4_dark = test_solarmems(B1500)
 			# save file .txt for sensor
-			save_file_solarmems(self,Voltage,I1_dark,I2_dark,I3_dark,I4_dark,"dark")
+			save_file_solarmems(main,Voltage,I1_dark,I2_dark,I3_dark,I4_dark,"dark")
 			# get current in -3.3V (12 position in list)
 			leakage_currents = [I1_dark[11], I2_dark[11], I3_dark[11], I4_dark[11]]
 			# 2) LIGHT MEAS
-			self.prober.light("1")
+			main.prober.light("1")
 			meas_status_light, message_light, I1_light, I2_light, I3_light, I4_light = test_solarmems(B1500)
 			# save file .txt for sensor
-			name_sensor = save_file_solarmems(self,Voltage,I1_light,I2_light,I3_light,I4_light,"light")
+			name_sensor = save_file_solarmems(main,Voltage,I1_light,I2_light,I3_light,I4_light,"light")
 			# get current in -3.3V (12 position in list)
 			photo_currents = [I1_light[11], I2_light[11], I3_light[11], I4_light[11]]
 			# 3) GET PARAMS
 			params = get_params(leakage_currents,photo_currents)
 			# 4) MAKE PHOTO
-			self.prober.image(path_images + name_sensor + ".jpg",1)
+			main.prober.image(path_images + name_sensor + ".jpg",1)
 			# 5) GET yield
 			pass_leakage_current = 0
 			pass_photo_current = 0
@@ -282,7 +287,7 @@ try:
 				message = "Some Pass test failed!"
 			
 			# save results
-			self.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+			main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
 			    "status" : meas_status,
 			    "message" : message,
 			    "contact_height" : "", 
@@ -342,43 +347,44 @@ try:
 			posx = [0,0]
 			posy = [0,0]
 			num_graphs = 2
-			plot_parameters = self.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
-			for i in range(0,num_graphs):
-				#self.plotwindow[i] = ""
-				self.show_plotwindow(plot_parameters[i], posx[i], posy[i],i)
+			plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
+			emit_plot(plot_parameters)
+			# for i in range(0,num_graphs):
+			# 	#self.plotwindow[i] = ""
+			# 	self.show_plotwindow(plot_parameters[i], posx[i], posy[i],i)
 			# print final result
 			if dieActual == str(nchips):
-				self.prober.light("0")
+				main.prober.light("0")
 				yield_value = good_devices /(good_devices+bad_devices) 
 				percentage_yield = str(round(yield_value*100)) + "%"
 
-				self.updateTextDescription("- Defective Devices: " + str(bad_devices) + "<br />" + "- Good Devices: " + str(good_devices) + "<br />" + "- Yield : " + percentage_yield)
+				main.updateTextDescription("- Defective Devices: " + str(bad_devices) + "<br />" + "- Good Devices: " + str(good_devices) + "<br />" + "- Yield : " + percentage_yield)
 
 	
 	else:
 		print("set Voltage")
 		Voltage = configure_meas_solarmems(B1500)
 		print(Voltage)
-		if self.prober=="":
-			self.prober_init()
+		if main.prober=="":
+			main.prober_init()
 		# 1) DARK MEAS
-		self.prober.light("0")
+		main.prober.light("0")
 		meas_status_dark, message_dark, I1_dark, I2_dark, I3_dark, I4_dark = test_solarmems(B1500)
 		# save file .txt for sensor
-		save_file_solarmems(self,Voltage,I1_dark,I2_dark,I3_dark,I4_dark,"dark")
+		save_file_solarmems(main,Voltage,I1_dark,I2_dark,I3_dark,I4_dark,"dark")
 		# get current in -3.3V (12 position in list)
 		leakage_currents = [I1_dark[11], I2_dark[11], I3_dark[11], I4_dark[11]]
 		# 2) LIGHT MEAS
-		self.prober.light("1")
+		main.prober.light("1")
 		meas_status_light, message_light, I1_light, I2_light, I3_light, I4_light = test_solarmems(B1500)
 		# save file .txt for sensor
-		name_sensor = save_file_solarmems(self,Voltage,I1_light,I2_light,I3_light,I4_light,"light")
+		name_sensor = save_file_solarmems(main,Voltage,I1_light,I2_light,I3_light,I4_light,"light")
 		# get current in -3.3V (12 position in list)
 		photo_currents = [I1_light[11], I2_light[11], I3_light[11], I4_light[11]]
 		# 3) GET PARAMS
 		params = get_params(leakage_currents,photo_currents)
 		# 4) MAKE PHOTO
-		self.prober.image(path_images + name_sensor + ".jpg",1)
+		main.prober.image(path_images + name_sensor + ".jpg",1)
 		# 5) GET yield
 		pass_leakage_current = 0
 		pass_photo_current = 0
@@ -396,7 +402,7 @@ try:
 		text_update += "<br />- Leakage current test: " + "OK" if pass_leakage_current else "NOT OK"
 		text_update += "<br />- Photo current test: " + "OK" if pass_photo_current else "NOT OK"
 		text_update += "<br />- Stability test: " + "OK" if pass_stability else "NOT OK"
-		self.updateTextDescription(text_update)	
+		main.updateTextDescription(text_update)
 		# show 2 graphs
 		posx = [0,0]
 		posy = [0,0]
@@ -404,6 +410,6 @@ try:
 
 except:
     message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<","").replace(">","") + " occurred. " + str(sys.exc_info()[1])
-    self.updateTextDescription(message,"ERROR")
+    main.updateTextDescription(message,"ERROR")
     retval = messageBox(self,"ERROR",message,"critical")
 

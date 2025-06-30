@@ -4,14 +4,14 @@ author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
-darkmode = false
+darkmode = true
 estepa = false
-txtprocess = "11234-12"
-txtlot = "11234"
-txtwafer = "12"
-txtmask = "CNM004"
-txttemperature = "24.5"
-txthumidity = "45"
+txtprocess = "14733"
+txtlot = "14733"
+txtwafer = "6"
+txtmask = "CNM863"
+txttemperature = "25.0"
+txthumidity = "48"
 
 [dirs]
 base = "config"

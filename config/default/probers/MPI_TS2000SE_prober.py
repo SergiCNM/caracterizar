@@ -1,7 +1,7 @@
 # MPI TS2000SE prober driver
 import pyvisa
 import time
-
+import os
 
 class MPI_TS2000SE:
 	def __init__(self, parameters):
@@ -280,13 +280,14 @@ class MPI_TS2000SE:
 
 	def image(self,path,with_Overlays=0):
 		try:
+
 			cmd = "vis:snap_image " + path + "," + str(with_Overlays)
 			response = self.instrument.query(cmd) 
 			if response=="OK":
 				return True
 			return False
-		except:
-			print("Alert, problem with command image")
+		except Exception as e:
+			print("Alert, problem with command image.\n" + str(e))
 			return False
 
 	# TEMP COMMANDS (status)

@@ -34,7 +34,7 @@ instruments["Keysight_B1500"]["timeout"] = '30000'
 
 # -----------  Keysight B1500LAN  -----------
 instruments["Keysight_B1500LAN"] = {}
-instruments["Keysight_B1500LAN"]["address"] = 'TCPIP0::169.254.248.246::5025::SOCKET'
+instruments["Keysight_B1500LAN"]["address"] = 'TCPIP0::169.254.81.78::5025::SOCKET'
 instruments["Keysight_B1500LAN"]["read_termination"] = '\n'
 instruments["Keysight_B1500LAN"]["write_termination"] = '\n'
 #instruments["Keysight_B1500LAN"]["timeout"] = '200000'
