@@ -4,7 +4,7 @@ import sys
 import toml
 from PySide6.QtWidgets import QFileDialog
 
-from modules import ResultFile
+global widgets, base_dir, reports_dir, results_dir
 
 # FOR testing
 
@@ -34,6 +34,7 @@ file_error = ""
 directoryName = QFileDialog.getExistingDirectory(self, "Select RUN folder", results_dir,  QFileDialog.ShowDirsOnly)
 if directoryName != "":
 	wafers_list = list()
+	dies_total = 0
 	for directory in sorted(os.listdir(directoryName)):
 		if os.path.isdir(directoryName + "/" + directory):
 			wafers_list.append(directory)
@@ -44,8 +45,18 @@ if directoryName != "":
 			print("Checking wafer " + wafer)
 			if "UP_LEFT" in wafer or "UP_RIGHT" in wafer:
 				dies_total = 92
-			else:
+			elif "DOWN_LEFT" in wafer or "DOWN_RIGHT" in wafer:
 				dies_total = 90
+			elif "TIRA1" in wafer or "TIRA12" in wafer:
+				dies_total = 20
+			elif "TIRA2" in wafer or "TIRA11" in wafer:
+				dies_total = 26
+			elif "TIRA3" in wafer or "TIRA10" in wafer:
+				dies_total = 30
+			elif "TIRA4" in wafer or "TIRA9" in wafer:
+				dies_total = 32
+			elif "TIRA5" in wafer or "TIRA6" in wafer or "TIRA7" in wafer or "TIRA8" in wafer:
+				dies_total = 33
 			print("Dies total: " + str(dies_total))
 			# check if exists 92*12 TXT total files inside wafer folder + cuartos folder + data folder for UP cuartos
 			for die in range(1, dies_total+1):
@@ -71,8 +82,24 @@ if get_report:
 		widgets.txtResultReport.appendPlainText("Checking information and creating plot graphs...")
 		QApplication.processEvents()
 		TLM = TLM(widgets, options, directoryName, self.config)
+
+
+		def clave_orden(carpeta):
+			# TIRAS
+			tira_match = re.search(r'TIRA(\d+)', carpeta)
+			if tira_match:
+				oblea = int(carpeta.split('-')[1].split('_')[0])
+				tira = int(tira_match.group(1))
+				return (oblea, 0, tira)  # Prioridad a TIRAS, suborden por número
+			# DIRECCIONES
+			direcciones = ['DOWN_LEFT', 'DOWN_RIGHT', 'UP_LEFT', 'UP_RIGHT']
+			for idx, d in enumerate(direcciones):
+				if d in carpeta:
+					oblea = int(carpeta.split('-')[1].split('_')[0])
+					return (oblea, 1, idx)  # Segundo nivel: direcciones, en orden predefinido
+			return (999, 999, 999)  # Si no encaja, poner al final
 		print(TLM.wafers)
-		for wafer in sorted(TLM.wafers):
+		for wafer in sorted(TLM.wafers, key=clave_orden):
 			widgets.txtResultReport.appendPlainText("Creating report TLM for wafer " + wafer + " ...")
 			QApplication.processEvents()
 			# ADD report

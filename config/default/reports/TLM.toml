@@ -1,10 +1,12 @@
-title = "EAD parameters"
+title = "TLM parameters"
 
 [parameters]
 WAFERMAP = true
 HISTOGRAM = true
 PLOT = true
 DATA = true
+PLOT_TYPE = "IV"
+DELETE_PLOTS = true
 
 [units]
 WAFERMAP = ""
@@ -13,9 +15,12 @@ PLOT = ""
 DATA = ""
 
 [options]
+PLOT_TYPE = "IV,RV"
 
 [help]
 WAFERMAP = "Print wafermap"
 HISTOGRAM = "Print histogram"
 PLOT = "Create plot"
 DATA = "Print data table information"
+PLOT_TYPE = "Type of plot to create (IV, RV)"
+DELETE_PLOTS = "Force to delete plots folder before creating new plots"

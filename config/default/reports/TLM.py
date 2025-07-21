@@ -50,6 +50,12 @@ class TLM(FPDF):
         self.parameter_list = list()
         self.dataWafersParameters_list = list()  # list of list with (wafer, parameter, value)
         self.check_wafers()
+        # force delete all plots folders and its content
+        if self.options["DELETE_PLOTS"] and os.path.exists(self.path_run):
+            for wafer in self.wafers:
+                path_plot = self.path_run + "/" + wafer + "/plots/"
+                if os.path.exists(path_plot):
+                    shutil.rmtree(path_plot)
         if self.error:
             self.widgets.txtResultReport.appendPlainText(f"Error creating report: {self.errorMessage}")
         for wafer in self.wafers:
@@ -93,7 +99,7 @@ class TLM(FPDF):
 
     def check_wafers(self):
         self.widgets.txtResultReport.setPlainText("")
-        self.cuartos = ["UP_LEFT", "UP_RIGHT", "DOWN_LEFT", "DOWN_RIGHT"]
+        dies_total = 0
         for directory in sorted(os.listdir(self.path_run)):
             if os.path.isdir(self.path_run + "/" + directory):
                 self.wafers.append(directory)
@@ -104,8 +110,19 @@ class TLM(FPDF):
                 # check if exists 92*12 TXT total files inside wafer folder + cuartos folder + data folder for UP cuartos
                 if "UP_LEFT" in wafer or "UP_RIGHT" in wafer:
                     dies_total = 92
-                else:
+                elif "DOWN_LEFT" in wafer or "DOWN_RIGHT" in wafer:
                     dies_total = 90
+                elif "TIRA1" in wafer or "TIRA12" in wafer:
+                    dies_total = 20
+                elif "TIRA2" in wafer or "TIRA11" in wafer:
+                    dies_total = 26
+                elif "TIRA3" in wafer or "TIRA10" in wafer:
+                    dies_total = 30
+                elif "TIRA4" in wafer or "TIRA9" in wafer:
+                    dies_total = 32
+                elif "TIRA5" in wafer or "TIRA6" in wafer or "TIRA7" in wafer or "TIRA8" in wafer:
+                    dies_total = 33
+
 
                 for die in range(1, dies_total + 1):
                     for module in range(1, 13):
@@ -136,7 +153,7 @@ class TLM(FPDF):
                 QApplication.processEvents()
                 if os.path.isfile(path_data + filedata) and "IV" in filedata:
                     # create plot in path_plot
-                    # first column voltage, fourth colum resistance, skipping 4 rows, header None, separation tab
+                    # first column voltage, second column current, fourth colum resistance, skipping 4 rows, header None, separation tab
                     df = pd.read_csv(path_data + filedata, sep="\t", skiprows=4, header=None)
                     # check df columns
                     if df.shape[1] < 5:
@@ -146,19 +163,36 @@ class TLM(FPDF):
 
                     # Reemplazar "Overflow" y convertir a float
                     df[1] = pd.to_numeric(df[1], errors='coerce')  # Voltaje
-                    df[4] = df[4].replace("Overflow", OVERFLOW_REPLACEMENT)
-                    df[4] = pd.to_numeric(df[4], errors='coerce')  # Resistencia
+
+
 
                     ax = plt.gca()
-                    df.plot(kind='line', x=df.columns[1], y=df.columns[4], ax=ax, label="R-V",
+
+                    if self.options["PLOT_TYPE"] == "IV":
+                        df[2] = pd.to_numeric(df[2], errors='coerce')  # Corriente
+                        title_graph = f"Current vs Voltage {filedata}"
+                        ylabel = "Current (A)"
+                        label_plot = "I-V"
+                        df.plot(kind='line', x=df.columns[1], y=df.columns[2], ax=ax, label=label_plot,
+                                color="blue", grid=True)
+                    else:
+                        df[4] = df[4].replace("Overflow", OVERFLOW_REPLACEMENT)
+                        df[4] = pd.to_numeric(df[4], errors='coerce')  # Resistencia
+                        title_graph = f"Resistance vs Voltage {filedata}"
+                        ylabel = "Resistance (Ohm)"
+                        label_plot = "R-V"
+
+                        df.plot(kind='line', x=df.columns[1], y=df.columns[4], ax=ax, label=label_plot,
                             color="blue", grid=True)
-                    plt.title(f"Resistance vs Voltage {filedata}")
+                    plt.title(title_graph)
                     plt.xlabel("Voltage (V)")
-                    plt.ylabel("Resistance (Ohm)")
-                    plt.subplots_adjust(bottom=0.15)
+                    plt.ylabel(ylabel)
+                    # plt.subplots_adjust(bottom=0.15)
+                    plt.gcf().set_size_inches(8, 5)  # Ajustar el tamaño de la figura
+                    plt.tight_layout()  # Ajustar márgenes automáticamente
 
                     filePlot = path_plot + filedata.replace(".TXT", ".png")
-                    plt.savefig(filePlot, dpi=100)
+                    plt.savefig(filePlot, dpi=100, bbox_inches='tight')
                     plt.clf()
                     counter += 1
 
@@ -298,7 +332,9 @@ class TLM(FPDF):
 
         # print wafermap & histogram
         wafer_path = self.path_run + "/" + wafer
-        cuarto = wafer.split("_")[1] + "_" + wafer.split("_")[2]
+        # cuarto = wafer.split("_")[1]
+        # if not "TIRA" in wafer:
+        #     cuarto = wafer.split("_")[1] + "_" + wafer.split("_")[2]
         wafer_data_path = wafer_path + "/data/"
         resistances = dict()
 
@@ -310,11 +346,13 @@ class TLM(FPDF):
             parts = basename.replace("IV_", "").replace(".TXT", "").split("_")
             return tuple(map(int, parts))  # (die, modulo)
 
+
         for file in sorted(files, key=extract_indices):
             parts = os.path.basename(file).replace("IV_", "").replace(".TXT", "").split("_")
             if len(parts) != 2:
                 continue
             die, modulo = map(int, parts)
+
             mean_res = get_mean_resistance(file)
             if mean_res is not None:
                 if modulo not in resistances:
@@ -327,6 +365,7 @@ class TLM(FPDF):
         if "wafermap_file" in self.config_estepa_toml[wafer]["conditions"]:
             wafermap_file = self.config_estepa_toml[wafer]["conditions"]["wafermap_file"]
         left = True
+
 
 
         if "WAFERMAP" in self.options and self.options["WAFERMAP"]:
@@ -653,8 +692,26 @@ class TLM(FPDF):
         # wafer_coordinates_dif = [(y_real_position - int(y), x_real_position + int(x)) for x, y in
         #                          [pos.split() for pos in wafer_positions]]
 
+        print(f"Wafer coordinates: {wafer_coordinates}")
+        print(f"Wafer coordinates dif: {wafer_coordinates_dif}")
+
+        # check how much chips in wafer_coordinates_dif are in wafer_coordinates
+        wafer_coordinates_dif_set = set(wafer_coordinates_dif)
+        wafer_coordinates_set = set(wafer_coordinates)
+        common_coordinates = wafer_coordinates_dif_set.intersection(wafer_coordinates_set)
+        print(f"Common coordinates: {common_coordinates}")
+        print(f"Number of chips in wafer_coordinates_dif: {len(wafer_coordinates_dif)}")
+        print(f"Number of chips in wafer_coordinates: {len(wafer_coordinates)}")
+        print(f"Number of common chips: {len(common_coordinates)}")
+        # print coordinates not in common
+        not_common_coordinates = wafer_coordinates_dif_set - common_coordinates
+        print(f"Coordinates not in common: {not_common_coordinates}")
+
+
         xips_position = []
         xip_position = 0
+        print(f"Matrix size: {matrix_size}x{matrix_size}")
+
         for x in range(matrix_size):
             for y in range(matrix_size):
                 if (x, y) in wafer_coordinates:
@@ -665,6 +722,7 @@ class TLM(FPDF):
                         # podemos verificar en función wafer_positions enviados y real_origin_chip
                         matrix[x, y] = 2
                         xips_position.append(xip_position)
+
 
 
         return [matrix, xips_position]
@@ -687,6 +745,7 @@ class TLM(FPDF):
     def numpy_array_print_to_wafer(self, np_array, wafer, resistances, modulo, left=True):
         np_array_reverse = np_array.copy()
         rows_num, cols_num = np_array.shape
+        print(f"For wafer {wafer} there are {rows_num} rows and {cols_num} cols")
         # fit middle page, calc width cell (same height), put value to make margin
         margin = 100
         width_cell = round((self.WIDTH-margin) / 14)
@@ -744,7 +803,7 @@ class TLM(FPDF):
                         border = 1
 
                         # print(f"Resistencia para el modulo {modulo} y posición {i}")
-                        res_value= float(resistances_modulo[i-1])
+                        res_value= float(resistances_modulo[i])
                         # print(res_value)
                         # format res_value to text with 2 decimals
                         res_value_txt = str("{:.2f}".format(res_value))
@@ -807,11 +866,6 @@ class TLM(FPDF):
         self.cell(w=40, h=wh, txt="Outlier : ", ln=0, fill=False)
         self.cell(w=40, h=wh, txt=str(counters["azul"]) + f" devices ({percentage})", ln=1, fill=False)
         self.ln(2)
-
-
-
-
-
 
 
         return np_array_reverse, estadistica[parameter], estepa_configuration

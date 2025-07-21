@@ -1,11 +1,12 @@
 # Test in HP 4155B instrument
 global test_status, measurement_status
 global dieActual, moduleActual
+global cartographic_measurement
 
 # print("Testing die "+str(dieActual)+ " & module " + str(moduleActual))
 if cartographic_measurement:
     meas_status = "meas_success"
-    self.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+    main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
         "status" : meas_status,
         "message" : "",
         "contact_height" : "", 

@@ -16,7 +16,7 @@ instruments["HP_4155B"] = {}
 instruments["HP_4155B"]["address"] = 'GPIB0::17::INSTR'
 instruments["HP_4155B"]["read_termination"] = '\n'
 instruments["HP_4155B"]["write_termination"] = '\n'
-instruments["HP_4155B"]["timeout"] = '30000'
+instruments["HP_4155B"]["timeout"] = '40000'
 
 
 # -----------  Keysight B1500  -----------

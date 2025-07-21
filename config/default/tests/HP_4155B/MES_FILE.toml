@@ -1,14 +1,14 @@
 title = "HP4155 MES parameters"
 
 [parameters]
-INTEGRATION = "SHOR"
+INTEGRATION = "MED"
 NET = "NET1"
-NET_UPDATE = "NET2"
+NET_UPDATE = "NET4"
 UPDATE_COUNT = 50
-MOVE_FILES = true
+MOVE_FILES = false
 DISK_FOLDER = "D:\\USERS\\ssanchez"
 FITXERS_FOLDER = "\\fitxers3\\fitxers\\siam-hp4155\\sergi"
-TEST_NAMES = ""
+TEST_NAMES = "CNM1246.MES"
 
 [options]
 INTEGRATION = "SHOR,MED,LONG"

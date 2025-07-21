@@ -141,15 +141,17 @@ class HP_4155B:
 		cmd = ":PAGE:SCON:STOP"
 		self.instrument.write(cmd)
 
-	def dataReady(self):
+	def dataReady(self, time_wait=1):
 		"""
 		Wait until data is ready
+		:param time_wait: time to wait in seconds
+		:return: None
 		"""
 		cmd = ":PAGE:SCON:STAT?"
 		res = self.instrument.query(cmd)
 		while res != 'IDLE':
 			res = self.instrument.query(cmd)
-			time.sleep(0.1)	
+			time.sleep(time_wait)
 
 	def integration_time(self, type):
 		"""
@@ -188,7 +190,7 @@ class HP_4155B:
 			# file name
 			cmd = ":MMEM:STOR:SSH '" + namefile + "'"
 			self.instrument.write(cmd)
-			time.sleep(3)
+			#time.sleep(3)
 
 	def refresh_net(self, MES_parameters):
 		"""

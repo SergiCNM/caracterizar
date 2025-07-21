@@ -30,13 +30,14 @@ def load_MES_parameters():
 
 def measure_single(hp4155):
 	# single measurement
-	measurement_status.status = "START"
+	#measurement_status.status = "START"
 	hp4155.single()
 	hp4155.dataReady()
-	measurement_status.status = "FINISH"
+	#measurement_status.status = "FINISH"
 
 
 load_MES_parameters()
+
 if MES_parameters["TEST_NAMES"] == "":
 	# exit with error
 	meas_result = {"meas_status" : "meas_error", "meas_message" : "No test names defined in MES_FILE.toml"}
@@ -44,6 +45,7 @@ if MES_parameters["TEST_NAMES"] == "":
 	main.updateTextDescription(txt_result, "ERROR")
 else:
 	hp4155 = HP_4155B(instruments["HP_4155B"])
+	test_names = MES_parameters["TEST_NAMES"].split(",")
 	count = 0
 	if cartographic_measurement:
 		if str(dieActual)=="1" and str(moduleActual)=="1":
@@ -61,7 +63,6 @@ else:
 				# configure int time and view graph
 				hp4155.integration_time(MES_parameters["INTEGRATION"])
 				hp4155.view_graph()
-				test_names = MES_parameters["TEST_NAMES"].split(",")
 				# init test
 				test_status.status = "STARTED"
 			else:
@@ -69,12 +70,21 @@ else:
 
 		if test_status.status=="STARTED":
 			for test_name in test_names:
+				measurement_status.status = "START"
+				print(f"{test_name} for die {dieActual} and module {moduleActual} STARTED!")
 				# set test name
+				print(f"Loading test: {test_name}")
 				hp4155.load_mes(destination=MES_parameters["NET"], namefile=test_name)
+				print(f"Test {test_name} loaded!")
+				print ("Measuring...")
 				measure_single(hp4155)
+				print("Measure completed!")
 				count += 1
 				# save DAT file in cartographic process
-				hp4155.save_result(MES_parameters["NET"],"IV_"+str(dieActual)+"_"+str(moduleActual))
+				name_file = f"{test_name.replace('.MES', '')}_" + str(dieActual) + "_" + str(moduleActual)
+				print("Saving result...")
+				hp4155.save_result(MES_parameters["NET"], name_file)
+				print(f"File {name_file} saved!")
 				meas_result = {"meas_status" : "meas_success", "meas_message" : ""}
 
 				txt_result = f"Measurement {test_name} done, die: " + str(dieActual) + " module: " + str(moduleActual)
@@ -112,6 +122,8 @@ else:
 					if MES_parameters["MOVE_FILES"]:
 						hp4155.move_files_txt(MES_parameters)
 					count = 0
+				measurement_status.status = "FINISH"
+				print(f"{test_name} for die {dieActual} and module {moduleActual} FINISHED!")
 	else:
 		dieActual = 1
 		moduleActual = 1
@@ -120,12 +132,12 @@ else:
 		# configure int time to default (SHOR) and view graph
 		hp4155.integration_time(MES_parameters["INTEGRATION"])
 		hp4155.view_graph()
-		test_names = MES_parameters["TEST_NAMES"].split(",")
 		for test_name in test_names:
 			# set test name
 			hp4155.load_mes(destination=MES_parameters["NET"], namefile=test_name)
 			measure_single(hp4155)
 			meas_result = {"meas_status" : "meas_success", "meas_message" : ""}
+			hp4155.save_result(MES_parameters["NET"], f"{test_name.replace('.MES','')}_" + str(dieActual) + "_" + str(moduleActual))
 			txt_result = f"Measurement {test_name} done, die: " + str(dieActual) + " module: " + str(moduleActual)
 			main.updateTextDescription(txt_result)
 

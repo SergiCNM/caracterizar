@@ -467,10 +467,12 @@ try:
 			posy_array = [0,0]
 			num_graphs = 2
 			plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
+			# print(plot_parameters)
 			for i in range(0,num_graphs):
 				#main.plotwindow[i] = ""
 				posx = posx_array[i]
 				posy = posy_array[i]
+				# emit_plot(plot_parameters[i])
 				# main.show_plotwindow(plot_parameters[i],i)
 			# print final result
 			if dieActual == str(nchips):
