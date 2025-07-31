@@ -4,12 +4,12 @@ author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
-darkmode = true
-estepa = false
+darkmode = false
+estepa = true
 txtprocess = "14733"
 txtlot = "14733"
 txtwafer = "6"
-txtmask = "CNM863"
+txtmask = "CNM004"
 txttemperature = "25.0"
 txthumidity = "48"
 
@@ -51,7 +51,7 @@ mysqlpassword = "Mysql123"
 mysqldatabase = "labs_new"
 
 [reports]
-title = "TLM REPORT"
-subtitle = "18398"
-date = "JUL 2025"
+title = "CAP REPORT"
+subtitle = "17224"
+date = "DIC 2023"
 author = "Sergi Sànchez"

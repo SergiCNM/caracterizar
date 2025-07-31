@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainKNlTXs.ui'
+## Form generated from reading UI file 'mainxSweFm.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -2433,10 +2433,7 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.measurements)
         self.instruments = QWidget()
         self.instruments.setObjectName(u"instruments")
-        self.verticalLayout_26 = QVBoxLayout(self.instruments)
-        self.verticalLayout_26.setObjectName(u"verticalLayout_26")
-        self.verticalLayout_25 = QVBoxLayout()
-        self.verticalLayout_25.setSpacing(6)
+        self.verticalLayout_25 = QVBoxLayout(self.instruments)
         self.verticalLayout_25.setObjectName(u"verticalLayout_25")
         self.label_3 = QLabel(self.instruments)
         self.label_3.setObjectName(u"label_3")
@@ -2446,16 +2443,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_25.addWidget(self.label_3)
 
-        self.verticalSpacer_8 = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.verticalSpacer_8 = QSpacerItem(13, 13, QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.verticalLayout_25.addItem(self.verticalSpacer_8)
 
-        self.gridLayout_9 = QGridLayout()
-        self.gridLayout_9.setObjectName(u"gridLayout_9")
-        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_9.addItem(self.horizontalSpacer_13, 0, 1, 1, 1)
-
+        self.horizontalLayout_40 = QHBoxLayout()
+        self.horizontalLayout_40.setObjectName(u"horizontalLayout_40")
         self.cmbInstruments_2 = QComboBox(self.instruments)
         self.cmbInstruments_2.addItem("")
         self.cmbInstruments_2.setObjectName(u"cmbInstruments_2")
@@ -2468,66 +2461,131 @@ class Ui_MainWindow(object):
         self.cmbInstruments_2.setIconSize(QSize(16, 16))
         self.cmbInstruments_2.setFrame(True)
 
-        self.gridLayout_9.addWidget(self.cmbInstruments_2, 0, 0, 1, 1)
+        self.horizontalLayout_40.addWidget(self.cmbInstruments_2)
 
-        self.verticalSpacer_9 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.horizontalSpacer_31 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
-        self.gridLayout_9.addItem(self.verticalSpacer_9, 1, 1, 1, 1)
+        self.horizontalLayout_40.addItem(self.horizontalSpacer_31)
+
+        self.btnParametersInstruments = QPushButton(self.instruments)
+        self.btnParametersInstruments.setObjectName(u"btnParametersInstruments")
+        self.btnParametersInstruments.setEnabled(True)
+        self.btnParametersInstruments.setMinimumSize(QSize(30, 30))
+        self.btnParametersInstruments.setMaximumSize(QSize(30, 16777215))
+        self.btnParametersInstruments.setFont(font)
+        self.btnParametersInstruments.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btnParametersInstruments.setStyleSheet(u"/*background-color: rgb(52, 59, 72);*/\n"
+"\n"
+"#pagesContainer .QPushButton {\n"
+"	border: 2px solid rgb(52, 59, 72);\n"
+"	border-radius: 5px;	\n"
+"	background-color: rgb(52, 59, 72);\n"
+"}\n"
+"\n"
+"#pagesContainer .QPushButton:hover {\n"
+"	background-color: rgb(57, 65, 80);\n"
+"	border: 2px solid rgb(61, 70, 86);\n"
+"}\n"
+"\n"
+"#pagesContainer .QPushButton:pressed {	\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 2px solid rgb(43, 50, 61);\n"
+"}\n"
+"\n"
+"#pagesContainer .QPushButton:disabled {\n"
+"\n"
+"	background-color: #333333; border: none;\n"
+"}")
+        self.btnParametersInstruments.setIcon(icon1)
+        self.btnParametersInstruments.setFlat(False)
+
+        self.horizontalLayout_40.addWidget(self.btnParametersInstruments)
+
+        self.horizontalSpacer_32 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_40.addItem(self.horizontalSpacer_32)
 
 
-        self.verticalLayout_25.addLayout(self.gridLayout_9)
+        self.verticalLayout_25.addLayout(self.horizontalLayout_40)
 
+        self.horizontalSpacer_13 = QSpacerItem(1182, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.verticalLayout_26.addLayout(self.verticalLayout_25)
+        self.verticalLayout_25.addItem(self.horizontalSpacer_13)
+
+        self.verticalSpacer_9 = QSpacerItem(20, 693, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_25.addItem(self.verticalSpacer_9)
 
         self.stackedWidget.addWidget(self.instruments)
         self.probers = QWidget()
         self.probers.setObjectName(u"probers")
-        self.verticalLayout_28 = QVBoxLayout(self.probers)
-        self.verticalLayout_28.setObjectName(u"verticalLayout_28")
-        self.verticalLayout_27 = QVBoxLayout()
-        self.verticalLayout_27.setObjectName(u"verticalLayout_27")
-        self.label_4 = QLabel(self.probers)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setMaximumSize(QSize(16777215, 20))
-        self.label_4.setStyleSheet(u"font: 700 12pt \"Segoe UI\";")
-        self.label_4.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+        self.verticalLayout_probers = QVBoxLayout(self.probers)
+        self.verticalLayout_probers.setObjectName(u"verticalLayout_probers")
+        self.label_probers = QLabel(self.probers)
+        self.label_probers.setObjectName(u"label_probers")
+        self.label_probers.setMaximumSize(QSize(16777215, 20))
+        self.label_probers.setStyleSheet(u"font: 700 12pt \"Segoe UI\";")
+        self.label_probers.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
 
-        self.verticalLayout_27.addWidget(self.label_4)
+        self.verticalLayout_probers.addWidget(self.label_probers)
 
-        self.verticalSpacer_10 = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.verticalSpacer_probers = QSpacerItem(13, 13, QSizePolicy.Minimum, QSizePolicy.Fixed)
 
-        self.verticalLayout_27.addItem(self.verticalSpacer_10)
+        self.verticalLayout_probers.addItem(self.verticalSpacer_probers)
 
-        self.gridLayout_3 = QGridLayout()
-        self.gridLayout_3.setSpacing(0)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.gridLayout_3.setContentsMargins(-1, 0, 0, -1)
+        self.horizontalLayout_probers = QHBoxLayout()
+        self.horizontalLayout_probers.setObjectName(u"horizontalLayout_probers")
         self.cmbProbers_2 = QComboBox(self.probers)
         self.cmbProbers_2.addItem("")
         self.cmbProbers_2.setObjectName(u"cmbProbers_2")
+        self.cmbProbers_2.setMinimumSize(QSize(150, 0))
+        self.cmbProbers_2.setMaximumSize(QSize(150, 30))
         self.cmbProbers_2.setFont(font)
-        self.cmbProbers_2.setAutoFillBackground(False)
         self.cmbProbers_2.setStyleSheet(u"background-color: rgb(33, 37, 43);")
         self.cmbProbers_2.setEditable(True)
-        self.cmbProbers_2.setIconSize(QSize(16, 16))
-        self.cmbProbers_2.setFrame(True)
 
-        self.gridLayout_3.addWidget(self.cmbProbers_2, 0, 0, 1, 1)
+        self.horizontalLayout_probers.addWidget(self.cmbProbers_2)
 
-        self.horizontalSpacer_14 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_probers_1 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
-        self.gridLayout_3.addItem(self.horizontalSpacer_14, 0, 1, 1, 1)
+        self.horizontalLayout_probers.addItem(self.horizontalSpacer_probers_1)
 
-        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.btnParametersProbers = QPushButton(self.probers)
+        self.btnParametersProbers.setObjectName(u"btnParametersProbers")
+        self.btnParametersProbers.setMinimumSize(QSize(30, 30))
+        self.btnParametersProbers.setMaximumSize(QSize(30, 16777215))
+        self.btnParametersProbers.setStyleSheet(u"\n"
+"/*background-color: rgb(52, 59, 72);*/\n"
+"#pagesContainer .QPushButton {\n"
+"	border: 2px solid rgb(52, 59, 72);\n"
+"	border-radius: 5px;\n"
+"	background-color: rgb(52, 59, 72);\n"
+"}\n"
+"#pagesContainer .QPushButton:hover {\n"
+"	background-color: rgb(57, 65, 80);\n"
+"	border: 2px solid rgb(61, 70, 86);\n"
+"}\n"
+"#pagesContainer .QPushButton:pressed {\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 2px solid rgb(43, 50, 61);\n"
+"}\n"
+"#pagesContainer .QPushButton:disabled {\n"
+"	background-color: #333333; border: none;\n"
+"}")
+        self.btnParametersProbers.setIcon(icon1)
 
-        self.gridLayout_3.addItem(self.verticalSpacer_11, 1, 1, 1, 1)
+        self.horizontalLayout_probers.addWidget(self.btnParametersProbers)
+
+        self.horizontalSpacer_probers_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_probers.addItem(self.horizontalSpacer_probers_2)
 
 
-        self.verticalLayout_27.addLayout(self.gridLayout_3)
+        self.verticalLayout_probers.addLayout(self.horizontalLayout_probers)
 
+        self.verticalSpacer_probers_bottom = QSpacerItem(20, 693, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_28.addLayout(self.verticalLayout_27)
+        self.verticalLayout_probers.addItem(self.verticalSpacer_probers_bottom)
 
         self.stackedWidget.addWidget(self.probers)
         self.estepa = QWidget()
@@ -4704,7 +4762,7 @@ class Ui_MainWindow(object):
 
         self.stackedWidget_configuration.setCurrentIndex(1)
         self.optionsNonAutomatic.setCurrentIndex(1)
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(3)
         self.tabWidget.setCurrentIndex(2)
         self.tabGraph.setCurrentIndex(0)
         self.optionsESTEPA.setCurrentIndex(0)
@@ -4896,10 +4954,16 @@ class Ui_MainWindow(object):
         self.cmbInstruments_2.setItemText(0, QCoreApplication.translate("MainWindow", u"Select instrument", None))
 
         self.cmbInstruments_2.setCurrentText(QCoreApplication.translate("MainWindow", u"Select instrument", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"PROBERS", None))
+#if QT_CONFIG(tooltip)
+        self.btnParametersInstruments.setToolTip(QCoreApplication.translate("MainWindow", u"Parameters configuration", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnParametersInstruments.setText("")
+        self.label_probers.setText(QCoreApplication.translate("MainWindow", u"PROBERS", None))
         self.cmbProbers_2.setItemText(0, QCoreApplication.translate("MainWindow", u"Select instrument", None))
 
-        self.cmbProbers_2.setCurrentText(QCoreApplication.translate("MainWindow", u"Select instrument", None))
+#if QT_CONFIG(tooltip)
+        self.btnParametersProbers.setToolTip(QCoreApplication.translate("MainWindow", u"Parameters configuration", None))
+#endif // QT_CONFIG(tooltip)
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"STATISTICS for the PARAMETRIC TEST", None))
         self.optLoadFiles.setText(QCoreApplication.translate("MainWindow", u"Load from files", None))
         self.optLoadBBDD.setText(QCoreApplication.translate("MainWindow", u"Load from BBDD", None))

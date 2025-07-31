@@ -5,6 +5,7 @@ WORKSPACE_NAME = "SOLARMEMS"
 GROUP = "SOLARMEMS"
 TEST_PRESET_GROUP_NAME = "Solarmems"
 FOLDER_IMAGES = "C:\\solarmems\\"
+ONLY_PHOTOS = true
 
 [options]
 
@@ -15,3 +16,4 @@ WORKSPACE_NAME = "Workspace name"
 GROUP = "Group name"
 TEST_PRESET_GROUP_NAME = "Test preset group name"
 FOLDER_IMAGES = "Folder to save images (MPI)"
+ONLY_PHOTOS = "Only take photos, no electrical measurements"

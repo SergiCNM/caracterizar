@@ -300,11 +300,12 @@ def create_file_results(main, folder, namefile):
 
 
 try:
-	# connect to B1500
-	B1500 = Keysight_B1500LAN(instruments["Keysight_B1500LAN"])
-	B1500.instrument.timeout = 200000 # bigger than test
 	load_TEST_parameters()
 	path_images = get_folder_photos(main)
+	if not TEST_parameters["ONLY_PHOTOS"]:
+		# connect to B1500
+		B1500 = Keysight_B1500LAN(instruments["Keysight_B1500LAN"])
+		B1500.instrument.timeout = 200000 # bigger than test
 
 	if cartographic_measurement:
 		nchips = main.waferwindow.wafer_parameters["nchips"]
@@ -318,53 +319,62 @@ try:
             #     buttons=QMessageBox.Yes | QMessageBox.Cancel,
             #     defaultButton=QMessageBox.Yes,
             # )
-			retval = message_user(main, "Init Keysight B1500 for measurement!", "Please, configure instrument for initialization", "yes_cancel")
-			if retval == QMessageBox.Yes:
-				# init B1500 for measurement
-				Voltage = []
-				bad_devices = 0
-				bad_coefvar_devices = 0
-				defective_devices = 0
-				good_devices = 0
-				configure_meas_solarmems(B1500)
-				test_status.status = "STARTED"
-				folder, namefile = get_folder_namefile(main)
-				if not create_file_results(main, folder, namefile):
-					test_status.status = "ABORTED"	
+			if not TEST_parameters["ONLY_PHOTOS"]:
+				retval = message_user(main, "Init Keysight B1500 for measurement!", "Please, configure instrument for initialization", "yes_cancel")
+				if retval == QMessageBox.Yes:
+					# init B1500 for measurement
+					Voltage = []
+					bad_devices = 0
+					bad_coefvar_devices = 0
+					defective_devices = 0
+					good_devices = 0
+					configure_meas_solarmems(B1500)
+					test_status.status = "STARTED"
+					folder, namefile = get_folder_namefile(main)
+					if not create_file_results(main, folder, namefile):
+						test_status.status = "ABORTED"
 
+				else:
+					test_status.status = "ABORTED"
 			else:
-				test_status.status = "ABORTED"
+				test_status.status = "STARTED"
 
 
 		if test_status.status =="STARTED":
-			# 1) DARK MEAS
-			main.prober.light("0")
-			meas_status_dark, message_dark, results = test_solarmems(B1500)
-			Voltage, I1_dark, I2_dark, I3_dark, I4_dark = results['V1'], results['I1'], results['I2'], results['I3'], results['I4']
-			# save file .txt for sensor
-			save_measurement_file_solarmems(main,Voltage,I1_dark,I2_dark,I3_dark,I4_dark,"dark")
-			# get current in -3.3V (12 position in list)
-			leakage_currents = [I1_dark[11], I2_dark[11], I3_dark[11], I4_dark[11]]
-			# get current in -9.9V (34 position in list)
-			leakage_currents2 = [I1_dark[33], I2_dark[33], I3_dark[33], I4_dark[33]]
+			if not TEST_parameters["ONLY_PHOTOS"]:
+				# 1) DARK MEAS
+				main.prober.light("0")
+				meas_status_dark, message_dark, results = test_solarmems(B1500)
+				Voltage, I1_dark, I2_dark, I3_dark, I4_dark = results['V1'], results['I1'], results['I2'], results['I3'], results['I4']
+				# save file .txt for sensor
+				save_measurement_file_solarmems(main,Voltage,I1_dark,I2_dark,I3_dark,I4_dark,"dark")
+				# get current in -3.3V (12 position in list)
+				leakage_currents = [I1_dark[11], I2_dark[11], I3_dark[11], I4_dark[11]]
+				# get current in -9.9V (34 position in list)
+				leakage_currents2 = [I1_dark[33], I2_dark[33], I3_dark[33], I4_dark[33]]
 
-			# 2) LIGHT MEAS
-			main.prober.light_property("light", brightness_light)
-			main.prober.light("1")
-			# wait time to adjust light & make measurement with correct light
-			time.sleep(1)
-			meas_status_light, message_light, results = test_solarmems(B1500)
-			Voltage, I1_light, I2_light, I3_light, I4_light = results['V1'], results['I1'], results['I2'], results['I3'], results['I4']
-			# save file .txt for sensor
-			name_sensor = save_measurement_file_solarmems(main,Voltage,I1_light,I2_light,I3_light,I4_light,"light")
-			# get current in -3.3V (12 position in list)
-			photo_currents = [I1_light[11], I2_light[11], I3_light[11], I4_light[11]]
-			# get current in -9.9V (34 position in list)
-			photo_currents2 = [I1_light[33], I2_light[33], I3_light[33], I4_light[33]]
-			
-			# 3) GET PARAMS & SAVE (line) TO RESULTS FILE
-			params = get_params(leakage_currents,photo_currents)
-			save_results_file_solarmems(main, name_sensor,leakage_currents,leakage_currents2,photo_currents,photo_currents2,params)
+				# 2) LIGHT MEAS
+				main.prober.light_property("light", brightness_light)
+				main.prober.light("1")
+				# wait time to adjust light & make measurement with correct light
+				time.sleep(1)
+				meas_status_light, message_light, results = test_solarmems(B1500)
+				Voltage, I1_light, I2_light, I3_light, I4_light = results['V1'], results['I1'], results['I2'], results['I3'], results['I4']
+				# save file .txt for sensor
+				name_sensor = save_measurement_file_solarmems(main,Voltage,I1_light,I2_light,I3_light,I4_light,"light")
+				# get current in -3.3V (12 position in list)
+				photo_currents = [I1_light[11], I2_light[11], I3_light[11], I4_light[11]]
+				# get current in -9.9V (34 position in list)
+				photo_currents2 = [I1_light[33], I2_light[33], I3_light[33], I4_light[33]]
+
+				# 3) GET PARAMS & SAVE (line) TO RESULTS FILE
+				params = get_params(leakage_currents,photo_currents)
+				save_results_file_solarmems(main, name_sensor,leakage_currents,leakage_currents2,photo_currents,photo_currents2,params)
+			else:
+				column_row = main.waferwindow.wafer_parameters["wafer_positions"]
+				die = int(dieActual)-1
+				num_sensor = die
+				name_sensor = "S" + f"{num_sensor:03d}"
 
 			# 4) MAKE PHOTO
 			main.prober.light_property("light", brightness_light_photo)
@@ -372,108 +382,121 @@ try:
 			time.sleep(1)
 			main.prober.image(path_images + name_sensor + ".jpg",1)
 
-			# 5) GET yield
-			pass_leakage_current = 0
-			pass_photo_current = 0
-			pass_stability = 0
-			for param in params:
-				if param["name"]=="Pass leakage current":
-					pass_leakage_current = param["value"]
-				if param["name"]=="Pass photo current":
-					pass_photo_current = param["value"]
-				if param["name"]=="Stability Cv":
-					pass_stability = param["value"]
-				
-			if pass_leakage_current and pass_photo_current and pass_stability:
-				#good_devices +=1
-				meas_status = "meas_success"
-				message = ""
-				if not meas_status_dark:
-					meas_status = "meas_error"
-					message = message_dark
-				else:
-					if not meas_status_light:
+			if not TEST_parameters["ONLY_PHOTOS"]:
+				# 5) GET yield
+				pass_leakage_current = 0
+				pass_photo_current = 0
+				pass_stability = 0
+				for param in params:
+					if param["name"]=="Pass leakage current":
+						pass_leakage_current = param["value"]
+					if param["name"]=="Pass photo current":
+						pass_photo_current = param["value"]
+					if param["name"]=="Stability Cv":
+						pass_stability = param["value"]
+
+				if pass_leakage_current and pass_photo_current and pass_stability:
+					#good_devices +=1
+					meas_status = "meas_success"
+					message = ""
+					if not meas_status_dark:
 						meas_status = "meas_error"
-						message = message_light
-			else:
-				if pass_leakage_current and pass_photo_current and not pass_stability:
-					#bad_coefvar_devices +=1
-					meas_status = "meas_warning"
-					message = "Bad CoefV!"
+						message = message_dark
+					else:
+						if not meas_status_light:
+							meas_status = "meas_error"
+							message = message_light
 				else:
-					#defective_devices +=1
-					meas_status = "meas_error"
-					message = "Unstable device!"
-			
-			# save results
-			main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
-			    "status" : meas_status,
-			    "message" : message,
-			    "contact_height" : "", 
-			    "variables" : [{
-			        "params" : [],
-			        "data" : [{"name" : "V", "values" : Voltage, "units" : "V"},{"name": "I01", "values" : I1_dark, "units": "A"},{"name": "I02", "values" : I2_dark, "units": "A"},{"name": "I03", "values" : I3_dark, "units": "A"},{"name": "I04", "values" : I4_dark, "units": "A"}]
-			    },{
-			        "params" : params,
-			        "data" : [{"name" : "V", "values" : Voltage, "units" : "V"},{"name": "I01", "values" : I1_light, "units": "A"},{"name": "I02", "values" : I2_light, "units": "A"},{"name": "I03", "values" : I3_light, "units": "A"},{"name": "I04", "values" : I4_light, "units": "A"}]
-			    }],
-			    "plot_parameters" : [{
-			        "name" : "Plot IV dark",
-			        "x" : Voltage,
-			        "y1" : I1_dark,
-			        "y2" : I2_dark,
-					"y3" : I3_dark,
-					"y4" : I4_dark,
-			        "titles" : {
-			            "title" : "I-V Measurement dark",
-			            "left" : "Sensor current",
-			            "bottom" : "Voltage"
-			        },
-			        "units" : {
-			            "left" : "A",
-			            "bottom" : "V",
-			            "right" : "A"
-			        },
-			        "showgrid" : {"x" : False, "y" : False},
-			        "legend" : False,
-			        "multiaxis" : False
+					if pass_leakage_current and pass_photo_current and not pass_stability:
+						#bad_coefvar_devices +=1
+						meas_status = "meas_warning"
+						message = "Bad CoefV!"
+					else:
+						#defective_devices +=1
+						meas_status = "meas_error"
+						message = "Unstable device!"
 
-			    },{
-			        "name" : "Plot IV light",
-			        "x" : Voltage,
-			        "y1" : I1_light,
-			        "y2" : I2_light,
-					"y3" : I3_light,
-					"y4" : I4_light,
-			        "titles" : {
-			            "title" : "I-V Measurement light",
-			            "left" : "Sensor current",
-			            "bottom" : "Voltage"
-			        },
-			        "units" : {
-			            "left" : "A",
-			            "bottom" : "V",
-			            "right" : "A"
-			        },
-			        "showgrid" : {"x" : False, "y" : False},
-			        "legend" : False,
-			        "multiaxis" : False
+				# save results
+				main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+					"status" : meas_status,
+					"message" : message,
+					"contact_height" : "",
+					"variables" : [{
+						"params" : [],
+						"data" : [{"name" : "V", "values" : Voltage, "units" : "V"},{"name": "I01", "values" : I1_dark, "units": "A"},{"name": "I02", "values" : I2_dark, "units": "A"},{"name": "I03", "values" : I3_dark, "units": "A"},{"name": "I04", "values" : I4_dark, "units": "A"}]
+					},{
+						"params" : params,
+						"data" : [{"name" : "V", "values" : Voltage, "units" : "V"},{"name": "I01", "values" : I1_light, "units": "A"},{"name": "I02", "values" : I2_light, "units": "A"},{"name": "I03", "values" : I3_light, "units": "A"},{"name": "I04", "values" : I4_light, "units": "A"}]
+					}],
+					"plot_parameters" : [{
+						"name" : "Plot IV dark",
+						"x" : Voltage,
+						"y1" : I1_dark,
+						"y2" : I2_dark,
+						"y3" : I3_dark,
+						"y4" : I4_dark,
+						"titles" : {
+							"title" : "I-V Measurement dark",
+							"left" : "Sensor current",
+							"bottom" : "Voltage"
+						},
+						"units" : {
+							"left" : "A",
+							"bottom" : "V",
+							"right" : "A"
+						},
+						"showgrid" : {"x" : False, "y" : False},
+						"legend" : False,
+						"multiaxis" : False
 
-			    }]
+					},{
+						"name" : "Plot IV light",
+						"x" : Voltage,
+						"y1" : I1_light,
+						"y2" : I2_light,
+						"y3" : I3_light,
+						"y4" : I4_light,
+						"titles" : {
+							"title" : "I-V Measurement light",
+							"left" : "Sensor current",
+							"bottom" : "Voltage"
+						},
+						"units" : {
+							"left" : "A",
+							"bottom" : "V",
+							"right" : "A"
+						},
+						"showgrid" : {"x" : False, "y" : False},
+						"legend" : False,
+						"multiaxis" : False
 
-			}
-			# show 2 graphs
-			posx_array = [0,0]
-			posy_array = [0,0]
-			num_graphs = 2
-			plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
-			# print(plot_parameters)
-			for i in range(0,num_graphs):
-				#main.plotwindow[i] = ""
-				posx = posx_array[i]
-				posy = posy_array[i]
-				# emit_plot(plot_parameters[i])
-				# main.show_plotwindow(plot_parameters[i],i)
+					}]
+
+				}
+				# show 2 graphs
+				posx_array = [0,0]
+				posy_array = [0,0]
+				num_graphs = 2
+				plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
+				# print(plot_parameters)
+				for i in range(0,num_graphs):
+					#main.plotwindow[i] = ""
+					posx = posx_array[i]
+					posy = posy_array[i]
+					# emit_plot(plot_parameters[i])
+					# main.show_plotwindow(plot_parameters[i],i)
+			else:
+
+				# only photos, no measurements
+				meas_status = "meas_success"
+				message = "Only photos taken!"
+				main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+					"status" : meas_status,
+					"message" : message,
+					"contact_height" : "",
+					"variables" : [],
+					"plot_parameters" : []
+				}
 			# print final result
 			if dieActual == str(nchips):
 				main.prober.light("0")

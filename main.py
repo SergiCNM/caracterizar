@@ -76,9 +76,14 @@ from numpy.random import randn
 from numpy.random import seed
 
 # import matplotlib histograms
-from matplotlib.backends.qt_compat import QtWidgets
+# from matplotlib.backends.qt_compat import QtWidgets
+# from matplotlib.backends.backend_qtagg import (
+#     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from PySide6 import QtWidgets
 from matplotlib.backends.backend_qtagg import (
-    FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar
+)
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
