@@ -216,23 +216,28 @@ class HP_4155B:
         """
         import shutil
         import os
-        # get path from MES_parameters
-        moving_from = "\\" + MES_parameters["FITXERS_FOLDER"] # adding \\ to recognize net folder
-        moving_to = MES_parameters["DISK_FOLDER"]
-        if not os.path.exists(moving_to):
-            print("Destination folder doesn't exist")
-            os.makedirs(moving_to)
-            print(f"Destination folder created: {moving_to}")
+        try:
+            # get path from MES_parameters
+            moving_from = "\\" + MES_parameters["FITXERS_FOLDER"] # adding \\ to recognize net folder
+            moving_to = MES_parameters["DISK_FOLDER"]
 
-        if not os.path.exists(moving_from):
-            print(f"Path doesn't exist {moving_from}")
+            if not os.path.exists(moving_to):
+                print("Destination folder doesn't exist")
+                os.makedirs(moving_to)
+                print(f"Destination folder created: {moving_to}")
 
-        # move files from NET to disk path
-        for file in os.listdir(moving_from):
-            if file.lower().endswith(".txt"):
-                ruta_origen = os.path.join(moving_from, file)
-                ruta_destino = os.path.join(moving_to, file)
-                print(f"Trying to move {ruta_origen} to {ruta_destino}")
-                shutil.move(ruta_origen, ruta_destino)
+            if not os.path.exists(moving_from):
+                print(f"Path doesn't exist {moving_from}")
+
+            # move files from NET to disk path
+            for file in os.listdir(moving_from):
+                if file.lower().endswith(".txt"):
+                    ruta_origen = os.path.join(moving_from, file)
+                    ruta_destino = os.path.join(moving_to, file)
+                    print(f"Trying to move {ruta_origen} to {ruta_destino}")
+                    shutil.move(ruta_origen, ruta_destino)
+
+        except Exception as e:
+            print(f"Error moving files: {e}")
 
 

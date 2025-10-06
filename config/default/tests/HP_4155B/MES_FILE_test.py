@@ -50,7 +50,6 @@ if MES_parameters["TEST_NAMES"] == "":
 else:
     hp4155 = HP_4155B(instruments["HP_4155B"])
     test_names = MES_parameters["TEST_NAMES"].split(",")
-    print(test_names)
     count = 0
     if cartographic_measurement:
         if str(dieActual)=="1" and str(moduleActual)=="1":
@@ -69,22 +68,14 @@ else:
         if test_status.status=="STARTED":
             for test_name in test_names:
                 measurement_status.status = "START"
-                print(f"{test_name} for die {dieActual} and module {moduleActual} STARTED!")
                 # set test name
-                print(f"Loading test: {test_name}")
                 hp4155.load_mes(destination=MES_parameters["NET"], namefile=test_name)
-                print(f"Test {test_name} loaded!")
-                print ("Measuring...")
                 measure_single(hp4155)
-                print("Measure completed!")
                 count += 1
                 # save DAT file in cartographic process
                 name_file = f"{test_name.replace('.MES', '')}_" + str(dieActual) + "_" + str(moduleActual)
-                print("Saving result...")
                 hp4155.save_result(MES_parameters["NET"], name_file)
-                print(f"File {name_file} saved!")
                 meas_result = {"meas_status" : "meas_success", "meas_message" : ""}
-
                 txt_result = f"Measurement {test_name} done, die: " + str(dieActual) + " module: " + str(moduleActual)
                 main.updateTextDescription(txt_result)
                 main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
