@@ -32,6 +32,8 @@ class Keithley_2470:
             self.timeout(int(parameters["timeout"]))
         self.parameters = parameters
 
+        print(self.idn())
+
     def reset(self):
         """
 		Reset function
@@ -95,8 +97,8 @@ class Keithley_2470:
             state = "ON"
         if state == 0:
             state = "OFF"
-        if state == "ON" or state == "OFF":
-            cmd = ":OUTP " + state
+        if state.lower() == "on" or state.lower() == "off":
+            cmd = ":OUTP " + state.upper()
             self.instrument.write(cmd)
         else:
             raise ValueError("OUTPUT state not possible (ON or OFF)")
@@ -321,6 +323,10 @@ a specific delay value from 50 μs to 10,000 s, or 0 for no delay
 
         return True
 
+    def set_voltage(self, voltage):
+        cmd = f":SOUR:VOLT {voltage}"
+        self.instrument.write(cmd)
+
     def get_error_count(self):
         return self.instrument.query(":SYST:ERR:COUN?")
 
@@ -415,6 +421,7 @@ a specific delay value from 50 μs to 10,000 s, or 0 for no delay
         self.reset()
         print(source, sens)
         return source, sens
+
     def get_source_list(self, IV_parameters):
         Stop = IV_parameters["STOP"]
         Start = IV_parameters["START"]

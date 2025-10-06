@@ -1513,6 +1513,7 @@ class MainWindow(QMainWindow):
         btnName = btn.objectName()
         # btnSaveHistogram, btnSaveWafermap, btnSaveCorrelation btnSaveDataValues, btnSaveParametersResult, btnSaveHistorical
         texto = str(btnName).replace("btnSave", "")
+        print(f"Texto to save: {texto}")
         if texto != "Historical" and texto != "Diagram":
             # GET run, wafer, & parameter values
             if widgets.optLoadFiles.isChecked():
