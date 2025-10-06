@@ -40,7 +40,6 @@ def measure_single(hp4155):
 
 
 load_MES_parameters()
-print(f"MES_parameters: {MES_parameters}")
 
 if MES_parameters["TEST_NAMES"] == "":
     # exit with error
