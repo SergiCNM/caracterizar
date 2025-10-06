@@ -71,7 +71,7 @@ class Keysight_B1500:
 		cmd = "CN"
 		if channel!="all":
 			if int(channel)>=1 and int(channel)<=4:
-				cmd = cmd + " " + strt(channel)
+				cmd = cmd + " " + str(channel)
 		self.instrument.write(cmd)
 
 	def disable_channels(self,channel="all"):
@@ -85,7 +85,7 @@ class Keysight_B1500:
 		cmd = "DZ"
 		if channel!="all":
 			if int(channel)>=1 and int(channel)<=4:
-				cmd = cmd + " " + strt(channel)
+				cmd = cmd + " " + str(channel)
 		self.instrument.write(cmd)	
 
 	def set_data_output_format(self,format,mode=0):
@@ -138,7 +138,7 @@ class Keysight_B1500:
 		self.instrument.write(cmd)
 
 
-	def save_result(self,destination,namefile, delimiter = "TAB"):
+	def save_result(self, destination, name_file, delimiter = "TAB"):
 		# destination = INTernal|NET1|NET2|NET3|NET4
 		destination_array = ["INT","NET1","NET2","NET3","NET4"]
 		if destination in destination_array:
@@ -157,7 +157,7 @@ class Keysight_B1500:
 			cmd = ":MMEM:STOR:SSH:UNIT OFF"
 			self.instrument.write(cmd)
 			# file name
-			cmd = ":MMEM:STOR:SSH '" + namefile + "'"
+			cmd = ":MMEM:STOR:SSH '" + name_file + "'"
 			self.instrument.write(cmd)
 	
 

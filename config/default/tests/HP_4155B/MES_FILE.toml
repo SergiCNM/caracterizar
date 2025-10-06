@@ -4,11 +4,11 @@ title = "HP4155 MES parameters"
 INTEGRATION = "MED"
 NET = "NET1"
 NET_UPDATE = "NET4"
-UPDATE_COUNT = 50
-MOVE_FILES = false
-DISK_FOLDER = "D:\\USERS\\ssanchez"
+UPDATE_COUNT = 2
+MOVE_FILES = true
+DISK_FOLDER = "C:\\GITHUB\\Python\\caracterizar\\results\\default\\test"
 FITXERS_FOLDER = "\\fitxers3\\fitxers\\siam-hp4155\\sergi"
-TEST_NAMES = "CNM1246.MES"
+TEST_NAMES = "CNM1246.MES,DIODO.MES"
 
 [options]
 INTEGRATION = "SHOR,MED,LONG"
