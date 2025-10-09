@@ -2,18 +2,18 @@ title = "CV parameters"
 
 [parameters]
 START = 5.0
-STOP = -5
-STEP = -0.25
-FREQ = 10
-OSC = 500
+STOP = -5.0
+STEP = -0.2
+FREQ = 30
+OSC = 30
 PN = 1.0
 CIRCUIT_MODE = "Parallel"
 NOT_CHANGE = false
 AVERAGE = false
-HYSTERESIS = true
+HYSTERESIS = false
 HYSTERESIS_TIME = 1
 WAIT_TIME = 0.0
-LIGHT = false
+LIGHT = true
 LIGHT_TIME = 3
 TEMPERATURE = 22.0
 AREA = 960400

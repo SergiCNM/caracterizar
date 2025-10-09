@@ -3,6 +3,8 @@
 import os.path
 import sys
 from PySide6.QtWidgets import QMessageBox
+
+from config.default.instruments import HP_4192A
 from config.functions import *
 import toml
 global test_status, measurement_status
@@ -10,6 +12,37 @@ global dieActual, moduleActual
 global CV_parameters
 global base_dir, tests_dir, cartographic_measurement
 
+
+def measure_CV(hp4192A,CV_parameters,voltage,capacitance,conductance):
+    i = 0
+    # Calc samples
+    num_samples = abs((float(CV_parameters["START"])-float(CV_parameters["STOP"]))/float(CV_parameters["STEP"])) + 1
+    # Calc PN
+    PN = 1
+    if CV_parameters["START"] < CV_parameters["STOP"]:
+        PN = -1
+    for i in range(0,int(num_samples)):
+        try:
+
+            hp4192A.single()  # lanza la medida
+            lectura = hp4192A.read()  # lee la medida
+            #print(f"Lecture: {lectura}")
+            lectura_array = lectura.split(",")
+            capacitance_value = lectura_array[0][4:]
+            conductance_value = lectura_array[1][4:]
+            voltage_value = lectura_array[2][1:]
+            capacitance.append(float(capacitance_value))
+            conductance.append(float(conductance_value))
+            voltage.append(float(voltage_value))
+            #print(f"Point {i+1} of {int(num_samples)}: V={float(voltage_value)} C={float(capacitance_value)} G={float(conductance_value)}")
+            hp4192A.srq()  # habilita SRQ
+
+        except Exception as e:
+            # with error in read stop the loop
+            print(f"Error: {e}")
+            break
+
+    return voltage,capacitance,conductance
 
 def load_CV_parameters():
     global CV_parameters
@@ -53,28 +86,16 @@ try:
     # measure CV
     # send CV_parameters to CONFIG HP4192A
     # default parameters
-    
+    # load parameters from toml file
+    load_CV_parameters()
 
     if cartographic_measurement:
-        # init CV_parameters
-        load_CV_parameters()
         if str(dieActual)=="1" and str(moduleActual)=="1":
-
-
-            # retval = QMessageBox.question(
-            #     self,
-            #     "Init instrument for CV!",
-            #     "Please, configure instrument for initialization",
-            #     buttons=QMessageBox.Yes | QMessageBox.Cancel ,
-            #     defaultButton=QMessageBox.Yes,
-            # )
             retval = message_user(main, "Init instrument for CV!", "Please, configure instrument for initialization", "yes_cancel")
             if retval == QMessageBox.Yes:
                 # reset instrument
                 hp4192A.reset()
-                # Zero open & Zero shorth
-                #hp4192A.zero_open("ON")
-                #hp4192A.zero_short("OFF")
+
                 test_status.status = "STARTED"
             else:
                 test_status.status = "ABORTED"
@@ -98,8 +119,7 @@ try:
                 CV_parameters["capacitance"] = capacitance # list
                 CV_parameters["conductance"] = conductance # list
                 CV_parameters["hysteresis_marker"] = False
-                print(f"Capacitance {dieActual}: {capacitance}")
-                print("Calculating CV")
+                # calculate parameters
                 if CV_parameters["CALCULATE_PARAMS"]:
                     results = calcular_cv(CV_parameters)
                 # hysteresis?
@@ -170,13 +190,9 @@ try:
             }
             plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
             # self.show_graph(plot_parameters)
-            emit_plot(plot_parameters)
-            namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(moduleActual) + ".txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                   headers=["V", "C", "G"], separation=",")
+
     else:
-        # init CV_parameters
-        load_CV_parameters()
+
         # single measure
         if hp4192A.config_CV(CV_parameters):
             # create empty list if not exists
@@ -184,6 +200,9 @@ try:
             capacitance = []
             conductance = []
             results = {}
+            # reset instrument
+            hp4192A.reset()
+
             if CV_parameters["WAIT_TIME"]>0:
                 time.sleep(CV_parameters["WAIT_TIME"])
             if CV_parameters["LIGHT"]:
@@ -260,13 +279,18 @@ try:
 
             }
 
-            # self.show_graph(plot_parameters)
-            emit_plot(plot_parameters)
-            namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_1_1.txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance], headers=["V", "C", "G"], separation=",")
+            dieActual = 1
+            moduleActual = 1
     # stop process
     hp4192A.stop()
     hp4192A.local()
+    emit_plot(plot_parameters)
+    namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
+        moduleActual) + ".txt"
+    main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
+                           headers=["V", "C", "G"], separation=",")
+
+    hp4192A.close()
 
 
 except:

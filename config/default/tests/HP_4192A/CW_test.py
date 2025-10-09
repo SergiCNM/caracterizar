@@ -3,6 +3,8 @@
 import os.path
 import sys
 from PySide6.QtWidgets import QMessageBox
+
+from config.default.instruments import HP_4192A
 from config.functions import *
 import toml
 global test_status, measurement_status
@@ -10,6 +12,26 @@ global dieActual, moduleActual
 global CW_parameters
 global base_dir, tests_dir, cartographic_measurement
     
+def measure_CW(hp4192A,CW_parameters,frequency,capacitance,conductance):
+    i = 0
+    # Calc samples
+    num_samples = abs((float(CW_parameters["START"])-float(CW_parameters["STOP"]))/float(CW_parameters["STEP"])) + 1
+    # lectura 4192a ex: NCPN+0.7910E-06,NGFN+14.940E+00,K+01000.000
+    frequency_value = 0
+    while float(frequency_value)<float(CW_parameters["STOP"]):
+        hp4192A.single()
+        lectura = hp4192A.read()
+        lectura_array = lectura.split(",")
+        capacitance_value = lectura_array[0][4:]
+        conductance_value = lectura_array[1][4:]
+        frequency_value = lectura_array[2][1:]
+        capacitance.append(float(capacitance_value))
+        conductance.append(float(conductance_value))
+        frequency.append(float(frequency_value))
+        hp4192A.srq()
+
+    return frequency,capacitance,conductance
+
 
 def load_CW_parameters():
     global CW_parameters
@@ -89,24 +111,24 @@ try:
                 "contact_height" : "", 
                 "variables" : {
                     "params" : [],
-                    "data" : [{"name" : "V", "values" : frequency, "units" : "V"},{"name": "C", "values" : capacitance, "units": "F"},{"name": "G", "values" : conductance, "units": "S"}]
+                    "data" : [{"name" : "V", "values" : frequency, "units" : "V"},{"name": "C", "values" : capacitance, "units": "pF"},{"name": "G", "values" : conductance, "units": "nS"}]
                 },
                 #"variables" : [{"name" : "cmax(pF)", "value" : 420.056},{"name" : "cmin(pF)", "value" : 210.057}],
                 "plot_parameters" : {
-                    "name" : "Plot CV",
+                    "name" : f"Plot CW Die {dieActual} Module {moduleActual}",
                     "x" : frequency,
                     "y1" : capacitance,
                     "y2" : conductance,
 
                     "titles" : {
-                        "title" : "C-V Measurement",
+                        "title" : f"Plot CW Die {dieActual} Module {moduleActual}",
                         "left" : "Capacitance",
-                        "bottom" : "Voltage",
+                        "bottom" : "Frequency",
                         "right" : "Conductance"
                     },
                     "units" : {
                         "left" : "F",
-                        "bottom" : "V",
+                        "bottom" : "kHz",
                         "right" : "S"
                     },
                     "showgrid" : {"x" : False, "y" : False},
@@ -116,12 +138,7 @@ try:
 
             }
             plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
-            # self.show_plotwindow(plot_parameters, posx, posy)
-            emit_plot(plot_parameters)
-            namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
-                moduleActual) + ".txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
-                                   headers=["F", "C", "G"], separation=",")
+
     else:
         # init CW_parameters
         load_CW_parameters()
@@ -136,40 +153,45 @@ try:
             CW_parameters["capacitance"] = capacitance # list
             CW_parameters["conductance"] = conductance # list
             plot_parameters = {
-                "name" : "Plot CW",
+                "name" : f"Plot CW Single Measure",
                 "x" : frequency,
                 "y1" : capacitance,
                 "y2" : conductance,
 
                 "titles" : {
-                    "title" : "CW Measurement",
+                    "title" : "Plot CW Single Measure",
                     "left" : "Capacitance",
                     "bottom" : "Frequency",
                     "right" : "Conductance"
                 },
                 "units" : {
                     "left" : "F",
-                    "bottom" : "Hz",
+                    "bottom" : "kHz",
                     "right" : "s"
                 },
                 "showgrid" : {"x" : False, "y" : False},
-                "legend" : False
+                "legend" : True,
+                "logarithmic" : {"x" : True, "y" : False},
                 #"foreground" : "#CCCCCC"
 
             }
 
             posx = 0
             posy = 0
-            #self.show_plotwindow(plot_parameters, posx, posy)
-            emit_plot(plot_parameters)
-            namefile = main.getDirs("results") + "/CW_" + main.ui.txtProcess.text() + "_1_1.txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
-                                   headers=["F", "C", "G"], separation=",")
+            dieActual = 1
+            moduleActual = 1
+
+    emit_plot(plot_parameters)
+    namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
+        moduleActual) + ".txt"
+    main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
+                           headers=["F", "C", "G"], separation=",")
+
     # stop process
     hp4192A.stop()
     hp4192A.local()
 
-    
+    hp4192A.close()
 
 
 except:

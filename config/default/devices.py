@@ -9,7 +9,7 @@ instruments["HP_4192A"] = {}
 instruments["HP_4192A"]["address"] = 'GPIB0::23::INSTR'
 instruments["HP_4192A"]["read_termination"] = '\r\n'
 instruments["HP_4192A"]["write_termination"] = '\r\n'
-instruments["HP_4192A"]["timeout"] = '10000' # 10 segundos medida
+instruments["HP_4192A"]["timeout"] = '20000'
 
 # -----------  HP4155B  -----------
 instruments["HP_4155B"] = {}

@@ -614,6 +614,16 @@ class MainWindow(QMainWindow):
                 #  static_canvas.figure.legend(loc="upper right")
                 static_canvas.figure.legend(loc="upper right", bbox_to_anchor=(1,1), bbox_transform=_static_ax.transAxes)
 
+            # logarithmic scale
+            if "logarithmic" in plot_parameters:
+                print(plot_parameters["logarithmic"])
+                if "x" in plot_parameters["logarithmic"] and plot_parameters["logarithmic"]["x"]:
+                    _static_ax.set_xscale('log')
+                if "y" in plot_parameters["logarithmic"] and plot_parameters["logarithmic"]["y"]:
+                    _static_ax.set_yscale('log')
+                if "y2" in plot_parameters["logarithmic"] and plot_parameters["logarithmic"]["y2"] and "y2" in plot_parameters:
+                    _static_ax2.set_yscale('log')
+
             widgets.btnSaveGraph.setVisible(True)
             widgets.btnClearGraph.setVisible(True)
 

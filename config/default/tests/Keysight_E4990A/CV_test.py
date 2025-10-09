@@ -120,8 +120,6 @@ try:
                     # Turn off bias
                     keysightE4990A.turn_off_bias()
 
-            params = []
-            data = []
 
             meas_status = "meas_success"
             # save results
@@ -130,7 +128,7 @@ try:
                 "message": "",
                 "contact_height": "",
                 "variables": {
-                    "params": params,
+                    "params": [],
                     "data": [{"name": "V", "values": voltage, "units": "V"},
                              {"name": "C", "values": capacitance * 1e15, "units": "fF"},
                              {"name": "G", "values": conductance * 1E9, "units": "nS"}]
@@ -159,7 +157,8 @@ try:
 
             }
             plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
-            main.show_graph(plot_parameters)
+            # main.show_graph(plot_parameters)
+            emit_plot(plot_parameters)
             namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
                 moduleActual) + ".txt"
             main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
@@ -236,10 +235,14 @@ try:
 
             }
 
-            main.show_graph(plot_parameters)
+            # main.show_graph(plot_parameters)
+            emit_plot(plot_parameters)
+            print("CV measurement completed")
+            # save results
             namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_1_1.txt"
             main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
                                    headers=["V", "C", "G"], separation=",")
+            print("File " + namefile + " saved")
 
     # stop process
     # keysightE4990A.stop()

@@ -2,11 +2,11 @@ title = "CW parameters"
 
 [parameters]
 START = 1.0
-STOP = 100.0
+STOP = 1000.0
 NUM_POINTS = 100
-LOGFREQ = false
-VOLTAGE = 5
-OSC = 500
+LOGFREQ = true
+VOLTAGE = -5
+OSC = 30
 APERTURE = "5"
 POINT_AVERAGE = false
 AVERAGE_POINTS = 8

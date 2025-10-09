@@ -92,7 +92,22 @@ class PlotWindow(QMainWindow):
             if "margins" in plot_parameters:
                 if len(plot_parameters["margins"])==4:
                     p.setContentsMargins(plot_parameters["margins"][0], plot_parameters["margins"][1], plot_parameters["margins"][2], plot_parameters["margins"][3])
-            
+
+            # -----------
+            # logarithmic
+            # -----------
+            if "logarithmic" in plot_parameters:
+                if "x" in plot_parameters["logarithmic"] and "y" in plot_parameters["logarithmic"]:
+                    print("logarithmic x: " + str(plot_parameters["logarithmic"]["x"]) + " y: " + str(plot_parameters["logarithmic"]["y"]))
+                    if plot_parameters["logarithmic"]["x"] in boolean_values and plot_parameters["logarithmic"]["y"] in boolean_values:
+                        if plot_parameters["logarithmic"]["x"] and plot_parameters["logarithmic"]["y"]:
+                            p.setLogMode(x=True, y=True)
+                        elif plot_parameters["logarithmic"]["x"] and not plot_parameters["logarithmic"]["y"]:
+                            p.setLogMode(x=True, y=False)
+                        elif not plot_parameters["logarithmic"]["x"] and plot_parameters["logarithmic"]["y"]:
+                            p.setLogMode(x=False, y=True)
+                        else:
+                            p.setLogMode(x=False, y=False)
 
             # ----------
             # showgrid

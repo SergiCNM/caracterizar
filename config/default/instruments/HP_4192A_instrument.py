@@ -4,9 +4,14 @@ import time
 
 
 class HP_4192A:
+	# masks según el manual (bit numbering: bit7 MSB -> 0x80)
+	_DATA_READY_MASK = 0x02  # bit 1 -> 0x02
+	_BUSY_MASK = 0x20  # bit 5 -> 0x20
+
 	def __init__(self,parameters):
 		rm = pyvisa.ResourceManager()
 		inst = rm.open_resource(parameters["address"])
+
 		self.instrument = inst
 		self.address = parameters["address"]
 		self.read_termination(parameters["read_termination"])
@@ -89,6 +94,8 @@ class HP_4192A:
 				circuit_mode = "C3"
 			if CV_parameters["CIRCUIT_MODE"] == "Series":
 				circuit_mode = "C2"
+
+
 		# --------
 		# DISPLAY
 		# --------
@@ -97,7 +104,7 @@ class HP_4192A:
 		# -----------------
 		# OSCILLATION LEVEL
 		# -----------------
-		oscillation_level = float(CV_parameters["OSC"]*1000)
+		oscillation_level = float(CV_parameters["OSC"]/1000)
 		cmd = "OL" + str(oscillation_level).replace(",",".") + "EN"
 		self.instrument.write(cmd)
 		# ---------
@@ -140,37 +147,12 @@ class HP_4192A:
 			cmd = "PB" + str(stop_bias).replace(",", ".") + "EN"
 			self.instrument.write(cmd)
 			AUTO_SWEEP = "W2"
-		# not_change = False
-		# if "NOT_CHANGE" in CV_parameters:
-		# 	not_change = CV_parameters["NOT_CHANGE"]
-		# if not_change:
-		# 	if PN==1:
-		# 		cmd = "TB" + str(abs(stop_bias)*-1).replace(",",".") + "EN"
-		# 		self.instrument.write(cmd)
-		# 		cmd = "PB" + str(abs(start_bias)).replace(",",".") + "EN"
-		# 		self.instrument.write(cmd)
-		# 	else:
-		# 		cmd = "TB" + str(abs(start_bias)*-1).replace(",",".") + "EN"
-		# 		self.instrument.write(cmd)
-		# 		cmd = "PB" + str(abs(stop_bias)).replace(",",".") + "EN"
-		# 		self.instrument.write(cmd)
-		# else:
-		# 	cmd = "TB" + str(start_bias).replace(",",".") + "EN"
-		# 	self.instrument.write(cmd)
-		# 	cmd = "PB" + str(stop_bias).replace(",",".") + "EN"
-		# 	self.instrument.write(cmd)
 
-
-		
-		
 		cmd = "AB W1 T3" # AB: sweep abort, W1: sweep auto, T3: TRIGGER HOLD/MANUAL
 		self.instrument.write(cmd)
 		cmd = AUTO_SWEEP
 		self.instrument.write(cmd)
-		# cmd = "W2" # W2: AUTO SWEEP START UP , or W4?
-		# if PN==1:
-		# 	cmd = "W4" # PN=1
-		# self.instrument.write(cmd)
+
 
 		return True
 
@@ -225,7 +207,7 @@ class HP_4192A:
 		# -----------------
 		# OSCILLATION LEVEL
 		# -----------------
-		oscillation_level = float(CW_parameters["OSC"]*1000)
+		oscillation_level = float(CW_parameters["OSC"]/1000)
 		cmd = "OL" + str(oscillation_level) + "EN"
 		self.instrument.write(cmd)
 		# ---------
@@ -375,6 +357,16 @@ class HP_4192A:
 		cmd = "EX" # execute
 		self.instrument.write(cmd)
 
+	def wait_for_srq(self, timeout=10.0):
+		"""Bloquea hasta que el instrumento emite SRQ o expira el timeout (segundos)."""
+		try:
+			self.instrument.wait_for_srq(timeout=int(timeout * 1000))
+		except pyvisa.errors.VisaIOError as e:
+			if e.error_code == pyvisa.constants.VI_ERROR_TMO:
+				raise TimeoutError("Timeout esperando SRQ del HP4192A")
+			else:
+				raise
+
 	def read(self):
 		return self.instrument.read()
 		
@@ -383,6 +375,5 @@ class HP_4192A:
 		cmd = "AB I0" # sweep abort and DC BIAS OFF
 		self.instrument.write(cmd)
 
-
-
-
+	def close(self):
+		self.instrument.close()
