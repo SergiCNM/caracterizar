@@ -1,7 +1,6 @@
 # Test CW in HP 4192A instrument
 
 import os.path
-import sys
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
@@ -11,11 +10,11 @@ global test_status, measurement_status
 global dieActual, moduleActual
 global CW_parameters
 global base_dir, tests_dir, cartographic_measurement
-    
-def measure_CW(hp4192A,CW_parameters,frequency,capacitance,conductance):
-    i = 0
-    # Calc samples
-    num_samples = abs((float(CW_parameters["START"])-float(CW_parameters["STOP"]))/float(CW_parameters["STEP"])) + 1
+
+
+def measure_CW(hp4192A, CW_parameters):
+    """ Measure CW from START to STOP with STEP"""
+    frequency, capacitance, conductance = [],[],[]
     # lectura 4192a ex: NCPN+0.7910E-06,NGFN+14.940E+00,K+01000.000
     frequency_value = 0
     while float(frequency_value)<float(CW_parameters["STOP"]):
@@ -64,44 +63,27 @@ def load_CW_parameters():
 try:
 
     hp4192A = HP_4192A(instruments["HP_4192A"])
-    # measure CV
-    # send CV_parameters to CONFIG HP4192A
-    # default parameters
-    
+    # init CW_parameters
+    load_CW_parameters()
+    frequency, capacitance, conductance = [],[],[]
 
     if cartographic_measurement:
-        # init CW_parameters
-        load_CW_parameters()
         if str(dieActual)=="1" and str(moduleActual)=="1":
-            # retval = QMessageBox.question(
-            #     main,
-            #     "Init instrument for CW!",
-            #     "Please, configure instrument for initialization",
-            #     buttons=QMessageBox.Yes | QMessageBox.Cancel ,
-            #     defaultButton=QMessageBox.Yes,
-            # )
             retval = message_user(main, "Init instrument for CW!", "Please, configure instrument for initialization",
                                   "yes_cancel")
             if retval == QMessageBox.Yes:
                 # reset instrument
                 hp4192A.reset()
-                # Zero open & Zero shorth
-                #hp4192A.zero_open("ON")
-                #hp4192A.zero_short("OFF")
                 test_status.status = "STARTED"
             else:
                 test_status.status = "ABORTED"
 
         if test_status.status=="STARTED":
-            frequency = []
-            capacitance = []
-            conductance = []
             if hp4192A.config_CW(CW_parameters):
-
-                frequency, capacitance, conductance = measure_CW(hp4192A,CW_parameters,frequency,capacitance,conductance)
-                CW_parameters["frequency"] = frequency # list
-                CW_parameters["capacitance"] = capacitance # list
-                CW_parameters["conductance"] = conductance # list
+                frequency, capacitance, conductance = measure_CW(hp4192A, CW_parameters)
+                CW_parameters["frequency"] = frequency
+                CW_parameters["capacitance"] = capacitance
+                CW_parameters["conductance"] = conductance
 
             meas_status = "meas_success"
             # save results
@@ -140,18 +122,11 @@ try:
             plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
 
     else:
-        # init CW_parameters
-        load_CW_parameters()
-        # single measure
         if hp4192A.config_CW(CW_parameters):
-            frequency = []
-            capacitance = []
-            conductance = []
-
-            frequency, capacitance, conductance = measure_CW(hp4192A,CW_parameters,frequency,capacitance,conductance)
-            CW_parameters["frequency"] = frequency # list
-            CW_parameters["capacitance"] = capacitance # list
-            CW_parameters["conductance"] = conductance # list
+            frequency, capacitance, conductance = measure_CW(hp4192A, CW_parameters)
+            CW_parameters["frequency"] = frequency
+            CW_parameters["capacitance"] = capacitance
+            CW_parameters["conductance"] = conductance
             plot_parameters = {
                 "name" : f"Plot CW Single Measure",
                 "x" : frequency,
@@ -176,8 +151,6 @@ try:
 
             }
 
-            posx = 0
-            posy = 0
             dieActual = 1
             moduleActual = 1
 

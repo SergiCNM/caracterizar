@@ -2,26 +2,26 @@
 
 import math
 import time
-
+import sys
 from PySide6.QtWidgets import QApplication
 
 
 def print_pretty_header(text):
-	length = len(text)
-	symbol_horizontal = "-"
-	symbol_vertical = "|"
-	print(print_simbol(length,symbol_horizontal))
-	print(symbol_vertical + " " + text + " " + symbol_vertical)
-	print(print_simbol(length,symbol_horizontal))
+    length = len(text)
+    symbol_horizontal = "-"
+    symbol_vertical = "|"
+    print(print_simbol(length,symbol_horizontal))
+    print(symbol_vertical + " " + text + " " + symbol_vertical)
+    print(print_simbol(length,symbol_horizontal))
 
 def print_simbol(length,symbol):
-	return symbol*(length+4)
+    return symbol*(length+4)
 
 # -----------------------------------------------------
 # SaveWafer function (wafers.py)
 # -----------------------------------------------------
 def get_btnName(x,y):
-	# x, y (positive)
+    # x, y (positive)
     btn_x = int(x) *-1
     btn_y = int(y) *-1
     
@@ -29,55 +29,57 @@ def get_btnName(x,y):
     return btnName
 
 def change_coord_to_origin(x,y,origin):
-	# x, y (negative)
+    # x, y (negative)
     origin_x, origin_y = origin.split()
     x_to_origin = int(x) - int(origin_x)
     y_to_origin = int(y) - int(origin_y)
     return str(x_to_origin) + " " + str(y_to_origin)
 
 def calc_wafer_size(wafer_size_inch):
-	# default 4"
-	wafer_size_inch = int(wafer_size_inch)
-	wafer_size_mm = 100
-	thickness = 525
-	if wafer_size_inch==1:
-	    wafer_size_mm = 25
-	    thickness = 1
-	if wafer_size_inch==2:
-	    wafer_size_mm = 51
-	    thickness = 275
-	if wafer_size_inch==3:
-	    wafer_size_mm = 76
-	    thickness = 375
-	if wafer_size_inch==4:
-	    wafer_size_mm = 100
-	    thickness = 525
-	if wafer_size_inch==5: # 4.9 inch
-	    wafer_size_mm = 125
-	    thickness = 625
-	if wafer_size_inch==6: # 5.9 inch
-	    wafer_size_mm = 150
-	    thickness = 675
-	if wafer_size_inch==8: # 7.9 inch
-	    wafer_size_mm = 200
-	    thickness = 725
-	if wafer_size_inch==12: # 11.8 inch
-	    wafer_size_mm = 300 
-	    thickness = 775
-	return [wafer_size_mm, thickness]
+    # default 4"
+    wafer_size_inch = int(wafer_size_inch)
+    wafer_size_mm = 100
+    thickness = 525
+    if wafer_size_inch==1:
+        wafer_size_mm = 25
+        thickness = 1
+    if wafer_size_inch==2:
+        wafer_size_mm = 51
+        thickness = 275
+    if wafer_size_inch==3:
+        wafer_size_mm = 76
+        thickness = 375
+    if wafer_size_inch==4:
+        wafer_size_mm = 100
+        thickness = 525
+    if wafer_size_inch==5: # 4.9 inch
+        wafer_size_mm = 125
+        thickness = 625
+    if wafer_size_inch==6: # 5.9 inch
+        wafer_size_mm = 150
+        thickness = 675
+    if wafer_size_inch==8: # 7.9 inch
+        wafer_size_mm = 200
+        thickness = 725
+    if wafer_size_inch==12: # 11.8 inch
+        wafer_size_mm = 300
+        thickness = 775
+    return [wafer_size_mm, thickness]
 # -----------------------------------------------------
 
 def get_cmin(cap_list):
-	i=0
-	cmin = 99999
-	for cap in cap_list:
-		if float(cap)<float(cmin):
-			cmin = float(cap)
+    """ Get Cmin from a list of capacitance values"""
+    cmin = 99999
+    for cap in cap_list:
+        if float(cap)<float(cmin):
+            cmin = float(cap)
 
-	return cmin
+    return cmin
 
 
 def calcular_cv(parameters):
+    """ Calculate Cmax, Cmin, dox, Na, Vfb, Nss from CV data"""
+    # Parameters received
     voltage = parameters["voltage"] # list
     capacitance = parameters["capacitance"] # list
     conductance  = parameters["conductance"] # list
@@ -100,14 +102,14 @@ def calcular_cv(parameters):
     vrs = -9E99
 
     if not parameters["CALCULATE_PARAMS"]:
-        return {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
+        return voltage, capacitance, conductance, {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
 
     if len(voltage) != len(capacitance) or len(capacitance) != len(conductance):
         # error
         if hysteresis:
-            return {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_H(ohms)": vrs}
+            return voltage, capacitance, conductance, {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_H(ohms)": vrs}
         else:
-            return {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
+            return voltage, capacitance, conductance, {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
 
     nmuestras = len(capacitance)
 
@@ -189,6 +191,9 @@ def calcular_cv(parameters):
     # --------
     # GET CMAX
     # --------
+    # Average of first 3 and last 3 points because of noise
+    # We assume that the curve starts in accumulation and ends in accumulation
+    # We check which one is higher to determine the sweep direction
     if capacitance[nmuestras-3] > capacitance[3]:
       cmax = (capacitance[nmuestras-3]+capacitance[nmuestras-4]+capacitance[nmuestras-5])/3
       sentido = 1
@@ -200,7 +205,9 @@ def calcular_cv(parameters):
     # GET CMIN
     # --------
     try:
-        cmin = get_cmin(capacitance)
+        # we avoid 3 first and 3 last points to avoid noise
+        capacitance_list = capacitance[3:nmuestras-3]
+        cmin = get_cmin(capacitance_list)
     except:
         print("Oops!", sys.exc_info()[0], "occurred.")
 
@@ -209,9 +216,9 @@ def calcular_cv(parameters):
     if cmax<=cmin or cmax<=0 or cmin<=0:
         # error
         if hysteresis:
-            return {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_H(ohms)": vrs}
+            return voltage, capacitance, conductance, {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_h(ohms)": vrs}
         else:
-            return {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
+            return voltage, capacitance, conductance, {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
 
     # dox extraction
     cox = cmax
@@ -235,9 +242,9 @@ def calcular_cv(parameters):
     if cmax<=Cfb or cmin>=Cfb:
         # error
         if hysteresis:
-            return {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_H(ohms)": vrs}
+            return voltage, capacitance, conductance, {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_h(ohms)": vrs}
         else:
-            return {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
+            return voltage, capacitance, conductance, {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
 
     # nss extraction
     i = 0
@@ -271,61 +278,10 @@ def calcular_cv(parameters):
     #set vnss [format {%e} $vnss]
     # Ok values
     if hysteresis:
-        return {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_H(ohms)": vrs}
+        return voltage, capacitance, conductance, {"cmax_h(pf)": vcmax, "cmin_h(pF)": vcmin, "dox_h(A)": vdox, "Na_h(cm¯³)": vna, "Vfb_h(V)": vvfb, "Nss_h(cm¯²)": vnss, "Rs_h(ohms)": vrs}
     else:
-        return {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
+        return voltage, capacitance, conductance, {"cmax(pf)": vcmax, "cmin(pF)": vcmin, "dox(A)": vdox, "Na(cm¯³)": vna, "Vfb(V)": vvfb, "Nss(cm¯²)": vnss, "Rs(ohms)": vrs}
 
-
-# def measure_CV(hp4192A, CV_parameters, voltage, capacitance, conductance):
-#     i = 0
-#     # Calc samples
-#     num_samples = abs((float(CV_parameters["START"])-float(CV_parameters["STOP"]))/float(CV_parameters["STEP"])) + 1
-#     # Calc PN
-#     PN = 1
-#     if CV_parameters["START"] < CV_parameters["STOP"]:
-#         PN = -1
-#
-#     for i in range(0,int(num_samples)):
-#         hp4192A.single()
-#         try:
-#             lectura = hp4192A.read()
-#             lectura_array = lectura.split(",")
-#             capacitance_value = lectura_array[0][4:]
-#             conductance_value = lectura_array[1][4:]
-#             voltage_value = lectura_array[2][1:]
-#             capacitance.append(float(capacitance_value))
-#             conductance.append(float(conductance_value))
-#             voltage.append(float(voltage_value))
-#         except Exception as e:
-#             # with error in read stop the loop
-#             print(f"Error: {e}")
-#             break
-#
-#         #time.sleep(1)
-#         hp4192A.srq()
-#
-#     return voltage,capacitance,conductance
-
-
-# def measure_CW(hp4192A,CW_parameters,frequency,capacitance,conductance):
-#     i = 0
-#     # Calc samples
-#     num_samples = abs((float(CW_parameters["START"])-float(CW_parameters["STOP"]))/float(CW_parameters["STEP"])) + 1
-#     # lectura 4192a ex: NCPN+0.7910E-06,NGFN+14.940E+00,K+01000.000
-#     frequency_value = 0
-#     while float(frequency_value)<float(CW_parameters["STOP"]):
-#         hp4192A.single()
-#         lectura = hp4192A.read()
-#         lectura_array = lectura.split(",")
-#         capacitance_value = lectura_array[0][4:]
-#         conductance_value = lectura_array[1][4:]
-#         frequency_value = lectura_array[2][1:]
-#         capacitance.append(float(capacitance_value))
-#         conductance.append(float(conductance_value))
-#         frequency.append(float(frequency_value))
-#         hp4192A.srq()
-#
-#     return frequency,capacitance,conductance
 
 
 def message_user(main, title, message, type_buttons="yes_cancel"):

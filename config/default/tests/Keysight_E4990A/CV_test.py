@@ -3,6 +3,8 @@
 import os.path
 import sys
 import numpy as np
+
+from config.default.instruments import Keysight_E4990A
 from config.functions import *
 import toml
 
@@ -35,6 +37,8 @@ def load_CV_parameters():
         "LIGHT_TIME": 1,
         "GRAPH1": "CP",
         "GRAPH2": "G",
+        "SERIAL_RES": False,
+        "CALCULATE_PARAMS": False,
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keysight_E4990A/CV.toml'
@@ -47,9 +51,8 @@ def load_CV_parameters():
 try:
 
     keysightE4990A = Keysight_E4990A(instruments["Keysight_E4990A"])
-    # measure CV
-    # send CV_parameters to CONFIG HP4192A
-    # default parameters
+    # init CV_parameters
+    load_CV_parameters()
 
     if cartographic_measurement:
         if str(dieActual) == "1" and str(moduleActual) == "1":
@@ -75,8 +78,6 @@ try:
                 test_status.status = "ABORTED"
 
         if test_status.status == "STARTED":
-            # init CV_parameters
-            load_CV_parameters()
             voltage = []
             capacitance = []
             conductance = []
@@ -130,13 +131,13 @@ try:
                 "variables": {
                     "params": [],
                     "data": [{"name": "V", "values": voltage, "units": "V"},
-                             {"name": "C", "values": capacitance * 1e15, "units": "fF"},
+                             {"name": "C", "values": capacitance * 1e12, "units": "pF"},
                              {"name": "G", "values": conductance * 1E9, "units": "nS"}]
                 },
                 "plot_parameters": {
                     "name": "Plot CV Die " + str(dieActual) + " Module " + str(moduleActual),
                     "x": voltage,
-                    "y1": capacitance * 1e15,
+                    "y1": capacitance * 1e12,
                     "y2": conductance * 1e9,
 
                     "titles": {
@@ -146,7 +147,7 @@ try:
                         "right": "Conductance"
                     },
                     "units": {
-                        "left": "fF",
+                        "left": "pF",
                         "bottom": "V",
                         "right": "nS"
                     },
@@ -157,21 +158,16 @@ try:
 
             }
             plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
-            # main.show_graph(plot_parameters)
-            emit_plot(plot_parameters)
-            namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
-                moduleActual) + ".txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                   headers=["V", "C", "G"], separation=",")
+
     else:
-        # init CV_parameters
-        load_CV_parameters()
+
         voltage = []
         capacitance = []
         conductance = []
         voltage_h = []
         capacitance_h = []
         conductance_h = []
+        results = {}
         # single measure
         if keysightE4990A.config_CV(CV_parameters):
             if CV_parameters["WAIT_TIME"] > 0:
@@ -190,7 +186,9 @@ try:
             CV_parameters["voltage"] = voltage
             CV_parameters["capacitance"] = capacitance
             CV_parameters["conductance"] = conductance
-            CV_parameters["hysteresis"] = False
+            CV_parameters["hysteresis_marker"] = False
+            if CV_parameters["CALCULATE_PARAMS"]:
+                results = calcular_cv(CV_parameters)
             # hysteresis?
             if CV_parameters["HYSTERESIS"]:
                 # wait time between hysteresis
@@ -204,18 +202,32 @@ try:
                     CV_parameters["voltage"] = voltage_h
                     CV_parameters["capacitance"] = capacitance_h
                     CV_parameters["conductance"] = conductance_h
-                    CV_parameters["hysteresis"] = True
+                    CV_parameters["hysteresis_marker"] = True
+                    if CV_parameters["CALCULATE_PARAMS"]:
+                        # calculate parameters
+                        results_h = calcular_cv(CV_parameters)
+                        # add to results
+                        for clave in results_h:
+                            results[clave] = results_h[clave]
                 # concatenate lists
                 voltage = np.concatenate((voltage, voltage_h))
                 capacitance = np.concatenate((capacitance, capacitance_h))
                 conductance = np.concatenate((conductance, conductance_h))
             # Turn off bias
             keysightE4990A.turn_off_bias()
+            params = []
+            data = []
+            if CV_parameters["CALCULATE_PARAMS"]:
+                txt_result = "<br /><strong>Results: </strong><br />"
+                for clave in results:
+                    txt_result = txt_result + " <strong>- " + clave + "</strong> = " + str(results[clave]) + "<br />"
+                    params.append({"name": clave, "value": str(results[clave])})
+                main.updateTextDescription(txt_result)
             # Plot parameters
             plot_parameters = {
                 "name": "Plot CV",
                 "x": voltage,
-                "y1": capacitance * 1e15,
+                "y1": capacitance * 1e12,
                 "y2": conductance * 1e9,
 
                 "titles": {
@@ -225,7 +237,7 @@ try:
                     "right": "Conductance"
                 },
                 "units": {
-                    "left": "fF",
+                    "left": "pF",
                     "bottom": "V",
                     "right": "nS"
                 },
@@ -234,20 +246,21 @@ try:
                 # "foreground" : "#CCCCCC"
 
             }
+            dieActual = 1
+            moduleActual = 1
 
-            # main.show_graph(plot_parameters)
-            emit_plot(plot_parameters)
-            print("CV measurement completed")
-            # save results
-            namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_1_1.txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                   headers=["V", "C", "G"], separation=",")
-            print("File " + namefile + " saved")
+        emit_plot(plot_parameters)
+        namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
+            moduleActual) + ".txt"
+        main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
+                               headers=["V", "C", "G"], separation=",")
 
     # stop process
-    # keysightE4990A.stop()
+    keysightE4990A.stop()
+    keysightE4990A.local()
 
-    # keysightE4990A.local()
+    # close instrument
+    keysightE4990A.close()
 
 
 

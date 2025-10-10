@@ -14,11 +14,8 @@ class Keysight_E4990A:
         self.read_termination(parameters["read_termination"])
         self.write_termination(parameters["write_termination"])
         self.timeout(int(parameters["timeout"]))
-        print(self.error())
-        print(self.idn())
         # self.stop()
         self.clear()
-        print(self.error())
         #self.reset()
         # self.instrument.buffer_read = 2048
 
@@ -379,3 +376,6 @@ class Keysight_E4990A:
         self.instrument.write(cmd)
 
         return cal_ok
+
+    def close(self):
+        self.instrument.close()

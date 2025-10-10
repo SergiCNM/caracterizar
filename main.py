@@ -226,13 +226,16 @@ class MainWindow(QMainWindow):
         # process control variables
         global measurement_status, test_status, contact_status
         global contact_test, contact_errors, actual_height  # control progressive contact
-
+        global dieActual, moduleActual, cartographic_measurement
         measurement_status = MeasurementStatus()
         test_status = TestStatus()
         contact_status = ContactStatus()
         contact_test = -1
         contact_errors = 0
         actual_height = 0
+        dieActual = 1
+        moduleActual = 1
+        cartographic_measurement = False
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
@@ -311,7 +314,7 @@ class MainWindow(QMainWindow):
         widgets.btnClearWafermap.clicked.connect(self.clearWafermap)
         widgets.btnSaveHistogram.clicked.connect(self.saveResults)
         widgets.btnClearHistogram.clicked.connect(self.clearHistogram)
-        widgets.btnSaveGraph.clicked.connect(self.saveResults)
+        widgets.btnSaveGraph.clicked.connect(self.saveGraph)
         widgets.btnClearGraph.clicked.connect(self.clearGraph)
         # widgets.btnSaveWafermap.clicked.connect(self.saveResults)
 
@@ -616,7 +619,6 @@ class MainWindow(QMainWindow):
 
             # logarithmic scale
             if "logarithmic" in plot_parameters:
-                print(plot_parameters["logarithmic"])
                 if "x" in plot_parameters["logarithmic"] and plot_parameters["logarithmic"]["x"]:
                     _static_ax.set_xscale('log')
                 if "y" in plot_parameters["logarithmic"] and plot_parameters["logarithmic"]["y"]:
@@ -1507,6 +1509,32 @@ class MainWindow(QMainWindow):
             widgets.txtParametersResult.setPlainText(
                 widgets.txtParametersResult.toPlainText() + "\n" + "No parameters selected!")
 
+    def saveGraph(self):
+        """ Save graph in results folder when click on btnSaveGraph button"""
+        global widgets
+        global dieActual, moduleActual
+        layout = widgets.horizontalLayout_graph
+        testname = widgets.cmbTests.currentText()
+        if testname == "Select test" or testname == "":
+            retval = messageBox(self, "Save graph", "No test selected!", "warning")
+            return
+        name_file = testname + "_" + widgets.txtLot.text() + "-" + widgets.txtWafer.text() + "_" + str(dieActual) + "_" + str(moduleActual)
+        if layout.count() > 0:
+            static_canvas = layout.itemAt(0).widget()
+            fileName, _ = QFileDialog.getSaveFileName(self,
+                                                      "Save graph as...", results_dir + "/" + name_file + ".png",
+                                                      "PNG Files (*.png);; JPG Files (*.jpg);; All files (*.*)")
+            if fileName:
+                try:
+                    static_canvas.figure.savefig(fileName, dpi=300)
+                    retval = messageBox(self, "Save graph", "Graph correctly saved into file:\n" + fileName, "info")
+                except Exception as e:
+                    retval = messageBox(self, "Save graph", "Some error occurs while saving file:\n" + fileName + "\n" + e,
+                                        "warning")
+        else:
+            retval = messageBox(self, "Save graph", "No graph to save!", "warning")
+
+
     def saveResults(self, where=""):
         # Click on Save buttons (Data Values, Results, Histogram, Correlation, Wafermap)
         # GET BUTTON CLICKED
@@ -1523,7 +1551,6 @@ class MainWindow(QMainWindow):
         btnName = btn.objectName()
         # btnSaveHistogram, btnSaveWafermap, btnSaveCorrelation btnSaveDataValues, btnSaveParametersResult, btnSaveHistorical
         texto = str(btnName).replace("btnSave", "")
-        print(f"Texto to save: {texto}")
         if texto != "Historical" and texto != "Diagram":
             # GET run, wafer, & parameter values
             if widgets.optLoadFiles.isChecked():
