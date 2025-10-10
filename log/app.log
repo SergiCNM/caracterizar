@@ -8949,3 +8949,5 @@
 25-10-10 14:39:54|INFO|5924|closeEvent|2152|Test Status: IDLE
 25-10-10 14:40:05|INFO|29608|__init__|220|Multithreading with maximum 12 threads
 25-10-10 14:43:52|INFO|29608|closeEvent|2152|Test Status: IDLE
+25-10-10 14:44:46|INFO|28484|__init__|220|Multithreading with maximum 12 threads
+25-10-10 16:11:14|INFO|28484|closeEvent|2152|Test Status: FINISHED

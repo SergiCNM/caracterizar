@@ -18,6 +18,9 @@ def measure_CV(hp4192A,CV_parameters):
     voltage, capacitance, conductance = [], [], []
     # Calc samples
     num_samples = abs((float(CV_parameters["START"])-float(CV_parameters["STOP"]))/float(CV_parameters["STEP"])) + 1
+    PN = 1
+    if CV_parameters["START"] > CV_parameters["STOP"]:
+        PN = -1
     for i in range(0,int(num_samples)):
         try:
             hp4192A.single()  # lanza la medida
@@ -86,6 +89,29 @@ def measure_CV_full(hp4192A, main, CV_parameters):
     return voltage, capacitance, conductance, results
 
 
+def make_compensation(hp4192A, main):
+    # make OPEN and SHORT compensation
+    retval = message_user(main, "Compensation", "Please, make OPEN compensation: remove the device from the fixture and press OK", "ok_cancel")
+    if retval != QMessageBox.Ok:
+        return False
+    main.updateTextDescription("Making OPEN compensation...<br />")
+    if CV_parameters["COMPENSATION_OPEN"]:
+        hp4192A.zero_open("ON")
+    else:
+        hp4192A.zero_open("OFF")
+    time.sleep(1)
+    retval = message_user(main, "Compensation", "Please, make SHORT compensation: short the fixture and press OK", "ok_cancel")
+    if retval != QMessageBox.Ok:
+        return False
+    main.updateTextDescription("Making SHORT compensation...<br />")
+    if CV_parameters["COMPENSATION_SHORT"]:
+        hp4192A.zero_short("ON")
+    else:
+        hp4192A.zero_short("OFF")
+    time.sleep(1)
+
+    return True
+
 def load_CV_parameters():
     global CV_parameters
     
@@ -138,6 +164,26 @@ try:
                 # reset instrument
                 hp4192A.reset()
                 test_status.status = "STARTED"
+                # Make compensation
+                if not CV_parameters["COMPENSATION_DONE"]:
+                    main.updateTextDescription("<br />Making compensation...<br />")
+                    if not make_compensation(hp4192A, main):
+                        main.updateTextDescription("Compensation failed! Aborting test...<br />", "ERROR")
+                        test_status.status = "ABORTED"
+                    else:
+                        # modify toml file to indicate that compensation is done
+                        CV_parameters["COMPENSATION_DONE"] = True
+                        filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV.toml'
+                        file_exists = os.path.exists(filename_config)
+                        if file_exists:
+                            toml_info = toml.load(filename_config)
+                            toml_info["parameters"] = CV_parameters
+                            # save file in UTF-8
+                            with open(filename_config, 'w', encoding='utf-8') as tomlfile:
+                                toml.dump(toml_info, tomlfile)
+                        main.updateTextDescription("Compensation done!<br />")
+                        retval = message_user(main, "Compensation done!", "Please, configure instrument for measurement and press YES to continue", "yes_cancel")
+
             else:
                 test_status.status = "ABORTED"
 

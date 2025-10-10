@@ -4,7 +4,7 @@ title = "CV parameters"
 START = 5.0
 STOP = -5.0
 STEP = -0.2
-FREQ = "10,30,100"
+FREQ = "100"
 OSC = 30
 PN = 1.0
 CIRCUIT_MODE = "Parallel"
@@ -21,6 +21,9 @@ FIMS = 4.1
 PERMITTIVITY = 3.9
 SERIAL_RES = false
 CALCULATE_PARAMS = true
+COMPENSATION_OPEN = false
+COMPENSATION_SHORT = false
+COMPENSATION_DONE = true
 
 [options]
 CIRCUIT_MODE = "Parallel,Series,Auto"
@@ -58,3 +61,6 @@ FIMS = "FIMS"
 PERMITTIVITY = "Permittivity"
 SERIAL_RES = "Calculate Serial resistance"
 CALCULATE_PARAMS = "Calculate parameters"
+COMPENSATION_OPEN = "Open compensation"
+COMPENSATION_SHORT = "Short compensation"
+COMPENSATION_DONE = "Compensation done"
