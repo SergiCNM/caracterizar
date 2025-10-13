@@ -264,7 +264,7 @@ try:
                                        headers=["F", "C", "G"], separation=",")
     else:
         # make compensation
-        make_full_compensation(main, Keysight_E4990A, CW_parameters)
+        make_full_compensation(main, keysightE4990A, CW_parameters)
         # init CW_parameters
         load_CW_parameters()
         frequency, capacitance, conductance = [], [], []
@@ -314,7 +314,7 @@ try:
                                        headers=["F", "C", "G"], separation=",")
 
     # Close instrument
-    keysightE4990A.close()
+    # keysightE4990A.close()
 
 
 except:

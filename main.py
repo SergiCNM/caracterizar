@@ -2459,7 +2459,7 @@ class MainWindow(QMainWindow):
         colors = {"NORMAL": "#FFFFFF", "ERROR": "#FF3300", "WARNING": "orange"}
         if not color in colors:
             color = "NORMAL"
-        texto_final = '<span style="color: #ff79c6">' + "[" + date_today + "]</span>" + "<br />" + '<span style="color: ' + \
+        texto_final = '<span style="color: #ff79c6">' + "[" + date_today + "]</span>" + " " + '<span style="color: ' + \
                       colors[color] + '">' + texto + "</span>"
 
         widgets.pteDescription.appendHtml(texto_final)

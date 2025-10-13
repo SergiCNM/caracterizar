@@ -363,7 +363,7 @@ try:
                                        headers=["V", "C", "G"], separation=",")
 
     # Close instrument
-    keysightE4990A.close()
+    # keysightE4990A.close()
 
 
 except:
