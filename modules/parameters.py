@@ -11,6 +11,8 @@ class ParametersWindow(QWidget):
         # QMainWindow.__init__(self)
         super().__init__()
         title = ""
+        min_width = 350
+        width = min_width
         layout = QVBoxLayout()
         layout.setObjectName("verticalLayout")
         tabs = QTabWidget()
@@ -42,11 +44,16 @@ class ParametersWindow(QWidget):
             # capture title app
             if "title" in self.toml_info:
                 title = self.toml_info["title"]
+            if "width" in self.toml_info:
+                width = int(self.toml_info["width"])
+                if width < min_width:
+                    width = min_width
             self.layoutSubGroup = dict()
 
             for elem in self.toml_info:
                 if elem != "units" and elem != "options" and elem != "help" and isinstance(self.toml_info[elem], dict):
-                    tabs.addTab(self.field_to_layout(elem), elem.upper())
+                    if elem != "WIDTH":
+                        tabs.addTab(self.field_to_layout(elem), elem.upper())
 
             layout.addWidget(tabs)
             button = QPushButton("Save configuration")
@@ -58,7 +65,7 @@ class ParametersWindow(QWidget):
             self.setLayout(self._layout)
             # self.setCentralWidget(button)
 
-        self.setFixedWidth(300)
+        self.setFixedWidth(width)
         # self.resize(400,500)
         self.setWindowTitle(title)
         if self.error:
