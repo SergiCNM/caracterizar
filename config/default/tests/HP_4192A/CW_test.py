@@ -1,4 +1,21 @@
+# -------------------------------------------------------
 # Test CW in HP 4192A instrument
+# -------------------------------------------------------
+# This test is used to measure CW curves in a semiconductor device
+# It can be used in cartographic mode or single measurement mode
+# In cartographic mode, the test is performed in each die and module of the wafer
+# In single measurement mode, the test is performed in a single device
+# The test can be configured to:
+#   - perform OPEN and SHORT compensation
+#   - set START, STOP and STEP frequencies
+#   - set SPOT voltages (can be multiple, separated by commas)
+#   - set OSC level
+#   - set CIRCUIT_MODE (Parallel or Series)
+#   - set AVERAGE (True or False)
+# The results are saved in a text file and plotted in the main window
+# The results are also saved in the meas_result variable of the waferwindow object
+# The configuration is saved in a toml file
+# -------------------------------------------------------
 
 import os.path
 from PySide6.QtWidgets import QMessageBox

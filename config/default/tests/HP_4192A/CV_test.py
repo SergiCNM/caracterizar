@@ -1,7 +1,22 @@
+# -------------------------------------------------------
 # Test CV in HP 4192A instrument
+# -------------------------------------------------------
+# This test is used to measure CV curves in a semiconductor device
+# It can be used in cartographic mode or single measurement mode
+# In cartographic mode, the test is performed in each die and module of the wafer
+# In single measurement mode, the test is performed in a single device
+# The test can be configured to:
+#   - make OPEN and SHORT compensation before the measurement
+#   - make hysteresis measurement
+#   - calculate parameters from the CV curve
+#   - use light during the measurement
+#   - use different frequencies for the measurement
+# The results are saved in a text file and plotted in the main window
+# The results are also saved in the meas_result variable of the waferwindow object
+# The configuration is saved in a toml file
+# -------------------------------------------------------
 
 import os.path
-import sys
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
