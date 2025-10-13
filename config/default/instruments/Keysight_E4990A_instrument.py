@@ -241,21 +241,21 @@ class Keysight_E4990A:
 
     def config_CW(self, CW_parameters):
         # CW_parameters dictionary with:
-        # "START" (kHz) (0.02 to 20000), "STOP"(kHz) (0.02 to 20000), "NUM_POINTS" (V) (from 2 to 1601), "OSC" (mV from 5 to 1000), "VOLTAGE" (V) (-40 to 40),
+        # "START" (kHz) (0.02 to 20000), "STOP"(kHz) (0.02 to 20000), "NUM_POINTS" (V) (from 2 to 1601), "OSC" (mV from 5 to 1000), "SPOT" (V) (-40 to 40),
 
         # FIRST CHECK PARAMETERS
-        if "START" in CW_parameters and "STOP" in CW_parameters and "NUM_POINTS" in CW_parameters and "OSC" in CW_parameters and "VOLTAGE" in CW_parameters:
+        if "START" in CW_parameters and "STOP" in CW_parameters and "NUM_POINTS" in CW_parameters and "OSC" in CW_parameters and "SPOT" in CW_parameters:
             # parameters passed
             if 0.02 <= CW_parameters["START"] <= 20000:
                 if 0.02 <= CW_parameters["STOP"] <= 20000:
                     if CW_parameters["STOP"] > CW_parameters["START"]:
                         if 2 <= CW_parameters["NUM_POINTS"] <= 1601:
-                            if -40 <= CW_parameters["VOLTAGE"] <= 40:
+                            if -40 <= CW_parameters["SPOT"] <= 40:
                                 if 1000 < CW_parameters["OSC"] < 5:
                                     print("OSCILLATION LEVEL not in range (5mV, 1000mv): " + str(CW_parameters["OSC"]))
                                     return False
                             else:
-                                print("VOLTAGE not in range (-40V, 40V): " + str(CW_parameters["VOLTAGE"]))
+                                print("SPOT voltage not in range (-40V, 40V): " + str(CW_parameters["SPOT"]))
                                 return False
                         else:
                             print("NUM POINTS not in range (2, 1601): " + str(CW_parameters["NUM_POINTS"]))
@@ -309,8 +309,8 @@ class Keysight_E4990A:
         self.instrument.write(
             f':CALC1:AVER:STAT {1 if CW_parameters["SWEEP_AVERAGE"] else 0}')  # Enable/Disable Sweep Averaging
 
-        # set VOLTAGE
-        self.instrument.write(f':SOUR:BIAS:VOLT {CW_parameters["VOLTAGE"]}')
+        # set SPOT voltage
+        self.instrument.write(f':SOUR:BIAS:VOLT {CW_parameters["SPOT"]}')
 
         return True
 
@@ -325,57 +325,66 @@ class Keysight_E4990A:
         cmd = ':SOUR:BIAS:STAT OFF' # Turn off Bias
         self.instrument.write(cmd)
 
-    def calibration_type(self, cal_type):
-        cal_type = cal_type.upper()
-        if cal_type == "OPEN":
-            cmd = ":SENS1:CORR1:COLL:TYPE OPEN"
-        elif cal_type=="SHORT":
-            QMessageBox.warning(
-                self,
-                "Short Calibration",
-                "Please, connect the SHORT calibration standard to the instrument",
-                buttons=QMessageBox.Ok,
-                defaultButton=QMessageBox.Ok,
-            )
-            cmd = ":SENS1:CORR1:COLL:TYPE SHOR"
-        elif cal_type=="LOAD":
-            QMessageBox.warning(
-                self,
-                "Load Calibration",
-                "Please, connect the LOAD calibration standard to the instrument",
-                buttons=QMessageBox.Ok,
-                defaultButton=QMessageBox.Ok,
-            )
-            cmd = ":SENS1:CORR1:COLL:TYPE LOAD"
-        self.instrument.write(cmd)
-        opc = self.opc()
-        if opc == '+1':
-            return True
+    def zero_open(self, state='ON'):
+        if state not in ['ON', 'OFF']:
+            print("State must be 'ON' or 'OFF'")
+            return False
 
-        return False
+        if state == 'OFF':
+            cmd = ":SENS1:CORR2:OPEN OFF"
+            self.instrument.write(cmd)
+            opc = self.opc()
+            if opc == '+1':
+                return True
+            return False
+        else:
+            cmd = "SENS1:CORR2:COLL:ACQ:OPEN"
+            self.instrument.write(cmd)
+            opc = self.opc()
+            if opc == '+1':
+                return True
 
-    def calibration(self, cal_type=["OPEN"]):
-        cal_ok = True
-        # Set compensation point to fix
-        cmd = ":SENS1:CORR1:COLL:FPO FIX"
-        self.instrument.write(cmd)
-        cal_types = ["OPEN", "SHORT", "LOAD"]
-        for calibration in cal_type:
-            calibration = calibration.upper()
-            if calibration in cal_types:
-                if self.calibration_type(calibration):
-                    print(f"Calibration type ('{calibration}') set")
-                else:
-                    cal_ok = False
-                    print(f"Calibration type ('{calibration}') not set")
-            else:
-                cal_ok = False
-                print(f"Calibration type ('{calibration}') not valid")
-        # save calibration
-        cmd = ":SENS1:CORR1:COLL:SAVE"
-        self.instrument.write(cmd)
+            return False
 
-        return cal_ok
+    def zero_short(self, state='ON'):
+        if state not in ['ON', 'OFF']:
+            print("State must be 'ON' or 'OFF'")
+            return False
+        if state == 'OFF':
+            cmd = ":SENS1:CORR2:SHOR OFF"
+            self.instrument.write(cmd)
+            opc = self.opc()
+            if opc == '+1':
+                return True
+            return False
+        else:
+            cmd = ":SENS1:CORR2:COLL:ZERO:SHOR"
+            self.instrument.write(cmd)
+            opc = self.opc()
+            if opc == '+1':
+                return True
+
+            return False
+
+    def zero_load(self, state='ON'):
+        if state not in ['ON', 'OFF']:
+            print("State must be 'ON' or 'OFF'")
+            return False
+        if state == 'OFF':
+            cmd = ":SENS1:CORR2:LOAD OFF"
+            self.instrument.write(cmd)
+            opc = self.opc()
+            if opc == '+1':
+                return True
+            return False
+        else:
+            cmd = ":SENS1:CORR1:COLL:ZERO:LOAD"
+            self.instrument.write(cmd)
+            opc = self.opc()
+            if opc == '+1':
+                return True
+
+            return False
 
     def close(self):
         self.instrument.close()

@@ -1,17 +1,35 @@
+# -------------------------------------------------------
 # Test CV in Keysight E4990A instrument
+# -------------------------------------------------------
+# This test is used to measure CV curves in a semiconductor device
+# It can be used in cartographic mode or single measurement mode
+# In cartographic mode, the test is performed in each die and module of the wafer
+# In single measurement mode, the test is performed in a single device
+# The test can be configured to:
+#   - make OPEN and SHORT compensation before the measurement
+#   - make hysteresis measurement
+#   - calculate parameters from the CV curve
+#   - use light during the measurement
+#   - use different frequencies for the measurement
+# The results are saved in a text file and plotted in the main window
+# The results are also saved in the meas_result variable of the waferwindow object
+# The configuration is saved in a toml file
+# -------------------------------------------------------
 
 import os.path
-import sys
 import numpy as np
+from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import Keysight_E4990A
+
 from config.functions import *
 import toml
 
 global test_status, measurement_status
 global dieActual, moduleActual
-
 global CV_parameters
+global base_dir, tests_dir, cartographic_measurement
+
 
 
 def load_CV_parameters():
@@ -23,7 +41,7 @@ def load_CV_parameters():
         "START": 0,
         "STOP": 40,
         "NUM_POINTS": 101,
-        "FREQ": 1000,
+        "FREQ": "1000",
         "OSC": 500,
         "APERTURE": "5",
         "POINT_AVERAGE": False,
@@ -35,10 +53,13 @@ def load_CV_parameters():
         "WAIT_TIME": 0.0,
         "LIGHT": False,
         "LIGHT_TIME": 1,
-        "GRAPH1": "CP",
-        "GRAPH2": "G",
         "SERIAL_RES": False,
         "CALCULATE_PARAMS": False,
+        "COMPENSATION_OPEN": False,
+        "COMPENSATION_SHORT": False,
+        "COMPENSATION_DONE": False,
+        "GRAPH1": "CP",
+        "GRAPH2": "G",
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keysight_E4990A/CV.toml'
@@ -48,228 +69,308 @@ def load_CV_parameters():
         CV_parameters = toml_info["parameters"]
 
 
+def measure_CV(keysightE4990A, CV_parameters):
+    try:
+        #self.instrument.write(':SENS1:DC:MEAS:CLE')
+        # self.instrument.write(':CALC1:AVER:CLE')
+        keysightE4990A.instrument.write(':SOUR:BIAS:STAT ON')  # Turn on Bias
+        keysightE4990A.instrument.write(':TRIG:SOUR BUS')
+        keysightE4990A.instrument.write(':INIT1:CONT OFF')
+        keysightE4990A.instrument.write(':INIT:IMM')
+        keysightE4990A.instrument.write(':TRIG:SING')
+
+        opc = keysightE4990A.instrument.query('*OPC?') # increase timeout to wait measure finish
+        keysightE4990A.autoscale()
+        error = keysightE4990A.error()
+        if error != '+0,"No error"':
+            print(f"ERROR: {error}")
+            keysightE4990A.clear()
+
+        # Read Results
+        keysightE4990A.instrument.write(':CALC1:PAR1:SEL')
+        keysightE4990A.instrument.write(':FORM:DATA ASC')
+        keysightE4990A.instrument.write(':FORM:REAL:ASC:LENG 12')
+        r1 = keysightE4990A.instrument.query(':CALC1:SEL:DATA:FDAT?')
+        # print(f'r1 = {r1}')
+        ra1 = np.fromstring(r1, sep=',')
+        keysightE4990A.instrument.write(':CALC1:PAR2:SEL')
+        keysightE4990A.instrument.write(':FORM:DATA ASC')
+        keysightE4990A.instrument.write(':FORM:REAL:ASC:LENG 12')
+        r2 = keysightE4990A.instrument.query(':CALC1:SEL:DATA:FDAT?')
+        ra2 = np.fromstring(r2, sep=',')
+        rx = keysightE4990A.instrument.query(':CALC1:SEL:DATA:XAX?')
+        rax = np.fromstring(rx, sep=',')
+        if not CV_parameters["HYSTERESIS"]:
+            keysightE4990A.turn_off_bias()
+
+        data = np.zeros((CV_parameters["NUM_POINTS"], 3))
+        for u in range(CV_parameters["NUM_POINTS"]):
+            data[u, 0] = rax[u]
+            data[u, 1] = ra1[2 * u]
+            data[u, 2] = ra2[2 * u]
+
+        X = data[:, 0]
+        Y1 = data[:, 1]
+        Y2 = data[:, 2]
+
+        if CV_parameters["START"] > CV_parameters["STOP"]:
+            # invert X, Y1 and Y2
+            X = np.flip(X)
+            Y1 = np.flip(Y1)
+            Y2 = np.flip(Y2)
+
+
+    except Exception as ex:
+        print(f"error ocurred: {ex} ")
+        keysightE4990A.stop()
+
+        return [], [], []
+
+    return X, Y1, Y2
+
+def measure_CV_full(main, keysightE4990A, CV_parameters):
+    results = {}
+    if CV_parameters["WAIT_TIME"] > 0:
+        time.sleep(CV_parameters["WAIT_TIME"])
+    if CV_parameters["LIGHT"]:
+        # prober is not initialized when you select single measurement
+        main.init_prober()
+        if main.prober != "":
+            main.prober.light("1")
+            time.sleep(CV_parameters["LIGHT_TIME"])
+            main.prober.light("0")
+
+    # measure
+    voltage, capacitance, conductance = measure_CV(keysightE4990A, CV_parameters)
+    CV_parameters["voltage"] = voltage
+    CV_parameters["capacitance"] = capacitance
+    CV_parameters["conductance"] = conductance
+    CV_parameters["hysteresis_marker"] = False
+    if CV_parameters["CALCULATE_PARAMS"]:
+        voltage, capacitance, conductance, results = calcular_cv(CV_parameters)
+    # hysteresis?
+    if CV_parameters["HYSTERESIS"]:
+        # wait time between hysteresis
+        if CV_parameters["HYSTERESIS_TIME"] > 0:
+            time.sleep(CV_parameters["HYSTERESIS_TIME"])
+        # swap variables
+        CV_parameters["START"], CV_parameters["STOP"] = CV_parameters["STOP"], CV_parameters["START"]
+        if keysightE4990A.config_CV(CV_parameters):
+            voltage_h, capacitance_h, conductance_h = measure_CV(keysightE4990A, CV_parameters)
+            CV_parameters["voltage"] = voltage_h
+            CV_parameters["capacitance"] = capacitance_h
+            CV_parameters["conductance"] = conductance_h
+            CV_parameters["hysteresis_marker"] = True
+            if CV_parameters["CALCULATE_PARAMS"]:
+                # calculate parameters
+                voltage_h, capacitance_h, conductance_h, results_h = calcular_cv(CV_parameters)
+                # add to results
+                for clave in results_h:
+                    results[clave] = results_h[clave]
+        # union lists
+        voltage = np.concatenate((voltage, voltage_h))
+        capacitance = np.concatenate((capacitance, capacitance_h))
+        conductance = np.concatenate((conductance, conductance_h))
+
+    return voltage, capacitance, conductance, results
+
+
+def make_compensation(main, keysightE4990A, CV_parameters):
+    # make OPEN and SHORT compensation
+    retval = message_user(main, "Compensation", "Please, make OPEN compensation: remove the device from the fixture and press OK", "ok_cancel")
+    if retval != QMessageBox.Ok:
+        return False
+    main.updateTextDescription("Making OPEN compensation...<br />")
+    if CV_parameters["COMPENSATION_OPEN"]:
+        keysightE4990A.zero_open("ON")
+    else:
+        keysightE4990A.zero_open("OFF")
+    time.sleep(1)
+    retval = message_user(main, "Compensation", "Please, make SHORT compensation: short the fixture and press OK", "ok_cancel")
+    if retval != QMessageBox.Ok:
+        return False
+    main.updateTextDescription("Making SHORT compensation...<br />")
+    if CV_parameters["COMPENSATION_SHORT"]:
+        keysightE4990A.zero_short("ON")
+    else:
+        keysightE4990A.zero_short("OFF")
+    time.sleep(1)
+
+    return True
+
+# Make compensation
+def make_full_compensation(main, keysightE4990A, CV_parameters):
+    if not CV_parameters["COMPENSATION_DONE"]:
+        main.updateTextDescription("<br />Making compensation...<br />")
+        if not make_compensation(main, keysightE4990A, CV_parameters):
+            main.updateTextDescription("Compensation failed! Aborting test...<br />", "ERROR")
+            test_status.status = "ABORTED"
+        else:
+            # modify toml file to indicate that compensation is done
+            CV_parameters["COMPENSATION_DONE"] = True
+            filename_config = os.getcwd() + base_dir + tests_dir + '/Keysight_E4990A/CV.toml'
+            file_exists = os.path.exists(filename_config)
+            if file_exists:
+                toml_info = toml.load(filename_config)
+                toml_info["parameters"] = CV_parameters
+                # save file in UTF-8
+                with open(filename_config, 'w', encoding='utf-8') as tomlfile:
+                    toml.dump(toml_info, tomlfile)
+            main.updateTextDescription("Compensation done!<br />")
+            retval = message_user(main, "Compensation done!", "Please, configure instrument for measurement, make CONTACT and press YES to continue", "yes_cancel")
+
+
+
 try:
 
     keysightE4990A = Keysight_E4990A(instruments["Keysight_E4990A"])
     # init CV_parameters
     load_CV_parameters()
+    # extract frequencies
+    freqs = CV_parameters["FREQ"].replace(" ", "").split(",")
+    # convert to float
+    freqs = [float(frequency) for frequency in freqs if frequency.isnumeric()]
 
     if cartographic_measurement:
         if str(dieActual) == "1" and str(moduleActual) == "1":
-            retval = QMessageBox.question(
-                main,
-                "Init instrument for CV!",
-                "Please, configure instrument for initialization",
-                buttons=QMessageBox.Yes | QMessageBox.Cancel,
-                defaultButton=QMessageBox.Yes,
-            )
+            retval = message_user(main, "Init instrument for CV!", "Please, configure instrument for initialization",
+                                  "yes_cancel")
             if retval == QMessageBox.Yes:
-                # reset instrument
-                # keysightE4990A.reset()
-                # # Calibration open, short, load
-                # main.prober.move_separation()
-                # if keysightE4990A.calibration(["OPEN"]):
-                #     test_status.status = "STARTED"
-                #     main.prober.move_contact()
-                # else:
-                #     test_status.status = "ABORTED"
                 test_status.status = "STARTED"
+                # make compensation
+                make_full_compensation(main, keysightE4990A, CV_parameters)
             else:
                 test_status.status = "ABORTED"
 
         if test_status.status == "STARTED":
-            voltage = []
-            capacitance = []
-            conductance = []
-            voltage_h = []
-            capacitance_h = []
-            conductance_h = []
+            # single measure
+            for freq in freqs:
+                load_CV_parameters() # reload parameters to avoid modifications during the test
+                CV_parameters["FREQ"] = freq
+                if keysightE4990A.config_CV(CV_parameters):
+                    voltage, capacitance, conductance, results = measure_CV_full(main, keysightE4990A, CV_parameters)
+                    params = []
+                    data = []
+                    if CV_parameters["CALCULATE_PARAMS"]:
+                        txt_result = "<br /><strong>Results: </strong><br />"
+                        for clave in results:
+                            txt_result = txt_result + " <strong>- " + clave + "</strong> = " + str(
+                                results[clave]) + "<br />"
+                            params.append({"name": clave, "value": str(results[clave])})
+                        main.updateTextDescription(txt_result)
+
+
+                    meas_status = "meas_success"
+                    meas_message = ""
+                else:
+                    meas_status = "meas_error"
+                    meas_message = "Error configuring instrument"
+                # save results
+                main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
+                    "status": meas_status,
+                    "message": meas_message,
+                    "contact_height": "",
+                    "variables": {
+                        "params": [],
+                        "data": [{"name": "V", "values": voltage, "units": "V"},
+                                 {"name": "C", "values": capacitance * 1e12, "units": "pF"},
+                                 {"name": "G", "values": conductance * 1E9, "units": "nS"}]
+                    },
+                    "plot_parameters": {
+                        "name": "Plot CV Die " + str(dieActual) + " Module " + str(moduleActual),
+                        "x": voltage,
+                        "y1": capacitance * 1e12,
+                        "y2": conductance * 1e9,
+
+                        "titles": {
+                            "title": "Plot CV " + str(CV_parameters["FREQ"]) + "kHz (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
+                            "left": "Capacitance",
+                            "bottom": "Voltage",
+                            "right": "Conductance"
+                        },
+                        "units": {
+                            "left": "pF",
+                            "bottom": "V",
+                            "right": "nS"
+                        },
+                        "showgrid": {"x": True, "y": True},
+                        "legend": False
+
+                    }
+
+                }
+                plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
+
+                emit_plot(plot_parameters)
+                namefile = main.getDirs("results") + "/CV" + str(
+                    CV_parameters["FREQ"]) + "kHz_" + main.ui.txtProcess.text() + "_" + str(
+                    dieActual) + "_" + str(
+                    moduleActual) + ".txt"
+                main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
+                                       headers=["V", "C", "G"], separation=",")
+    else:
+
+        # make compensation
+        make_full_compensation(main, keysightE4990A, CV_parameters)
+        # single measure
+        for freq in freqs:
+            load_CV_parameters()  # reload parameters to avoid modifications during the test
+            CV_parameters["FREQ"] = freq
             if keysightE4990A.config_CV(CV_parameters):
-                if CV_parameters["WAIT_TIME"] > 0:
-                    time.sleep(CV_parameters["WAIT_TIME"])
-
-                if CV_parameters["LIGHT"] and CV_parameters["LIGHT_TIME"] > 0:
-                    main.prober.light("1")
-                    time.sleep(CV_parameters["LIGHT_TIME"])
-                    main.prober.light("0")
-
-                CV_parameters["hysteresis_mode"] = False
-                voltage, capacitance, conductance = keysightE4990A.measure(CV_parameters)
-                CV_parameters["voltage"] = voltage  # list
-                CV_parameters["capacitance"] = capacitance  # list
-                CV_parameters["conductance"] = conductance  # list
-                CV_parameters["hysteresis"] = False
-
-                # hysteresis?
-                if CV_parameters["HYSTERESIS"]:
-                    # wait time between measures
-                    if CV_parameters["HYSTERESIS_TIME"] > 0:
-                        time.sleep(CV_parameters["HYSTERESIS_TIME"])
-                    # swap variables
-                    CV_parameters["START"], CV_parameters["STOP"] = CV_parameters["STOP"], CV_parameters["START"]
-                    if keysightE4990A.config_CV(CV_parameters):
-                        CV_parameters["hysteresis_mode"] = True
-                        voltage_h, capacitance_h, conductance_h = keysightE4990A.measure(CV_parameters)
-                        CV_parameters["voltage"] = voltage_h
-                        CV_parameters["capacitance"] = capacitance_h
-                        CV_parameters["conductance"] = conductance_h
-                        CV_parameters["hysteresis"] = True
-                    # concatenate lists
-                    voltage = np.concatenate((voltage, voltage_h))
-                    capacitance = np.concatenate((capacitance, capacitance_h))
-                    conductance = np.concatenate((conductance, conductance_h))
-                    # Turn off bias
-                    keysightE4990A.turn_off_bias()
-
-
-            meas_status = "meas_success"
-            # save results
-            main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
-                "status": meas_status,
-                "message": "",
-                "contact_height": "",
-                "variables": {
-                    "params": [],
-                    "data": [{"name": "V", "values": voltage, "units": "V"},
-                             {"name": "C", "values": capacitance * 1e12, "units": "pF"},
-                             {"name": "G", "values": conductance * 1E9, "units": "nS"}]
-                },
-                "plot_parameters": {
-                    "name": "Plot CV Die " + str(dieActual) + " Module " + str(moduleActual),
+                voltage, capacitance, conductance, results = measure_CV_full(main, keysightE4990A, CV_parameters)
+                params = []
+                data = []
+                if CV_parameters["CALCULATE_PARAMS"]:
+                    txt_result = "<br /><strong>Results: </strong><br />"
+                    for clave in results:
+                        txt_result = txt_result + " <strong>- " + clave + "</strong> = " + str(
+                            results[clave]) + "<br />"
+                        params.append({"name": clave, "value": str(results[clave])})
+                    main.updateTextDescription(txt_result)
+                plot_parameters = {
+                    "name": "Plot CV",
                     "x": voltage,
-                    "y1": capacitance * 1e12,
-                    "y2": conductance * 1e9,
+                    "y1": capacitance,
+                    "y2": conductance,
 
                     "titles": {
-                        "title": "C-V Measurement" + str(dieActual) + " Module " + str(moduleActual),
+                        "title": "CV Measurement at " + str(CV_parameters["FREQ"]) + "kHz",
                         "left": "Capacitance",
                         "bottom": "Voltage",
                         "right": "Conductance"
                     },
                     "units": {
-                        "left": "pF",
+                        "left": "F",
                         "bottom": "V",
-                        "right": "nS"
+                        "right": "s"
                     },
-                    "showgrid": {"x": True, "y": True},
-                    "legend": False
+                    "showgrid": {"x": False, "y": False},
+                    "legend": True
+                    # "foreground" : "#CCCCCC"
 
                 }
 
-            }
-            plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
+                dieActual = 1
+                moduleActual = 1
+                # stop process
+                keysightE4990A.stop()
 
-    else:
+                emit_plot(plot_parameters)
+                namefile = main.getDirs("results") + "/CV" + str(
+                    CV_parameters["FREQ"]) + "kHz_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
+                    moduleActual) + ".txt"
+                main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
+                                       headers=["V", "C", "G"], separation=",")
 
-        voltage = []
-        capacitance = []
-        conductance = []
-        voltage_h = []
-        capacitance_h = []
-        conductance_h = []
-        results = {}
-        # single measure
-        if keysightE4990A.config_CV(CV_parameters):
-            if CV_parameters["WAIT_TIME"] > 0:
-                time.sleep(CV_parameters["WAIT_TIME"])
-            if CV_parameters["LIGHT"]:
-                # prober is not initialized when you select single measurement
-                main.init_prober()
-                if main.prober != "":
-                    main.prober.light("1")
-                    time.sleep(CV_parameters["LIGHT_TIME"])
-                    main.prober.light("0")
-
-            # measure
-            CV_parameters["hysteresis_mode"] = False
-            voltage, capacitance, conductance = keysightE4990A.measure(CV_parameters)
-            CV_parameters["voltage"] = voltage
-            CV_parameters["capacitance"] = capacitance
-            CV_parameters["conductance"] = conductance
-            CV_parameters["hysteresis_marker"] = False
-            if CV_parameters["CALCULATE_PARAMS"]:
-                results = calcular_cv(CV_parameters)
-            # hysteresis?
-            if CV_parameters["HYSTERESIS"]:
-                # wait time between hysteresis
-                if CV_parameters["HYSTERESIS_TIME"] > 0:
-                    time.sleep(CV_parameters["HYSTERESIS_TIME"])
-                # swap variables
-                CV_parameters["START"], CV_parameters["STOP"] = CV_parameters["STOP"], CV_parameters["START"]
-                if keysightE4990A.config_CV(CV_parameters):
-                    CV_parameters["hysteresis_mode"] = True
-                    voltage_h, capacitance_h, conductance_h = keysightE4990A.measure(CV_parameters)
-                    CV_parameters["voltage"] = voltage_h
-                    CV_parameters["capacitance"] = capacitance_h
-                    CV_parameters["conductance"] = conductance_h
-                    CV_parameters["hysteresis_marker"] = True
-                    if CV_parameters["CALCULATE_PARAMS"]:
-                        # calculate parameters
-                        results_h = calcular_cv(CV_parameters)
-                        # add to results
-                        for clave in results_h:
-                            results[clave] = results_h[clave]
-                # concatenate lists
-                voltage = np.concatenate((voltage, voltage_h))
-                capacitance = np.concatenate((capacitance, capacitance_h))
-                conductance = np.concatenate((conductance, conductance_h))
-            # Turn off bias
-            keysightE4990A.turn_off_bias()
-            params = []
-            data = []
-            if CV_parameters["CALCULATE_PARAMS"]:
-                txt_result = "<br /><strong>Results: </strong><br />"
-                for clave in results:
-                    txt_result = txt_result + " <strong>- " + clave + "</strong> = " + str(results[clave]) + "<br />"
-                    params.append({"name": clave, "value": str(results[clave])})
-                main.updateTextDescription(txt_result)
-            # Plot parameters
-            plot_parameters = {
-                "name": "Plot CV",
-                "x": voltage,
-                "y1": capacitance * 1e12,
-                "y2": conductance * 1e9,
-
-                "titles": {
-                    "title": "C-V Measurement",
-                    "left": "Capacitance",
-                    "bottom": "Voltage",
-                    "right": "Conductance"
-                },
-                "units": {
-                    "left": "pF",
-                    "bottom": "V",
-                    "right": "nS"
-                },
-                "showgrid": {"x": True, "y": True},
-                "legend": True
-                # "foreground" : "#CCCCCC"
-
-            }
-            dieActual = 1
-            moduleActual = 1
-
-        emit_plot(plot_parameters)
-        namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
-            moduleActual) + ".txt"
-        main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                               headers=["V", "C", "G"], separation=",")
-
-    # stop process
-    keysightE4990A.stop()
-    keysightE4990A.local()
-
-    # close instrument
+    # Close instrument
     keysightE4990A.close()
-
-
 
 
 except:
     message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<", "").replace(">", "") + " occurred. " + str(
         sys.exc_info()[1])
     main.updateTextDescription(message, "ERROR")
-    retval = messageBox(main, "ERROR", message, "critical")
+    message_user(main, "ERROR",message,"ok_error")
 
     # print("ERROR: " + "Oops! " + str(sys.exc_info()[0]) + " occurred. " + str(sys.exc_info()[1]))
 

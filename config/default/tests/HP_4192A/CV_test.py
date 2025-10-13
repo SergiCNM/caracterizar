@@ -57,7 +57,7 @@ def measure_CV(hp4192A,CV_parameters):
     return voltage,capacitance,conductance
 
 
-def measure_CV_full(hp4192A, main, CV_parameters):
+def measure_CV_full(main, hp4192A, CV_parameters):
     results = {}
     if CV_parameters["WAIT_TIME"] > 0:
         time.sleep(CV_parameters["WAIT_TIME"])
@@ -209,9 +209,10 @@ try:
         if test_status.status=="STARTED":
             # single measure
             for freq in freqs:
+                load_CV_parameters()  # reload parameters to avoid modifications during the test
                 CV_parameters["FREQ"] = freq
                 if hp4192A.config_CV(CV_parameters):
-                    voltage, capacitance, conductance, results = measure_CV_full(hp4192A, main, CV_parameters)
+                    voltage, capacitance, conductance, results = measure_CV_full(main, hp4192A, CV_parameters)
                     params = []
                     data = []
                     if CV_parameters["CALCULATE_PARAMS"]:
@@ -224,13 +225,15 @@ try:
 
 
                     meas_status = "meas_success"
+                    meas_message = ""
                 else:
                     voltage, capacitance, conductance = [], [], []
                     meas_status = "meas_error"
+                    meas_message = "Error configuring instrument"
                 # save results
                 main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
                     "status" : meas_status,
-                    "message" : "",
+                    "message" : meas_message,
                     "contact_height" : "",
                     "variables" : {
                         "params" : params,
@@ -269,15 +272,14 @@ try:
                                        headers=["V", "C", "G"], separation=",")
 
     else:
-        # reset instrument
-        hp4192A.reset()
         # make compensation
         make_full_compensation(main, hp4192A, CV_parameters)
         # single measure
         for freq in freqs:
+            load_CV_parameters()  # reload parameters to avoid modifications during the test
             CV_parameters["FREQ"] = freq
             if hp4192A.config_CV(CV_parameters):
-                voltage, capacitance, conductance, results = measure_CV_full(hp4192A, main, CV_parameters)
+                voltage, capacitance, conductance, results = measure_CV_full(main, hp4192A, CV_parameters)
                 params = []
                 data = []
                 if CV_parameters["CALCULATE_PARAMS"]:

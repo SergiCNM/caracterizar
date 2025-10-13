@@ -260,9 +260,8 @@ try:
 except:
     message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<","").replace(">","") + " occurred. " + str(sys.exc_info()[1])
     main.updateTextDescription(message,"ERROR")
-    # retval = messageBox(main,"ERROR",message,"critical")
     message_user(main, "ERROR", message, "ok_error")
-    #print("ERROR: " + "Oops! " + str(sys.exc_info()[0]) + " occurred. " + str(sys.exc_info()[1]))
+
 
 
 
