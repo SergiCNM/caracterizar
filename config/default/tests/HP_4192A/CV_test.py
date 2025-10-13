@@ -89,7 +89,7 @@ def measure_CV_full(hp4192A, main, CV_parameters):
     return voltage, capacitance, conductance, results
 
 
-def make_compensation(hp4192A, main):
+def make_compensation(main, hp4192A, CV_parameters):
     # make OPEN and SHORT compensation
     retval = message_user(main, "Compensation", "Please, make OPEN compensation: remove the device from the fixture and press OK", "ok_cancel")
     if retval != QMessageBox.Ok:
@@ -111,6 +111,28 @@ def make_compensation(hp4192A, main):
     time.sleep(1)
 
     return True
+
+# Make compensation
+def make_full_compensation(main, hp4192A, CV_parameters):
+    if not CV_parameters["COMPENSATION_DONE"]:
+        main.updateTextDescription("<br />Making compensation...<br />")
+        if not make_compensation(main, hp4192A, CV_parameters):
+            main.updateTextDescription("Compensation failed! Aborting test...<br />", "ERROR")
+            test_status.status = "ABORTED"
+        else:
+            # modify toml file to indicate that compensation is done
+            CV_parameters["COMPENSATION_DONE"] = True
+            filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV.toml'
+            file_exists = os.path.exists(filename_config)
+            if file_exists:
+                toml_info = toml.load(filename_config)
+                toml_info["parameters"] = CV_parameters
+                # save file in UTF-8
+                with open(filename_config, 'w', encoding='utf-8') as tomlfile:
+                    toml.dump(toml_info, tomlfile)
+            main.updateTextDescription("Compensation done!<br />")
+            retval = message_user(main, "Compensation done!", "Please, configure instrument for measurement, make CONTACT and press YES to continue", "yes_cancel")
+
 
 def load_CV_parameters():
     global CV_parameters
@@ -164,26 +186,8 @@ try:
                 # reset instrument
                 hp4192A.reset()
                 test_status.status = "STARTED"
-                # Make compensation
-                if not CV_parameters["COMPENSATION_DONE"]:
-                    main.updateTextDescription("<br />Making compensation...<br />")
-                    if not make_compensation(hp4192A, main):
-                        main.updateTextDescription("Compensation failed! Aborting test...<br />", "ERROR")
-                        test_status.status = "ABORTED"
-                    else:
-                        # modify toml file to indicate that compensation is done
-                        CV_parameters["COMPENSATION_DONE"] = True
-                        filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV.toml'
-                        file_exists = os.path.exists(filename_config)
-                        if file_exists:
-                            toml_info = toml.load(filename_config)
-                            toml_info["parameters"] = CV_parameters
-                            # save file in UTF-8
-                            with open(filename_config, 'w', encoding='utf-8') as tomlfile:
-                                toml.dump(toml_info, tomlfile)
-                        main.updateTextDescription("Compensation done!<br />")
-                        retval = message_user(main, "Compensation done!", "Please, configure instrument for measurement and press YES to continue", "yes_cancel")
-
+                # make compensation
+                make_full_compensation(main, hp4192A, CV_parameters)
             else:
                 test_status.status = "ABORTED"
 
@@ -205,50 +209,55 @@ try:
 
 
                     meas_status = "meas_success"
-                    # save results
-                    main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
-                        "status" : meas_status,
-                        "message" : "",
-                        "contact_height" : "",
-                        "variables" : {
-                            "params" : params,
-                            "data" : [{"name" : "V", "values" : voltage, "units" : "V"},{"name": "C", "values" : capacitance, "units": "F"},{"name": "G", "values" : conductance, "units": "S"}]
+                else:
+                    voltage, capacitance, conductance = [], [], []
+                    meas_status = "meas_error"
+                # save results
+                main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+                    "status" : meas_status,
+                    "message" : "",
+                    "contact_height" : "",
+                    "variables" : {
+                        "params" : params,
+                        "data" : [{"name" : "V", "values" : voltage, "units" : "V"},{"name": "C", "values" : capacitance, "units": "F"},{"name": "G", "values" : conductance, "units": "S"}]
+                    },
+                    "plot_parameters" : {
+                        "name" : f"Plot CV Die {dieActual} Module {moduleActual}",
+                        "x" : voltage,
+                        "y1" : capacitance,
+                        "y2" : conductance,
+
+                        "titles" : {
+                            "title" : "Plot CV " + str(CV_parameters["FREQ"]) + "kHz (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
+                            "left" : "Capacitance",
+                            "bottom" : "Voltage",
+                            "right" : "Conductance"
                         },
-                        "plot_parameters" : {
-                            "name" : "Plot CV",
-                            "x" : voltage,
-                            "y1" : capacitance,
-                            "y2" : conductance,
-
-                            "titles" : {
-                                "title" : "CV Measurement at " + str(CV_parameters["FREQ"]) + "kHz (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
-                                "left" : "Capacitance",
-                                "bottom" : "Voltage",
-                                "right" : "Conductance"
-                            },
-                            "units" : {
-                                "left" : "F",
-                                "bottom" : "V",
-                                "right" : "S"
-                            },
-                            "showgrid" : {"x" : False, "y" : False},
-                            "legend" : True
-
-                        }
+                        "units" : {
+                            "left" : "F",
+                            "bottom" : "V",
+                            "right" : "S"
+                        },
+                        "showgrid" : {"x" : False, "y" : False},
+                        "legend" : True
 
                     }
-                    plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
 
-                    emit_plot(plot_parameters)
-                    namefile = main.getDirs("results") + "/CV" + str(CV_parameters["FREQ"]) + "kHz_" + main.ui.txtProcess.text() + "_" + str(
-                        dieActual) + "_" + str(
-                        moduleActual) + ".txt"
-                    main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                           headers=["V", "C", "G"], separation=",")
+                }
+                plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
+
+                emit_plot(plot_parameters)
+                namefile = main.getDirs("results") + "/CV" + str(CV_parameters["FREQ"]) + "kHz_" + main.ui.txtProcess.text() + "_" + str(
+                    dieActual) + "_" + str(
+                    moduleActual) + ".txt"
+                main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
+                                       headers=["V", "C", "G"], separation=",")
 
     else:
         # reset instrument
         hp4192A.reset()
+        # make compensation
+        make_full_compensation(main, hp4192A, CV_parameters)
         # single measure
         for freq in freqs:
             CV_parameters["FREQ"] = freq

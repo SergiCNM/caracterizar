@@ -31,6 +31,51 @@ def measure_CW(hp4192A, CW_parameters):
 
     return frequency,capacitance,conductance
 
+def make_compensation(main, hp4192A, CW_parameters):
+    # make OPEN and SHORT compensation
+    retval = message_user(main, "Compensation", "Please, make OPEN compensation: remove the device from the fixture and press OK", "ok_cancel")
+    if retval != QMessageBox.Ok:
+        return False
+    main.updateTextDescription("Making OPEN compensation...<br />")
+    if CW_parameters["COMPENSATION_OPEN"]:
+        hp4192A.zero_open("ON")
+    else:
+        hp4192A.zero_open("OFF")
+    time.sleep(1)
+    retval = message_user(main, "Compensation", "Please, make SHORT compensation: short the fixture and press OK", "ok_cancel")
+    if retval != QMessageBox.Ok:
+        return False
+    main.updateTextDescription("Making SHORT compensation...<br />")
+    if CW_parameters["COMPENSATION_SHORT"]:
+        hp4192A.zero_short("ON")
+    else:
+        hp4192A.zero_short("OFF")
+    time.sleep(1)
+
+    return True
+
+# Make compensation
+def make_full_compensation(main, hp4192A, CW_parameters):
+    if not CW_parameters["COMPENSATION_DONE"]:
+        main.updateTextDescription("<br />Making compensation...<br />")
+        if not make_compensation(main, hp4192A, CW_parameters):
+            main.updateTextDescription("Compensation failed! Aborting test...<br />", "ERROR")
+            test_status.status = "ABORTED"
+        else:
+            # modify toml file to indicate that compensation is done
+            CW_parameters["COMPENSATION_DONE"] = True
+            filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CW.toml'
+            file_exists = os.path.exists(filename_config)
+            if file_exists:
+                toml_info = toml.load(filename_config)
+                toml_info["parameters"] = CW_parameters
+                # save file in UTF-8
+                with open(filename_config, 'w', encoding='utf-8') as tomlfile:
+                    toml.dump(toml_info, tomlfile)
+            main.updateTextDescription("Compensation done!<br />")
+            retval = message_user(main, "Compensation done!", "Please, configure instrument for measurement, make CONTACT and press YES to continue", "yes_cancel")
+
+
 
 def load_CW_parameters():
     global CW_parameters
@@ -40,17 +85,14 @@ def load_CW_parameters():
     "START" : 1,
     "STOP" : 1000,
     "STEP" : 1,
-    "VOLTAGE" : -5,
-    "SPOT" : 30,
+    "SPOT" : "-5",
+    "OSC": 30,
     "CIRCUIT_MODE" : "Parallel",
-    "AVERAGE" : False # True is slow measure
+    "AVERAGE" : True, # True is slow measure
+    "COMPENSATION_OPEN" : True,
+    "COMPENSATION_SHORT" : True,
+    "COMPENSATION_DONE" : False
     }
-    # load from external json file in tests_dir (if exists, if not default values)
-    # filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CW.json'
-    # file_exists = os.path.exists(filename_config)
-    # if file_exists:
-    #     with open(filename_config) as json_file:
-    #         CW_parameters = json.load(json_file)
     filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CW.toml'
     file_exists = os.path.exists(filename_config)
     if file_exists:
@@ -66,6 +108,13 @@ try:
     # init CW_parameters
     load_CW_parameters()
     frequency, capacitance, conductance = [],[],[]
+    # extract spots
+    spots = CW_parameters["SPOT"].replace(" ", "").split(",")
+    # convert to float
+    spots = [float(i) for i in spots
+             if (i.isnumeric() or
+                 (i[0]=="-" and i[1:].isnumeric()) or
+                 (i[0]=="+" and i[1:].isnumeric()))]
 
     if cartographic_measurement:
         if str(dieActual)=="1" and str(moduleActual)=="1":
@@ -75,35 +124,88 @@ try:
                 # reset instrument
                 hp4192A.reset()
                 test_status.status = "STARTED"
+                # make compensation
+                make_full_compensation(main, hp4192A, CW_parameters)
             else:
                 test_status.status = "ABORTED"
 
         if test_status.status=="STARTED":
+            for spot in spots:
+                CW_parameters["SPOT"] = spot
+                if hp4192A.config_CW(CW_parameters):
+                    frequency, capacitance, conductance = measure_CW(hp4192A, CW_parameters)
+                    CW_parameters["frequency"] = frequency
+                    CW_parameters["capacitance"] = capacitance
+                    CW_parameters["conductance"] = conductance
+
+                    meas_status = "meas_success"
+                else:
+                    frequency, capacitance, conductance = [],[],[]
+                    meas_status = "meas_error"
+                # save results
+                main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+                    "status" : meas_status,
+                    "message" : "",
+                    "contact_height" : "",
+                    "variables" : {
+                        "params" : [],
+                        "data" : [{"name" : "V", "values" : frequency, "units" : "V"},{"name": "C", "values" : capacitance, "units": "pF"},{"name": "G", "values" : conductance, "units": "nS"}]
+                    },
+                    #"variables" : [{"name" : "cmax(pF)", "value" : 420.056},{"name" : "cmin(pF)", "value" : 210.057}],
+                    "plot_parameters" : {
+                        "name" : "Plot CW " + str(CW_parameters["SPOT"]) + "V (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
+                        "x" : frequency,
+                        "y1" : capacitance,
+                        "y2" : conductance,
+
+                        "titles" : {
+                            "title" : "Plot CW " + str(CW_parameters["SPOT"]) + "V (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
+                            "left" : "Capacitance",
+                            "bottom" : "Frequency",
+                            "right" : "Conductance"
+                        },
+                        "units" : {
+                            "left" : "F",
+                            "bottom" : "kHz",
+                            "right" : "S"
+                        },
+                        "showgrid" : {"x" : False, "y" : False},
+                        "legend" : True,
+                        "logarithmic": {"x": True, "y": False},
+
+                    }
+
+                }
+                plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
+
+                emit_plot(plot_parameters)
+                namefile = main.getDirs("results") + "/CW"+ str(CW_parameters["SPOT"]) + "V" + main.ui.txtProcess.text() + "_" + str(
+                    dieActual) + "_" + str(
+                    moduleActual) + ".txt"
+                main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
+                                       headers=["F", "C", "G"], separation=",")
+
+    else:
+        # reset instrument
+        hp4192A.reset()
+        # make compensation
+        make_full_compensation(main, hp4192A, CW_parameters)
+        # single measure
+        for spot in spots:
+            CW_parameters["SPOT"] = spot
             if hp4192A.config_CW(CW_parameters):
                 frequency, capacitance, conductance = measure_CW(hp4192A, CW_parameters)
                 CW_parameters["frequency"] = frequency
                 CW_parameters["capacitance"] = capacitance
                 CW_parameters["conductance"] = conductance
-
-            meas_status = "meas_success"
-            # save results
-            main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
-                "status" : meas_status,
-                "message" : "",
-                "contact_height" : "", 
-                "variables" : {
-                    "params" : [],
-                    "data" : [{"name" : "V", "values" : frequency, "units" : "V"},{"name": "C", "values" : capacitance, "units": "pF"},{"name": "G", "values" : conductance, "units": "nS"}]
-                },
-                #"variables" : [{"name" : "cmax(pF)", "value" : 420.056},{"name" : "cmin(pF)", "value" : 210.057}],
-                "plot_parameters" : {
-                    "name" : f"Plot CW Die {dieActual} Module {moduleActual}",
+                plot_parameters = {
+                    "name" : f"Plot CW Single Measure",
                     "x" : frequency,
                     "y1" : capacitance,
                     "y2" : conductance,
 
                     "titles" : {
-                        "title" : f"Plot CW Die {dieActual} Module {moduleActual}",
+                        "title" : "Plot CW Single Measure",
                         "left" : "Capacitance",
                         "bottom" : "Frequency",
                         "right" : "Conductance"
@@ -111,54 +213,25 @@ try:
                     "units" : {
                         "left" : "F",
                         "bottom" : "kHz",
-                        "right" : "S"
+                        "right" : "s"
                     },
                     "showgrid" : {"x" : False, "y" : False},
-                    "legend" : False
+                    "legend" : True,
+                    "logarithmic" : {"x" : True, "y" : False},
+                    #"foreground" : "#CCCCCC"
 
                 }
 
-            }
-            plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
+                dieActual = 1
+                moduleActual = 1
 
-    else:
-        if hp4192A.config_CW(CW_parameters):
-            frequency, capacitance, conductance = measure_CW(hp4192A, CW_parameters)
-            CW_parameters["frequency"] = frequency
-            CW_parameters["capacitance"] = capacitance
-            CW_parameters["conductance"] = conductance
-            plot_parameters = {
-                "name" : f"Plot CW Single Measure",
-                "x" : frequency,
-                "y1" : capacitance,
-                "y2" : conductance,
-
-                "titles" : {
-                    "title" : "Plot CW Single Measure",
-                    "left" : "Capacitance",
-                    "bottom" : "Frequency",
-                    "right" : "Conductance"
-                },
-                "units" : {
-                    "left" : "F",
-                    "bottom" : "kHz",
-                    "right" : "s"
-                },
-                "showgrid" : {"x" : False, "y" : False},
-                "legend" : True,
-                "logarithmic" : {"x" : True, "y" : False},
-                #"foreground" : "#CCCCCC"
-
-            }
-
-            dieActual = 1
-            moduleActual = 1
-
-    emit_plot(plot_parameters)
-    namefile = main.getDirs("results") + "/CV_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
-        moduleActual) + ".txt"
-    main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
-                           headers=["F", "C", "G"], separation=",")
+                emit_plot(plot_parameters)
+                namefile = main.getDirs("results") + "/CW" + str(
+                    CW_parameters["SPOT"]) + "V" + main.ui.txtProcess.text() + "_" + str(
+                    dieActual) + "_" + str(
+                    moduleActual) + ".txt"
+                main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
+                                       headers=["F", "C", "G"], separation=",")
 
     # stop process
     hp4192A.stop()

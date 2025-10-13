@@ -4,10 +4,13 @@ title = "CV parameters"
 START = 1
 STOP = 1000
 STEP = 1
-SPOT = -5
+SPOT = "-5"
 OSC = 30
 CIRCUIT_MODE = "Parallel"
 AVERAGE = true
+COMPENSATION_OPEN = false
+COMPENSATION_SHORT = false
+COMPENSATION_DONE = true
 
 [options]
 CIRCUIT_MODE = "Parallel,Series"
@@ -20,4 +23,13 @@ SPOT = "V"
 OSC = "mV"
 
 [help]
-START = "Start voltage"
+START = "Start frequency"
+STOP = "Stop frequency"
+STEP = "Step frequency"
+SPOT = "Spot voltage comma separated"
+OSC = "Oscillation voltage"
+CIRCUIT_MODE = "Circuit mode"
+AVERAGE = "Calculate average"
+COMPENSATION_OPEN = "Open compensation"
+COMPENSATION_SHORT = "Short compensation"
+COMPENSATION_DONE = "Compensation done"
