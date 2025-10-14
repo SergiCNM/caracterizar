@@ -27,7 +27,6 @@ from logging.handlers import RotatingFileHandler
 from functions import *
 # all other functions
 from modules import *
-
 from widgets import *
 
 os.environ["QT_FONT_DPI"] = "96"  # FIX Problem for High DPI and Scale above 100%
@@ -285,6 +284,8 @@ class MainWindow(QMainWindow):
         widgets.btnViewWafermap.clicked.connect(partial(self.view_wafermap, enable=True))
         widgets.btnGoHome.clicked.connect(self.go_home)
         widgets.btnParameters.clicked.connect(self.parameters_config)
+        widgets.btnParametersInstruments.clicked.connect(self.instruments_config)
+        widgets.btnParametersProbers.clicked.connect(self.probers_config)
 
 
         # LOAD FROM FILES
@@ -2686,6 +2687,98 @@ class MainWindow(QMainWindow):
                 else:
                     retval = messageBox(self, "Error getting parameters from file", self.parameterwindow.error_message,
                                         "critical")
+
+    def instruments_config(self):
+        instrument_name = ""
+        if widgets.cmbInstruments_2.currentIndex() > 0:
+            instrument_name = widgets.cmbInstruments_2.currentText()
+
+        if instrument_name == "":
+            QMessageBox.warning(self, "No instrument", "Please select an instrument first.")
+            return
+
+        # === Buscar ruta base de configuración ===
+        base_config_path = os.path.join(os.getcwd(), "config", "default")
+
+        # Intentar primero en instruments.toml
+        instruments_path = os.path.join(base_config_path, "instruments.toml")
+
+        target_file = None
+
+        # Cargar los TOML (si existen) y buscar el dispositivo
+        if os.path.exists(instruments_path):
+            try:
+                instruments_data = toml.load(instruments_path)
+                if instrument_name in instruments_data:
+                    target_file = instruments_path
+            except Exception:
+                pass
+
+        # Si no se encuentra
+        if target_file is None:
+            QMessageBox.warning(
+                self,
+                "Not found",
+                f"No configuration found for '{instrument_name}' in instruments.toml.",
+            )
+            return
+
+        # === Abrir ventana de parámetros ===
+        try:
+            self.instrument_window = DeviceParametersWindow(target_file, instrument_name)
+            self.instrument_window.show()
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Error opening configuration",
+                f"Error while opening {instrument_name} configuration:\n{e}",
+            )
+
+    def probers_config(self):
+        prober_name = ""
+        if widgets.cmbProbers_2.currentIndex() > 0:
+            prober_name = widgets.cmbProbers_2.currentText()
+
+        if prober_name == "":
+            QMessageBox.warning(self, "No prober", "Please select a prober first.")
+            return
+
+        # === Buscar ruta base de configuración ===
+        base_config_path = os.path.join(os.getcwd(), "config", "default")
+
+        # Intentar primero en probers.toml
+        probers_path = os.path.join(base_config_path, "probers.toml")
+
+        target_file = None
+
+        # Cargar los TOML (si existen) y buscar el dispositivo
+        if os.path.exists(probers_path):
+            try:
+                probers_data = toml.load(probers_path)
+                if prober_name in probers_data:
+                    target_file = probers_path
+            except Exception:
+                pass
+
+        # Si no se encuentra
+        if target_file is None:
+            QMessageBox.warning(
+                self,
+                "Not found",
+                f"No configuration found for '{prober_name}' in probers.toml.",
+            )
+            return
+
+        # === Abrir ventana de parámetros ===
+        try:
+            self.prober_window = DeviceParametersWindow(target_file, prober_name)
+            self.prober_window.show()
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Error opening configuration",
+                f"Error while opening {prober_name} configuration:\n{e}",
+            )
 
     def execute_cartographic_measurement(self):
         global measurement_status, wafer_parameters, test_status, contact_status, contact_test, contact_errors, actual_height, file_measurement

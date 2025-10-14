@@ -55,3 +55,4 @@ from . config import Config
 
 # Import parameters
 from . parameters import ParametersWindow
+from . parameters import DeviceParametersWindow

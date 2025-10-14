@@ -170,3 +170,224 @@ class ParametersWindow(QWidget):
         toml_file = open(self.path_file, "w", encoding="utf-8")
         toml.dump(self.toml_info, toml_file)
         toml_file.close()
+
+
+# class DeviceParametersWindow(QWidget):
+#     """
+#     Ventana de configuración para instrumentos o probers (instruments.toml / probers.toml).
+#     Permite editar los parámetros del dispositivo seleccionado.
+#     """
+#     def __init__(self, toml_path, device_name):
+#         super().__init__()
+#         self.toml_path = toml_path
+#         self.device_name = device_name
+#         self.setWindowTitle(f"Parameters: {device_name}")
+#         self.layout = QVBoxLayout()
+#         self.setLayout(self.layout)
+#
+#         # Cargar configuración completa del fichero TOML
+#         import toml
+#         if not os.path.exists(toml_path):
+#             raise FileNotFoundError(f"{toml_path} not found.")
+#         self.toml_data = toml.load(toml_path)
+#
+#         if device_name not in self.toml_data:
+#             raise KeyError(f"Device {device_name} not found in {toml_path}")
+#
+#         self.device_data = self.toml_data[device_name]
+#         self.fields = {}
+#
+#         form = QFormLayout()
+#         for key, value in self.device_data.items():
+#             widget = None
+#
+#             if isinstance(value, bool):
+#                 widget = QCheckBox()
+#                 widget.setChecked(value)
+#             elif isinstance(value, int):
+#                 widget = QSpinBox()
+#                 widget.setMaximum(9999999)
+#                 widget.setMinimum(-9999999)
+#                 widget.setValue(value)
+#             elif isinstance(value, float):
+#                 widget = QDoubleSpinBox()
+#                 widget.setMaximum(9999999)
+#                 widget.setMinimum(-9999999)
+#                 widget.setDecimals(3)
+#                 widget.setValue(value)
+#             else:
+#                 display_value = (
+#                     str(value)
+#                     .replace("\r", "\\r")
+#                     .replace("\n", "\\n")
+#                 )
+#                 widget = QLineEdit(display_value)
+#
+#             form.addRow(QLabel(key), widget)
+#             self.fields[key] = widget
+#
+#         self.layout.addLayout(form)
+#
+#         # Botón guardar
+#         save_button = QPushButton("Save configuration")
+#         save_button.clicked.connect(self.save_configuration)
+#         self.layout.addWidget(save_button)
+#
+#         self.setMinimumWidth(400)
+#
+#     def save_configuration(self):
+#         """Guardar cambios en el fichero TOML."""
+#         for key, widget in self.fields.items():
+#             if isinstance(widget, QCheckBox):
+#                 self.device_data[key] = widget.isChecked()
+#             elif isinstance(widget, QSpinBox) or isinstance(widget, QDoubleSpinBox):
+#                 self.device_data[key] = widget.value()
+#             elif isinstance(widget, QLineEdit):
+#                 text = widget.text()
+#
+#                 # Convertir secuencias visibles "\n" o "\r" a caracteres reales
+#                 text = (
+#                     text.replace("\\r", "\r")
+#                     .replace("\\n", "\n")
+#                 )
+#
+#                 # Intentar convertir a número si aplica
+#                 if text.isdigit():
+#                     self.device_data[key] = int(text)
+#                 else:
+#                     try:
+#                         self.device_data[key] = float(text)
+#                     except ValueError:
+#                         self.device_data[key] = text
+#
+#         # Sobrescribir el bloque correspondiente en el TOML
+#         self.toml_data[self.device_name] = self.device_data
+#         with open(self.toml_path, "w", encoding="utf-8") as f:
+#             import toml
+#             toml.dump(self.toml_data, f)
+#
+#         QMessageBox.information(self, "Saved", f"Configuration saved for {self.device_name}")
+
+
+class DeviceParametersWindow(QWidget):
+    def __init__(self, toml_path, device_name):
+        super().__init__()
+        self.toml_path = toml_path
+        self.device_name = device_name
+        self.setWindowTitle(f"Parameters: {device_name}")
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        import toml
+        if not os.path.exists(toml_path):
+            raise FileNotFoundError(f"{toml_path} not found.")
+        self.toml_data = toml.load(toml_path)
+
+        # Buscar sección principal y posibles subbloques
+        if device_name not in self.toml_data:
+            raise KeyError(f"Device {device_name} not found in {toml_path}")
+
+        self.device_data = self.toml_data[device_name]
+        self.fields = {}
+
+        tabs = QTabWidget()
+        tabs.addTab(self._build_form(self.device_data, device_name), "Main")
+
+        # Buscar subbloques como [device_name.xxx]
+        # prefix = device_name + "."
+        # for key in self.toml_data.keys():
+        #     if key.startswith(prefix):
+        #         subname = key.split(".")[1]
+        #         subdata = self.toml_data[key]
+        #         tabs.addTab(self._build_form(subdata, subname), subname)
+        # Buscar subbloques dentro del diccionario principal (anidados)
+        for subname, subdata in self.device_data.items():
+            if isinstance(subdata, dict):
+                tabs.addTab(self._build_form(subdata, subname), subname)
+        self.layout.addWidget(tabs)
+
+        # Botón guardar
+        save_button = QPushButton("Save configuration")
+        save_button.clicked.connect(self.save_configuration)
+        self.layout.addWidget(save_button)
+        self.setMinimumWidth(450)
+
+    def _build_form(self, section_data, section_name):
+        """Crea un formulario (tab) para un bloque de configuración"""
+        form = QFormLayout()
+        container = QWidget()
+        container.setLayout(form)
+
+        if section_name not in self.fields:
+            self.fields[section_name] = {}
+
+        for key, value in section_data.items():
+            # ⚠️ Ignorar subdiccionarios (que ya tendrán su pestaña)
+            if isinstance(value, dict):
+                continue
+            if isinstance(value, bool):
+                widget = QCheckBox()
+                widget.setChecked(value)
+            elif isinstance(value, int):
+                widget = QSpinBox()
+                widget.setMaximum(9999999)
+                widget.setMinimum(-9999999)
+                widget.setValue(value)
+            elif isinstance(value, float):
+                widget = QDoubleSpinBox()
+                widget.setMaximum(9999999)
+                widget.setMinimum(-9999999)
+                widget.setDecimals(3)
+                widget.setValue(value)
+            else:
+                # Mostrar secuencias de escape visibles
+                display_value = (
+                    str(value)
+                    .replace("\r", "\\r")
+                    .replace("\n", "\\n")
+                )
+                widget = QLineEdit(display_value)
+
+            form.addRow(QLabel(key), widget)
+            self.fields[section_name][key] = widget
+
+        return container
+
+    def save_configuration(self):
+        """Guardar cambios en el fichero TOML."""
+        for section_name, section_fields in self.fields.items():
+            # Referencia al bloque correcto dentro del diccionario principal
+            if section_name == self.device_name:
+                target_dict = self.toml_data[self.device_name]
+            else:
+                # Asegurar que el subdiccionario existe dentro del principal
+                if section_name not in self.toml_data[self.device_name]:
+                    self.toml_data[self.device_name][section_name] = {}
+                target_dict = self.toml_data[self.device_name][section_name]
+
+            # Actualizar valores
+            for key, widget in section_fields.items():
+                if isinstance(widget, QCheckBox):
+                    val = widget.isChecked()
+                elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
+                    val = widget.value()
+                elif isinstance(widget, QLineEdit):
+                    val = widget.text().replace("\\r", "\r").replace("\\n", "\n")
+                    if val.isdigit():
+                        val = int(val)
+                    else:
+                        try:
+                            val = float(val)
+                        except ValueError:
+                            pass
+                else:
+                    val = widget.text()
+
+                target_dict[key] = val
+
+        import toml
+        with open(self.toml_path, "w", encoding="utf-8") as f:
+            toml.dump(self.toml_data, f)
+
+        QMessageBox.information(self, "Saved", f"Configuration saved for {self.device_name}")
+

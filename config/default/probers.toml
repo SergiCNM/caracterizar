@@ -1,0 +1,39 @@
+[CNM_TEST]
+address = "GPIB0::00::INSTR"
+read_termination = "\n"
+write_termination = "\n"
+timeout = 10
+soft_contact = false
+
+[MPI_TS2000SE]
+address = "GPIB0::13::INSTR"
+read_termination = "\n"
+write_termination = "\n"
+timeout = 10
+soft_contact = true
+
+[KARLSUSS_PA200]
+address = "GPIB0::1::INSTR"
+read_termination = "\r\n"
+write_termination = "\r\n"
+timeout = 10
+soft_contact = false
+
+[CNM_TEST.progressive_contact]
+enable = false
+program = "testcontact_random.py"
+steps = 5
+max_tries = 2
+reach_contact = false
+measure_always = true
+
+[MPI_TS2000SE.progressive_contact]
+enable = false
+program = "testcontact_random.py"
+steps = 10
+max_tries = 4
+reach_contact = false
+measure_always = true
+
+[KARLSUSS_PA200.progressive_contact]
+enable = false
