@@ -417,8 +417,15 @@ class ModulesWindow(QMainWindow):
                 name_widget = "txtY" + str(i)
                 self.ui.centralwidget.findChild(QDoubleSpinBox,name_widget).setValue(float(modul_array[1]))
                 name_widget = "txtN" + str(i)
-                if WaferWindow.wafer_modules_name:
-                    self.ui.centralwidget.findChild(QLineEdit, name_widget).setText(WaferWindow.wafer_modules_name[i-1])
+                # if WaferWindow.wafer_modules_name:
+                #     self.ui.centralwidget.findChild(QLineEdit, name_widget).setText(WaferWindow.wafer_modules_name[i-1])
+                if WaferWindow.wafer_modules_name and len(WaferWindow.wafer_modules_name) >= i:
+                    self.ui.centralwidget.findChild(QLineEdit, name_widget).setText(
+                        WaferWindow.wafer_modules_name[i - 1]
+                    )
+                else:
+                    # Si no existe el nombre, asignamos uno por defecto
+                    self.ui.centralwidget.findChild(QLineEdit, name_widget).setText(f"{i}")
                 i = i + 1
             else:
                 print("Error getting modules")
@@ -618,7 +625,7 @@ class WaferWindow(QMainWindow):
             for i in range (len(self.wafer.wafer_modules),self.wafer.nmodules):
                 self.wafer.wafer_modules.append('0.000000 0.000000')
         else:
-            for i in range (self.wafer.nmodules,len(self.wafer.wafer_modules)):
+            for i in range(len(self.wafer.wafer_modules) - 1, self.wafer.nmodules - 1, -1):
                 del self.wafer.wafer_modules[i]
         self.wafer.xsize = self.widgets.txtXSize.value()
         self.wafer.ysize = self.widgets.txtYSize.value()

@@ -3704,76 +3704,170 @@ class SplashScreen(QMainWindow):
             self.login.ui.password.setText(password)
 
 
+# class LoginWindow(QMainWindow):
+#
+#     def __init__(self):
+#
+#         QMainWindow.__init__(self)
+#         self.ui = Ui_LoginWindow()
+#         self.ui.setupUi(self)
+#
+#         # def moveWindow(event):
+#         #     if event.buttons() == Qt.LeftButton:
+#         #         self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+#         #         self.dragPos = event.globalPosition().toPoint()
+#         #         event.accept()
+#
+#         # REMOVE TITLE BAR
+#         #self.setWindowFlag(Qt.FramelessWindowHint)
+#         #self.setAttribute(Qt.WA_TranslucentBackground)
+#
+#         # connect buttons minimize & close
+#         self.ui.btnClose.clicked.connect(self.close_window)
+#         self.ui.btnMinimize.clicked.connect(self.minimize_window)
+#         self.ui.btnToggle.clicked.connect(self.toggle_password)
+#
+#         # connect login button
+#         self.ui.btnLogin.clicked.connect(self.login_function)
+#
+#         # default values
+#         self.ui.username.setText("sergi.sanchez@imb-cnm.csic.es")
+#         # put icon eye
+#         self.ui.password
+#
+#         # self.ui.version.mouseMoveEvent = moveWindow
+#
+#         # set version in splash screen
+#         self.ui.version.setText(version)
+#         self.offset = QPoint()
+#         self.show()
+#
+#     def toggle_password(self):
+#         if self.ui.password.echoMode() == QLineEdit.Normal:
+#             self.ui.password.setEchoMode(QLineEdit.Password)
+#         else:
+#             self.ui.password.setEchoMode(QLineEdit.Normal)
+#
+#     def minimize_window(self):
+#         self.showMinimized()
+#
+#     def close_window(self):
+#         if self.waferwindow:
+#             self.waferwindow.moduleswindow.close()
+#             self.waferwindow.close()
+#         self.close()
+#         QCoreApplication.quit()
+#
+#     # MOUSE CLICK EVENTS
+#     # ///////////////////////////////////////////////////////////////
+#     def mousePressEvent(self, event):
+#         # SET DRAG POS WINDOW
+#         # offset from top left corner
+#         # p = event.globalPosition();
+#         # offset = p.toPoint()
+#
+#         self.dragPos = event.globalPosition().toPoint()
+#
+#     def mouseMoveEvent(self, event):
+#         if event.buttons() == Qt.LeftButton:
+#             self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+#             self.dragPos = event.globalPosition().toPoint()
+#             event.accept()
+#
+#     def login_function(self):
+#         global username, password, counter, errorLogin
+#         username = self.ui.username.text()
+#         password = self.ui.password.text()
+#
+#         self.splash = SplashScreen()
+#         counter = 0
+#         errorLogin = False
+#         self.splash.show()
+#         self.destroy()
+#         self.splash.ui.version.setText(version)
+#         self.splash.ui.lblStatus.setText("Verifying log in access...")
+
+
 class LoginWindow(QMainWindow):
-
     def __init__(self):
-
-        QMainWindow.__init__(self)
+        super().__init__()
         self.ui = Ui_LoginWindow()
         self.ui.setupUi(self)
 
-        def moveWindow(event):
-            if event.buttons() == Qt.LeftButton:
-                self.move(self.pos() + event.globalPos - self.dragPos)
-                self.dragPos == event.globalPos()
-                event.accept()
-
-        # REMOVE TITLE BAR
+        # ---------------------------
+        #  WINDOW CONFIG
+        # ---------------------------
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
-        # connect buttons minimize & close
+        # Conectar botones personalizados
         self.ui.btnClose.clicked.connect(self.close_window)
         self.ui.btnMinimize.clicked.connect(self.minimize_window)
         self.ui.btnToggle.clicked.connect(self.toggle_password)
-
-        # connect login button
         self.ui.btnLogin.clicked.connect(self.login_function)
 
-        # default values
+        # Permitir arrastrar ventana desde cualquier zona superior
+        self.dragPos = QPoint()
+        self.ui.frame.mouseMoveEvent = self.move_window  # añade un QWidget en QtDesigner llamado "title_bar"
+
+        # Configurar valores por defecto
         self.ui.username.setText("sergi.sanchez@imb-cnm.csic.es")
-        # put icon eye
-        self.ui.password
-
-        self.ui.version.mouseMoveEvent = moveWindow
-
-        # set version in splash screen
         self.ui.version.setText(version)
-        self.offset = QPoint()
+
         self.show()
 
+    # ---------------------------
+    #  WINDOW ACTIONS
+    # ---------------------------
+    def minimize_window(self):
+        self.showMinimized()
+
+    def close_window(self):
+        try:
+            self.waferwindow.moduleswindow.close()
+            self.waferwindow.close()
+        except Exception:
+            pass
+        self.close()
+        QCoreApplication.quit()
+
+    # ---------------------------
+    #  MOVE WINDOW
+    # ---------------------------
+    def mousePressEvent(self, event):
+        """Guardar posición inicial al hacer clic"""
+        if event.button() == Qt.LeftButton:
+            self.dragPos = event.globalPosition().toPoint()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        """Mover ventana si está presionado el botón izquierdo"""
+        if event.buttons() == Qt.LeftButton:
+            self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+            self.dragPos = event.globalPosition().toPoint()
+            event.accept()
+
+    def move_window(self, event):
+        """Permite arrastrar ventana desde el title_bar"""
+        if event.buttons() == Qt.LeftButton:
+            self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+            self.dragPos = event.globalPosition().toPoint()
+            event.accept()
+
+    # ---------------------------
+    #  PASSWORD TOGGLE
+    # ---------------------------
     def toggle_password(self):
         if self.ui.password.echoMode() == QLineEdit.Normal:
             self.ui.password.setEchoMode(QLineEdit.Password)
         else:
             self.ui.password.setEchoMode(QLineEdit.Normal)
 
-    def minimize_window(self):
-        self.showMinimized()
-
-    def close_window(self):
-        self.waferwindow.moduleswindow.close()
-        self.waferwindow.close()
-        self.close()
-        QCoreApplication.quit()
-
-    # MOUSE CLICK EVENTS
-    # ///////////////////////////////////////////////////////////////
-    def mousePressEvent(self, event):
-        # SET DRAG POS WINDOW
-        # offset from top left corner
-        # p = event.globalPosition();
-        # offset = p.toPoint()
-
-        self.dragPos = event.globalPos()
-
-    def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton:
-            self.move(self.pos() + event.globalPos() - self.dragPos)
-            self.dragPos = event.globalPos()
-            event.accept()
-
+    # ---------------------------
+    #  LOGIN ACTION
+    # ---------------------------
     def login_function(self):
+        """Verifica las credenciales y muestra el splash screen"""
         global username, password, counter, errorLogin
         username = self.ui.username.text()
         password = self.ui.password.text()

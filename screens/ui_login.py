@@ -12,6 +12,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
+
 class Ui_LoginWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -152,17 +153,15 @@ class Ui_LoginWindow(object):
         self.btnClose.setGeometry(QRect(569, 1, 30, 32))
         self.btnClose.setMaximumSize(QSize(30, 16777215))
         self.btnClose.setToolTipDuration(-1)
-        self.btnClose.setStyleSheet(u"qproperty-icon: url(:/images/icons8-macos-close-30.png);")
+        # self.btnClose.setStyleSheet(u"qproperty-icon: url(:/images/icons8-macos-close-30.png);")
+        self.btnClose.setIcon(QIcon("images/icons/icon_close.png"))
         self.btnClose.setIconSize(QSize(30, 30))
         self.btnClose.setFlat(True)
         self.btnMinimize = QPushButton(self.frame)
         self.btnMinimize.setObjectName(u"btnMinimize")
         self.btnMinimize.setGeometry(QRect(539, 1, 30, 32))
         self.btnMinimize.setMaximumSize(QSize(30, 16777215))
-        self.btnMinimize.setStyleSheet(u"qproperty-icon: url(:/images/icons8-macos-minimize-30.png);\n"
-"\n"
-"\n"
-"")
+        self.btnMinimize.setIcon(QIcon("images/icons/icon_minimize.png"))
         self.btnMinimize.setIconSize(QSize(30, 30))
         self.btnMinimize.setAutoRepeat(False)
         self.btnMinimize.setFlat(True)

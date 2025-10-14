@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'waferzrqctm.ui'
+## Form generated from reading UI file 'waferbMeSqp.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -222,7 +222,7 @@ class Ui_WaferWindow(object):
         self.txtNumberModules.setMinimumSize(QSize(50, 0))
         self.txtNumberModules.setMaximumSize(QSize(50, 16777215))
         self.txtNumberModules.setMinimum(1)
-        self.txtNumberModules.setMaximum(30)
+        self.txtNumberModules.setMaximum(40)
 
         self.horizontalLayout.addWidget(self.txtNumberModules)
 
