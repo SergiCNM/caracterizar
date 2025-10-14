@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainxSweFm.ui'
+## Form generated from reading UI file 'mainVBxLUS.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -2501,6 +2501,40 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_40.addWidget(self.btnParametersInstruments)
 
+        self.horizontalSpacer_14 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+        self.horizontalLayout_40.addItem(self.horizontalSpacer_14)
+
+        self.btnIDNInstrument = QPushButton(self.instruments)
+        self.btnIDNInstrument.setObjectName(u"btnIDNInstrument")
+        self.btnIDNInstrument.setMinimumSize(QSize(30, 30))
+        self.btnIDNInstrument.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btnIDNInstrument.setStyleSheet(u"/*background-color: rgb(52, 59, 72);*/\n"
+"\n"
+"#pagesContainer .QPushButton {\n"
+"	border: 2px solid rgb(52, 59, 72);\n"
+"	border-radius: 5px;	\n"
+"	background-color: rgb(52, 59, 72);\n"
+"}\n"
+"\n"
+"#pagesContainer .QPushButton:hover {\n"
+"	background-color: rgb(57, 65, 80);\n"
+"	border: 2px solid rgb(61, 70, 86);\n"
+"}\n"
+"\n"
+"#pagesContainer .QPushButton:pressed {	\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 2px solid rgb(43, 50, 61);\n"
+"}\n"
+"\n"
+"#pagesContainer .QPushButton:disabled {\n"
+"\n"
+"	background-color: #333333; border: none;\n"
+"}")
+        self.btnIDNInstrument.setIcon(icon4)
+
+        self.horizontalLayout_40.addWidget(self.btnIDNInstrument)
+
         self.horizontalSpacer_32 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_40.addItem(self.horizontalSpacer_32)
@@ -2575,6 +2609,66 @@ class Ui_MainWindow(object):
         self.btnParametersProbers.setIcon(icon1)
 
         self.horizontalLayout_probers.addWidget(self.btnParametersProbers)
+
+        self.horizontalSpacer_33 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+        self.horizontalLayout_probers.addItem(self.horizontalSpacer_33)
+
+        self.btnIDNProber = QPushButton(self.probers)
+        self.btnIDNProber.setObjectName(u"btnIDNProber")
+        self.btnIDNProber.setMinimumSize(QSize(30, 30))
+        self.btnIDNProber.setStyleSheet(u"\n"
+"/*background-color: rgb(52, 59, 72);*/\n"
+"#pagesContainer .QPushButton {\n"
+"	border: 2px solid rgb(52, 59, 72);\n"
+"	border-radius: 5px;\n"
+"	background-color: rgb(52, 59, 72);\n"
+"}\n"
+"#pagesContainer .QPushButton:hover {\n"
+"	background-color: rgb(57, 65, 80);\n"
+"	border: 2px solid rgb(61, 70, 86);\n"
+"}\n"
+"#pagesContainer .QPushButton:pressed {\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 2px solid rgb(43, 50, 61);\n"
+"}\n"
+"#pagesContainer .QPushButton:disabled {\n"
+"	background-color: #333333; border: none;\n"
+"}")
+        self.btnIDNProber.setIcon(icon4)
+
+        self.horizontalLayout_probers.addWidget(self.btnIDNProber)
+
+        self.horizontalSpacer_37 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+        self.horizontalLayout_probers.addItem(self.horizontalSpacer_37)
+
+        self.btnProberControl = QPushButton(self.probers)
+        self.btnProberControl.setObjectName(u"btnProberControl")
+        self.btnProberControl.setMinimumSize(QSize(30, 30))
+        self.btnProberControl.setStyleSheet(u"\n"
+"/*background-color: rgb(52, 59, 72);*/\n"
+"#pagesContainer .QPushButton {\n"
+"	border: 2px solid rgb(52, 59, 72);\n"
+"	border-radius: 5px;\n"
+"	background-color: rgb(52, 59, 72);\n"
+"}\n"
+"#pagesContainer .QPushButton:hover {\n"
+"	background-color: rgb(57, 65, 80);\n"
+"	border: 2px solid rgb(61, 70, 86);\n"
+"}\n"
+"#pagesContainer .QPushButton:pressed {\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 2px solid rgb(43, 50, 61);\n"
+"}\n"
+"#pagesContainer .QPushButton:disabled {\n"
+"	background-color: #333333; border: none;\n"
+"}")
+        icon11 = QIcon()
+        icon11.addFile(u":/icons/images/icons/cil-move.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnProberControl.setIcon(icon11)
+
+        self.horizontalLayout_probers.addWidget(self.btnProberControl)
 
         self.horizontalSpacer_probers_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -2651,9 +2745,9 @@ class Ui_MainWindow(object):
         self.btnLoadFiles.setFont(font)
         self.btnLoadFiles.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnLoadFiles.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon11 = QIcon()
-        icon11.addFile(u":/icons/images/icons/cil-loop-circular.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnLoadFiles.setIcon(icon11)
+        icon12 = QIcon()
+        icon12.addFile(u":/icons/images/icons/cil-loop-circular.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnLoadFiles.setIcon(icon12)
 
         self.gridLayout_13.addWidget(self.btnLoadFiles, 4, 0, 1, 1)
 
@@ -2673,9 +2767,9 @@ class Ui_MainWindow(object):
         self.btnOpenWafermapFile.setFont(font)
         self.btnOpenWafermapFile.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnOpenWafermapFile.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon12 = QIcon()
-        icon12.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnOpenWafermapFile.setIcon(icon12)
+        icon13 = QIcon()
+        icon13.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnOpenWafermapFile.setIcon(icon13)
 
         self.gridLayout_13.addWidget(self.btnOpenWafermapFile, 3, 1, 1, 1)
 
@@ -2704,7 +2798,7 @@ class Ui_MainWindow(object):
         self.btnOpenDataFile.setFont(font)
         self.btnOpenDataFile.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnOpenDataFile.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnOpenDataFile.setIcon(icon12)
+        self.btnOpenDataFile.setIcon(icon13)
 
         self.gridLayout_13.addWidget(self.btnOpenDataFile, 1, 1, 1, 1)
 
@@ -2759,9 +2853,9 @@ class Ui_MainWindow(object):
         self.btnNextParamFiles.setFont(font)
         self.btnNextParamFiles.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnNextParamFiles.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon13 = QIcon()
-        icon13.addFile(u":/icons/images/icons/cil-chevron-right.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnNextParamFiles.setIcon(icon13)
+        icon14 = QIcon()
+        icon14.addFile(u":/icons/images/icons/cil-chevron-right.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnNextParamFiles.setIcon(icon14)
 
         self.gridLayout_14.addWidget(self.btnNextParamFiles, 0, 3, 1, 1)
 
@@ -2781,7 +2875,7 @@ class Ui_MainWindow(object):
         self.btnCorrelationFiles.setFont(font)
         self.btnCorrelationFiles.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnCorrelationFiles.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnCorrelationFiles.setIcon(icon11)
+        self.btnCorrelationFiles.setIcon(icon12)
 
         self.gridLayout_14.addWidget(self.btnCorrelationFiles, 0, 4, 1, 1)
 
@@ -2792,7 +2886,7 @@ class Ui_MainWindow(object):
         self.btnAnalyzeFiles.setFont(font)
         self.btnAnalyzeFiles.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnAnalyzeFiles.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnAnalyzeFiles.setIcon(icon11)
+        self.btnAnalyzeFiles.setIcon(icon12)
 
         self.gridLayout_14.addWidget(self.btnAnalyzeFiles, 0, 0, 1, 1)
 
@@ -2804,9 +2898,9 @@ class Ui_MainWindow(object):
         self.btnPreviousParamFiles.setFont(font)
         self.btnPreviousParamFiles.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnPreviousParamFiles.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon14 = QIcon()
-        icon14.addFile(u":/icons/images/icons/cil-chevron-left.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnPreviousParamFiles.setIcon(icon14)
+        icon15 = QIcon()
+        icon15.addFile(u":/icons/images/icons/cil-chevron-left.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnPreviousParamFiles.setIcon(icon15)
 
         self.gridLayout_14.addWidget(self.btnPreviousParamFiles, 0, 1, 1, 1)
 
@@ -2939,7 +3033,7 @@ class Ui_MainWindow(object):
         self.btnNextParamBBDD.setFont(font)
         self.btnNextParamBBDD.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnNextParamBBDD.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnNextParamBBDD.setIcon(icon13)
+        self.btnNextParamBBDD.setIcon(icon14)
 
         self.gridLayout_21.addWidget(self.btnNextParamBBDD, 0, 3, 1, 1)
 
@@ -2950,7 +3044,7 @@ class Ui_MainWindow(object):
         self.btnCorrelationBBDD.setFont(font)
         self.btnCorrelationBBDD.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnCorrelationBBDD.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnCorrelationBBDD.setIcon(icon11)
+        self.btnCorrelationBBDD.setIcon(icon12)
 
         self.gridLayout_21.addWidget(self.btnCorrelationBBDD, 0, 4, 1, 1)
 
@@ -2961,7 +3055,7 @@ class Ui_MainWindow(object):
         self.btnAnalyzeBBDD.setFont(font)
         self.btnAnalyzeBBDD.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnAnalyzeBBDD.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnAnalyzeBBDD.setIcon(icon11)
+        self.btnAnalyzeBBDD.setIcon(icon12)
 
         self.gridLayout_21.addWidget(self.btnAnalyzeBBDD, 0, 0, 1, 1)
 
@@ -2973,7 +3067,7 @@ class Ui_MainWindow(object):
         self.btnPreviousParamBBDD.setFont(font)
         self.btnPreviousParamBBDD.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnPreviousParamBBDD.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnPreviousParamBBDD.setIcon(icon14)
+        self.btnPreviousParamBBDD.setIcon(icon15)
 
         self.gridLayout_21.addWidget(self.btnPreviousParamBBDD, 0, 1, 1, 1)
 
@@ -3395,7 +3489,7 @@ class Ui_MainWindow(object):
         self.pushButton.setFont(font)
         self.pushButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.pushButton.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.pushButton.setIcon(icon12)
+        self.pushButton.setIcon(icon13)
 
         self.gridLayout.addWidget(self.pushButton, 0, 1, 1, 1)
 
@@ -3470,7 +3564,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 218, 218))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 365, 218))
         self.scrollAreaWidgetContents.setStyleSheet(u" QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: rgb(52, 59, 72);\n"
@@ -3518,9 +3612,9 @@ class Ui_MainWindow(object):
         self.commandLinkButton.setObjectName(u"commandLinkButton")
         self.commandLinkButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.commandLinkButton.setStyleSheet(u"")
-        icon15 = QIcon()
-        icon15.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.commandLinkButton.setIcon(icon15)
+        icon16 = QIcon()
+        icon16.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.commandLinkButton.setIcon(icon16)
 
         self.gridLayout_2.addWidget(self.commandLinkButton, 1, 6, 1, 1)
 
@@ -3856,7 +3950,7 @@ class Ui_MainWindow(object):
         self.btnAddWafers.setMaximumSize(QSize(60, 16777215))
         self.btnAddWafers.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnAddWafers.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnAddWafers.setIcon(icon13)
+        self.btnAddWafers.setIcon(icon14)
 
         self.verticalLayout_47.addWidget(self.btnAddWafers)
 
@@ -3958,7 +4052,7 @@ class Ui_MainWindow(object):
         self.btnPreviousParamConsult.setFont(font)
         self.btnPreviousParamConsult.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnPreviousParamConsult.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnPreviousParamConsult.setIcon(icon14)
+        self.btnPreviousParamConsult.setIcon(icon15)
 
         self.gridLayout_8.addWidget(self.btnPreviousParamConsult, 0, 1, 1, 1)
 
@@ -3970,7 +4064,7 @@ class Ui_MainWindow(object):
         self.btnNextParamConsult.setFont(font)
         self.btnNextParamConsult.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnNextParamConsult.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnNextParamConsult.setIcon(icon13)
+        self.btnNextParamConsult.setIcon(icon14)
 
         self.gridLayout_8.addWidget(self.btnNextParamConsult, 0, 3, 1, 1)
 
@@ -3981,7 +4075,7 @@ class Ui_MainWindow(object):
         self.btnConsult.setFont(font)
         self.btnConsult.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnConsult.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnConsult.setIcon(icon11)
+        self.btnConsult.setIcon(icon12)
 
         self.gridLayout_8.addWidget(self.btnConsult, 0, 0, 1, 1)
 
@@ -4060,9 +4154,9 @@ class Ui_MainWindow(object):
 "\n"
 "	background-color: #333333; border: none;\n"
 "}")
-        icon16 = QIcon()
-        icon16.addFile(u":/icons/images/icons/cil-cloud-upload.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnUploadHistorical.setIcon(icon16)
+        icon17 = QIcon()
+        icon17.addFile(u":/icons/images/icons/cil-cloud-upload.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnUploadHistorical.setIcon(icon17)
 
         self.horizontalLayout_35.addWidget(self.btnUploadHistorical)
 
@@ -4271,7 +4365,7 @@ class Ui_MainWindow(object):
         self.btnUploadFiles.setFont(font)
         self.btnUploadFiles.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnUploadFiles.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnUploadFiles.setIcon(icon16)
+        self.btnUploadFiles.setIcon(icon17)
 
         self.gridLayout_20.addWidget(self.btnUploadFiles, 18, 0, 1, 1)
 
@@ -4309,7 +4403,7 @@ class Ui_MainWindow(object):
         self.btnOpenWafermapFileInbase.setFont(font)
         self.btnOpenWafermapFileInbase.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnOpenWafermapFileInbase.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnOpenWafermapFileInbase.setIcon(icon12)
+        self.btnOpenWafermapFileInbase.setIcon(icon13)
 
         self.gridLayout_20.addWidget(self.btnOpenWafermapFileInbase, 3, 1, 1, 1)
 
@@ -4343,7 +4437,7 @@ class Ui_MainWindow(object):
         self.btnOpenDataFileInbase.setFont(font)
         self.btnOpenDataFileInbase.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnOpenDataFileInbase.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btnOpenDataFileInbase.setIcon(icon12)
+        self.btnOpenDataFileInbase.setIcon(icon13)
 
         self.gridLayout_20.addWidget(self.btnOpenDataFileInbase, 1, 1, 1, 1)
 
@@ -4673,9 +4767,9 @@ class Ui_MainWindow(object):
         self.btnReport.setFont(font)
         self.btnReport.setCursor(QCursor(Qt.PointingHandCursor))
         self.btnReport.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon17 = QIcon()
-        icon17.addFile(u":/icons/images/icons/cil-briefcase.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnReport.setIcon(icon17)
+        icon18 = QIcon()
+        icon18.addFile(u":/icons/images/icons/cil-briefcase.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnReport.setIcon(icon18)
 
         self.verticalLayout_15.addWidget(self.btnReport)
 
@@ -4958,12 +5052,25 @@ class Ui_MainWindow(object):
         self.btnParametersInstruments.setToolTip(QCoreApplication.translate("MainWindow", u"Parameters configuration", None))
 #endif // QT_CONFIG(tooltip)
         self.btnParametersInstruments.setText("")
+#if QT_CONFIG(tooltip)
+        self.btnIDNInstrument.setToolTip(QCoreApplication.translate("MainWindow", u"Check instrument", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnIDNInstrument.setText("")
         self.label_probers.setText(QCoreApplication.translate("MainWindow", u"PROBERS", None))
         self.cmbProbers_2.setItemText(0, QCoreApplication.translate("MainWindow", u"Select instrument", None))
 
+        self.cmbProbers_2.setCurrentText(QCoreApplication.translate("MainWindow", u"Select prober", None))
 #if QT_CONFIG(tooltip)
         self.btnParametersProbers.setToolTip(QCoreApplication.translate("MainWindow", u"Parameters configuration", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.btnIDNProber.setToolTip(QCoreApplication.translate("MainWindow", u"Check prober", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnIDNProber.setText("")
+#if QT_CONFIG(tooltip)
+        self.btnProberControl.setToolTip(QCoreApplication.translate("MainWindow", u"Prober Control Window", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnProberControl.setText("")
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"STATISTICS for the PARAMETRIC TEST", None))
         self.optLoadFiles.setText(QCoreApplication.translate("MainWindow", u"Load from files", None))
         self.optLoadBBDD.setText(QCoreApplication.translate("MainWindow", u"Load from BBDD", None))

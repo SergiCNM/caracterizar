@@ -210,7 +210,7 @@ class MPI_TS2000SE:
         )
 
 
-	def light(self,mode):
+	def light(self, mode):
 		try:
 			if str(mode)=="1" or str(mode)=="0":
 				cmd = "vis:switch_light Scope," + str(mode)

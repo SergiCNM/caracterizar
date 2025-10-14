@@ -108,6 +108,55 @@ QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPo
 from functools import partial
 import traceback
 
+
+class IDNWorker(QThread):
+    finished = Signal(str, str)   # (status, message)
+
+    def __init__(self, instrument_name, instrument_config, is_prober):
+        super().__init__()
+        self.instrument_name = instrument_name
+        self.instrument_config = instrument_config
+        self.is_prober = is_prober
+
+    def run(self):
+        """Carga el driver y ejecuta el método idn() sin bloquear la UI."""
+        if not self.is_prober:
+            driver_filename = f"{self.instrument_name}_instrument.py"
+            driver_path = os.path.join("config", "default", "instruments", driver_filename)
+        else:
+            driver_filename = f"{self.instrument_name}_prober.py"
+            driver_path = os.path.join("config", "default", "probers", driver_filename)
+
+        if not os.path.exists(driver_path):
+            self.finished.emit("error", f"Driver file '{driver_filename}' not found.")
+            return
+
+        try:
+            spec = importlib.util.spec_from_file_location(self.instrument_name, driver_path)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[self.instrument_name] = module
+            spec.loader.exec_module(module)
+            instrument_driver = getattr(module, self.instrument_name, None)
+
+            if instrument_driver is None:
+                self.finished.emit("error", f"Class '{self.instrument_name}' not found in driver.")
+                return
+
+            instrument_instance = instrument_driver(self.instrument_config)
+            instrument_instance.instrument.timeout = 5000  # 5 segundos
+
+            try:
+                idn = instrument_instance.idn()
+                if not idn:
+                    idn = "(no response)"
+                self.finished.emit("ok", idn)
+            except Exception as e:
+                self.finished.emit("error", f"Error executing idn():\n{e}")
+
+        except Exception as e:
+            self.finished.emit("error", f"Error loading driver:\n{e}")
+
+
 class NavigationToolbarMod(NavigationToolbar):
     # only display the buttons we need
 
@@ -286,7 +335,9 @@ class MainWindow(QMainWindow):
         widgets.btnParameters.clicked.connect(self.parameters_config)
         widgets.btnParametersInstruments.clicked.connect(self.instruments_config)
         widgets.btnParametersProbers.clicked.connect(self.probers_config)
-
+        widgets.btnIDNInstrument.clicked.connect(self.query_instrument_idn)
+        widgets.btnIDNProber.clicked.connect(self.query_prober_idn)
+        widgets.btnProberControl.clicked.connect(self.prober_control)
 
         # LOAD FROM FILES
         widgets.btnLoadFiles.clicked.connect(self.load_from_files)
@@ -2698,7 +2749,7 @@ class MainWindow(QMainWindow):
             return
 
         # === Buscar ruta base de configuración ===
-        base_config_path = os.path.join(os.getcwd(), "config", "default")
+        base_config_path = os.path.join(os.getcwd(), "config", username)
 
         # Intentar primero en instruments.toml
         instruments_path = os.path.join(base_config_path, "instruments.toml")
@@ -2744,9 +2795,9 @@ class MainWindow(QMainWindow):
             return
 
         # === Buscar ruta base de configuración ===
-        base_config_path = os.path.join(os.getcwd(), "config", "default")
+        base_config_path = os.path.join(os.getcwd(), "config", username)
 
-        # Intentar primero en probers.toml
+        # Intentar carga en probers.toml
         probers_path = os.path.join(base_config_path, "probers.toml")
 
         target_file = None
@@ -2779,6 +2830,123 @@ class MainWindow(QMainWindow):
                 "Error opening configuration",
                 f"Error while opening {prober_name} configuration:\n{e}",
             )
+
+
+    def query_instrument_idn(self):
+        """Lanza el hilo que ejecuta la consulta IDN del instrumento."""
+        instrument_name = ""
+        if widgets.cmbInstruments_2.currentIndex() > 0:
+            instrument_name = widgets.cmbInstruments_2.currentText()
+
+        if instrument_name == "":
+            QMessageBox.warning(self, "No instrument", "Please select an instrument first.")
+            return
+
+        # QMessageBox.information(self, "Instrument", f"Querying IDN for '{instrument_name}'... please wait.")
+
+        # Crear ventana de progreso
+        self.progress = QProgressDialog(
+            f"Querying IDN for '{instrument_name}'...", None, 0, 0, self
+        )
+        self.progress.setWindowTitle("Instrument")
+        self.progress.setCancelButton(None)
+        self.progress.setWindowModality(Qt.ApplicationModal)
+        self.progress.setMinimumDuration(0)
+        self.progress.show()
+
+        # Timeout fijo: 5 segundos
+        self.progress_timeout_ms = 5000
+        self.progress_timer = QTimer(self)
+        self.progress_timer.setSingleShot(True)
+        self.progress_timer.timeout.connect(lambda: self.on_idn_timeout(instrument_name))
+        self.progress_timer.start(self.progress_timeout_ms)
+
+        # Crear hilo para ejecutar el IDN
+        self.idn_thread = IDNWorker(instrument_name, instruments[instrument_name], False)
+        self.idn_thread.finished.connect(self.on_idn_finished)
+        self.idn_thread.start()
+
+    def query_prober_idn(self):
+        """Lanza el hilo que ejecuta la consulta IDN del prober."""
+        prober_name = ""
+        if widgets.cmbProbers_2.currentIndex() > 0:
+            prober_name = widgets.cmbProbers_2.currentText()
+
+        if prober_name == "":
+            QMessageBox.warning(self, "No prober", "Please select a prober first.")
+            return
+
+        # QMessageBox.information(self, "Prober", f"Querying IDN for '{prober_name}'... please wait.")
+        # Crear ventana de progreso
+        self.progress = QProgressDialog(
+            f"Querying IDN for '{prober_name}'...", None, 0, 0, self
+        )
+        self.progress.setWindowTitle("Prober")
+        self.progress.setCancelButton(None)
+        self.progress.setWindowModality(Qt.ApplicationModal)
+        self.progress.setMinimumDuration(0)
+        self.progress.show()
+
+        # Timeout fijo: 5 segundos
+        self.progress_timeout_ms = 5000
+        self.progress_timer = QTimer(self)
+        self.progress_timer.setSingleShot(True)
+        self.progress_timer.timeout.connect(lambda: self.on_idn_timeout(prober_name))
+        self.progress_timer.start(self.progress_timeout_ms)
+
+        # Crear hilo para ejecutar el IDN
+        self.idn_thread = IDNWorker(prober_name, probers[prober_name], True)
+        self.idn_thread.finished.connect(self.on_idn_finished)
+        self.idn_thread.start()
+
+
+    def on_idn_finished(self, status, message):
+        # Detiene temporizador y cierra progress
+        if hasattr(self, "progress_timer"):
+            self.progress_timer.stop()
+        if hasattr(self, "progress"):
+            self.progress.close()
+        title = "IDN"
+        if status == "ok":
+            QMessageBox.information(self, title, f"{title}:\n{message}")
+        else:
+            QMessageBox.critical(self, "Error", message)
+
+    def on_idn_timeout(self, instrument_name):
+        """Ejecutado si no hay respuesta del IDN en 5 s."""
+        if hasattr(self, "progress"):
+            self.progress.close()
+
+        try:
+            if hasattr(self, "idn_thread") and self.idn_thread.isRunning():
+                self.idn_thread.terminate()
+        except Exception:
+            pass
+
+        QMessageBox.warning(
+            self,
+            "Timeout",
+            f"The instrument '{instrument_name}' did not respond within 5 seconds.\n"
+            "It may be offline or disconnected.",
+        )
+
+    def prober_control(self):
+        prober_name = ""
+        if widgets.cmbProbers_2.currentIndex() > 0:
+            prober_name = widgets.cmbProbers_2.currentText()
+
+        if prober_name == "":
+            QMessageBox.warning(self, "No prober", "Please select a prober first.")
+            return
+
+        # init prober
+        self.prober = eval(prober_name)(probers[prober_name])
+        if self.prober is not None:
+            self.prober_window2 = ProberControl(self, prober_name)
+        if hasattr(self, "prober_window2"):
+            self.prober_window2.show()
+            self.prober_window2.activateWindow()
+            self.prober_window2.raise_()
 
     def execute_cartographic_measurement(self):
         global measurement_status, wafer_parameters, test_status, contact_status, contact_test, contact_errors, actual_height, file_measurement
