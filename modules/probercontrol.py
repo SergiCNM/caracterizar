@@ -17,8 +17,12 @@ class ProberControl(QWidget):
         grid_xy = QGridLayout()
         self.cmbRefXY = QComboBox()
         self.cmbRefXY.addItems(["Zero", "Home", "Relative", "Center", "User", "Z", "H", "R", "C"])
-        self.txtX = QDoubleSpinBox(); self.txtX.setRange(-100000, 100000); self.txtX.setDecimals(4)
-        self.txtY = QDoubleSpinBox(); self.txtY.setRange(-100000, 100000); self.txtY.setDecimals(4)
+        self.txtX = QDoubleSpinBox();
+        self.txtX.setRange(-100000, 100000);
+        self.txtX.setDecimals(4)
+        self.txtY = QDoubleSpinBox();
+        self.txtY.setRange(-100000, 100000);
+        self.txtY.setDecimals(4)
         btnGoXY = QPushButton("Go XY")
         btnGoXY.clicked.connect(self.move_xy)
         grid_xy.addWidget(QLabel("Reference:"), 0, 0)
@@ -35,7 +39,9 @@ class ProberControl(QWidget):
         grid_z = QGridLayout()
         self.cmbRefZ = QComboBox()
         self.cmbRefZ.addItems(["Zero", "Contact", "Separation", "Relative"])
-        self.txtZ = QDoubleSpinBox(); self.txtZ.setRange(-10000, 10000); self.txtZ.setDecimals(4)
+        self.txtZ = QDoubleSpinBox();
+        self.txtZ.setRange(-10000, 10000);
+        self.txtZ.setDecimals(4)
         btnGoZ = QPushButton("Go Z")
         btnGoZ.clicked.connect(self.move_z)
         grid_z.addWidget(QLabel("Reference:"), 0, 0)
@@ -47,6 +53,16 @@ class ProberControl(QWidget):
 
         # --- POSICIÓN / HOME / CONTACTO ---
         layout.addWidget(QLabel("<b>Quick Moves</b>"))
+
+        # 🔸 Nuevo combo para referencia de posición (Zero, Home, Current, Center)
+        ref_layout = QHBoxLayout()
+        ref_layout.addWidget(QLabel("Reference (Get Position):"))
+        self.cmbRefGetPos = QComboBox()
+        self.cmbRefGetPos.addItems(["Zero", "Home", "Current", "Center"])
+        self.cmbRefGetPos.setCurrentText("Current")
+        ref_layout.addWidget(self.cmbRefGetPos)
+        layout.addLayout(ref_layout)
+
         move_buttons = QHBoxLayout()
         for label, func in [
             ("Home", self.move_home),
@@ -134,11 +150,12 @@ class ProberControl(QWidget):
 
     def get_position(self):
         try:
-            xy = self.main.prober.get_chuck_xy("Current")
-            z = self.main.prober.get_chuck_z("Current")
-            self.lblPos.setText(f"Position: XY={xy}, Z={z}")
+            reference = self.cmbRefGetPos.currentText()
+            xy = self.main.prober.get_chuck_xy(reference)
+            z = self.main.prober.get_chuck_z(reference)
+            self.lblPos.setText(f"Position ({reference}): XY={xy}, Z={z}")
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error getting position:\n{e}")
+            QMessageBox.critical(self, "Error", f"Error getting position ({reference}):\n{e}")
 
     def get_temp(self):
         try:

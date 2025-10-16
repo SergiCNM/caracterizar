@@ -9,11 +9,13 @@ HYSTERESIS = false
 HYSTERESIS_TIME = 1
 WAIT_TIME = 0.0
 LIGHT = false
-LIGHT_TIME = 0.0
+LIGHT_TIME = 3.0
 RANGE = "1000"
 ROUTE_TERM = "REAR"
 MEAS_SOURCE = "VOLT"
 MEAS_SENSE = "CURR"
+RES_MIN = 100.0
+RES_MAX = 120.0
 
 [options]
 RANGE = "AUTO,0.2,2,20,200,1000"
@@ -34,3 +36,16 @@ RANGE = "V"
 [help]
 START = "Start voltage"
 STOP = "Stop voltage"
+STEP = "Voltage step"
+COMPLIANCE = "Current compliance"
+HYSTERESIS = "Enable hysteresis"
+HYSTERESIS_TIME = "Time to wait at each step in hysteresis mode"
+WAIT_TIME = "Time to wait after setting voltage"
+LIGHT = "Enable light"
+LIGHT_TIME = "Time to wait after turning on light"
+RANGE = "Measurement range"
+ROUTE_TERM = "Measurement terminal"
+MEAS_SOURCE = "Measurement source"
+MEAS_SENSE = "Measurement sense"
+RES_MIN = "Minimum resistance for resistance measurement"
+RES_MAX = "Maximum resistance for resistance measurement"

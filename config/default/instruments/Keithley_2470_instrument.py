@@ -32,8 +32,6 @@ class Keithley_2470:
             self.timeout(int(parameters["timeout"]))
         self.parameters = parameters
 
-        print(self.idn())
-
     def reset(self):
         """
 		Reset function
@@ -224,7 +222,6 @@ a specific delay value from 50 μs to 10,000 s, or 0 for no delay
         # cmd = f":TRAC:DATA? {startIndex}, {endIndex}, \"{bufferName}\", {bufferElements}"
         cmd = f":TRAC:DATA? {startIndex}, {endIndex}, \"{self.buffer_name}\", {bufferElements}"
         data = self.instrument.query(cmd)
-        print(data)
         return data.split(",")
 
     def get_buffer_end(self, bufferName="devbuffer1"):
