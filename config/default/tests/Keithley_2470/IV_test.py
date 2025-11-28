@@ -71,9 +71,7 @@ def save_file(main, voltage, current, resistance, namefile):
 
 def measure_IV(IV_parameters, k2470):
     # create empty list if not exists
-    voltage = []
-    current = []
-    resistance = []
+    voltage, current, resistance = [], [], []
     if IV_parameters["WAIT_TIME"] > 0:
         time.sleep(IV_parameters["WAIT_TIME"])
     if IV_parameters["LIGHT"]:
@@ -157,7 +155,6 @@ if __name__ == "__main__":
         k2470 = Keithley_2470(instruments["Keithley_2470"])
         if cartographic_measurement:
             if str(dieActual)=="1" and str(moduleActual) == "1":
-
                 retval = message_user(main, "Init instrument for IV!",
                                       "Please, configure instrument for initialization",
                                       "yes_cancel")
@@ -198,7 +195,6 @@ if __name__ == "__main__":
                 # show results resistance average in description
                 main.updateTextDescription(f"R_avg: {resistance_avg:.4e} Ohm", "RESULT")
                 # get plot parameters
-
                 plot_parameters = get_plot_parameters(voltage, current, resistance)
                 # save results
                 main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
@@ -219,7 +215,6 @@ if __name__ == "__main__":
                 namefile = f"IV_{main.ui.txtLot.text()}_W" + f"{int(main.ui.txtWafer.text()):02d}_{str(dieActual)}_{str(moduleActual)}"
                 save_file(main, voltage, current, resistance, namefile)
         else:
-
             # single measure
             if k2470.config_IV(IV_parameters):
                 time.sleep(2)
@@ -243,8 +238,6 @@ if __name__ == "__main__":
         # stop process, close instrument
         k2470.stop()
         k2470.close()
-
-
 
     except:
         message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<","").replace(">","") + " occurred. " + str(sys.exc_info()[1])

@@ -4,8 +4,8 @@ title = "SOLARMEMS test parameters"
 WORKSPACE_NAME = "SOLARMEMS"
 GROUP = "SOLARMEMS"
 TEST_PRESET_GROUP_NAME = "Solarmems"
-FOLDER_IMAGES = "C:\\solarmems\\"
-ONLY_PHOTOS = true
+FOLDER_IMAGES = "C:\\solarmems\\19143-2\\"
+ONLY_PHOTOS = false
 
 [options]
 

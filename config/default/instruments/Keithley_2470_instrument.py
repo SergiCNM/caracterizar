@@ -219,7 +219,6 @@ a specific delay value from 50 μs to 10,000 s, or 0 for no delay
 		:param endIndex endIndex
 		:return: data
 		"""
-        # cmd = f":TRAC:DATA? {startIndex}, {endIndex}, \"{bufferName}\", {bufferElements}"
         cmd = f":TRAC:DATA? {startIndex}, {endIndex}, \"{self.buffer_name}\", {bufferElements}"
         data = self.instrument.query(cmd)
         return data.split(",")

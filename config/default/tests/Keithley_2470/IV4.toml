@@ -1,4 +1,4 @@
-title = "IV 4 terminal parameters"
+title = "IV 4 wire parameters"
 
 [parameters]
 START = 0.0
@@ -12,11 +12,16 @@ LIGHT = false
 LIGHT_TIME = 0.0
 RANGE = "AUTO"
 ROUTE_TERM = "FRONT"
-
+MEAS_SOURCE = "VOLT"
+MEAS_SENSE = "CURR"
+RES_MIN = 100.0
+RES_MAX = 120.0
 
 [options]
 RANGE = "AUTO,0.2,2,20,200,1000"
 ROUTE_TERM = "FRONT,REAR"
+MEAS_SOURCE = "VOLT,CURR"
+MEAS_SENSE = "CURR,RES"
 
 [units]
 START = "V"
@@ -27,7 +32,22 @@ HYSTERESIS_TIME = "s"
 WAIT_TIME = "s"
 LIGHT_TIME = "s"
 RANGE = "V"
+RES_MIN = "Ohm"
+RES_MAX = "Ohm"
 
 [help]
 START = "Start voltage"
 STOP = "Stop voltage"
+STEP = "Voltage step"
+COMPLIANCE = "Current compliance"
+HYSTERESIS = "Enable hysteresis"
+HYSTERESIS_TIME = "Time to wait at each step in hysteresis mode"
+WAIT_TIME = "Time to wait after setting voltage"
+LIGHT = "Enable light"
+LIGHT_TIME = "Time to wait after turning on light"
+RANGE = "Measurement range"
+ROUTE_TERM = "Measurement terminal"
+MEAS_SOURCE = "Measurement source"
+MEAS_SENSE = "Measurement sense"
+RES_MIN = "Minimum resistance for resistance measurement"
+RES_MAX = "Maximum resistance for resistance measurement"

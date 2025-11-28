@@ -35,7 +35,11 @@ def load_IV_parameters():
         "LIGHT": False,
         "LIGHT_TIME": 1,
         "RANGE": "AUTO",
-        "ROUTE_TERM": "REAR"
+        "ROUTE_TERM": "REAR",
+        "MEAS_SOURCE": "VOLT",
+        "MEAS_SENSE": "CURR",
+        "RES_MIN": 100.0,
+        "RES_MAX": 120.0
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2470/IV_temp.toml'

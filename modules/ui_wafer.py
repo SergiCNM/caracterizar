@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'waferbMeSqp.ui'
+## Form generated from reading UI file 'waferFhoZNE.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -28,9 +28,9 @@ class Ui_WaferWindow(object):
         if not WaferWindow.objectName():
             WaferWindow.setObjectName(u"WaferWindow")
         WaferWindow.setEnabled(True)
-        WaferWindow.resize(1100, 862)
-        WaferWindow.setMinimumSize(QSize(1100, 800))
-        WaferWindow.setMaximumSize(QSize(1100, 862))
+        WaferWindow.resize(1200, 862)
+        WaferWindow.setMinimumSize(QSize(1200, 800))
+        WaferWindow.setMaximumSize(QSize(1200, 862))
         self.action4 = QAction(WaferWindow)
         self.action4.setObjectName(u"action4")
         self.action6 = QAction(WaferWindow)
@@ -43,11 +43,11 @@ class Ui_WaferWindow(object):
         self.actionView_Module_1.setObjectName(u"actionView_Module_1")
         self.centralwidget = QWidget(WaferWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.centralwidget.setMinimumSize(QSize(1100, 800))
-        self.centralwidget.setMaximumSize(QSize(1100, 800))
+        self.centralwidget.setMinimumSize(QSize(1200, 800))
+        self.centralwidget.setMaximumSize(QSize(1200, 800))
         self.verticalLayoutWidget = QWidget(self.centralwidget)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(10, 0, 1081, 791))
+        self.verticalLayoutWidget.setGeometry(QRect(10, 0, 1181, 791))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -129,6 +129,22 @@ class Ui_WaferWindow(object):
         self.label_5.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
         self.horizontalLayout_3.addWidget(self.label_5)
+
+        self.label_7 = QLabel(self.verticalLayoutWidget)
+        self.label_7.setObjectName(u"label_7")
+        self.label_7.setMinimumSize(QSize(50, 0))
+        self.label_7.setMaximumSize(QSize(50, 16777215))
+        self.label_7.setFont(font)
+
+        self.horizontalLayout_3.addWidget(self.label_7)
+
+        self.label_8 = QLabel(self.verticalLayoutWidget)
+        self.label_8.setObjectName(u"label_8")
+        self.label_8.setMinimumSize(QSize(50, 0))
+        self.label_8.setMaximumSize(QSize(50, 16777215))
+        self.label_8.setFont(font)
+
+        self.horizontalLayout_3.addWidget(self.label_8)
 
         self.label_9 = QLabel(self.verticalLayoutWidget)
         self.label_9.setObjectName(u"label_9")
@@ -238,6 +254,20 @@ class Ui_WaferWindow(object):
 
         self.horizontalLayout.addWidget(self.btnModules)
 
+        self.txtInitChip = QLineEdit(self.verticalLayoutWidget)
+        self.txtInitChip.setObjectName(u"txtInitChip")
+        self.txtInitChip.setMinimumSize(QSize(50, 0))
+        self.txtInitChip.setMaximumSize(QSize(50, 16777215))
+
+        self.horizontalLayout.addWidget(self.txtInitChip)
+
+        self.txtEndChip = QLineEdit(self.verticalLayoutWidget)
+        self.txtEndChip.setObjectName(u"txtEndChip")
+        self.txtEndChip.setMinimumSize(QSize(50, 0))
+        self.txtEndChip.setMaximumSize(QSize(50, 16777215))
+
+        self.horizontalLayout.addWidget(self.txtEndChip)
+
         self.cmbStartingLocation = QComboBox(self.verticalLayoutWidget)
         self.cmbStartingLocation.setObjectName(u"cmbStartingLocation")
         self.cmbStartingLocation.setEnabled(False)
@@ -262,33 +292,9 @@ class Ui_WaferWindow(object):
 
         self.horizontalLayout.addWidget(self.cmbMoveBy)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout.addItem(self.horizontalSpacer_4)
-
-        self.btnPrint = QPushButton(self.verticalLayoutWidget)
-        self.btnPrint.setObjectName(u"btnPrint")
-        self.btnPrint.setEnabled(False)
-        self.btnPrint.setMinimumSize(QSize(32, 32))
-        self.btnPrint.setMaximumSize(QSize(32, 32))
-        icon2 = QIcon()
-        icon2.addFile(u":/images/images/buttons/print.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnPrint.setIcon(icon2)
-        self.btnPrint.setIconSize(QSize(24, 24))
-
-        self.horizontalLayout.addWidget(self.btnPrint)
-
-        self.btnSave = QPushButton(self.verticalLayoutWidget)
-        self.btnSave.setObjectName(u"btnSave")
-        self.btnSave.setEnabled(False)
-        self.btnSave.setMinimumSize(QSize(32, 32))
-        self.btnSave.setMaximumSize(QSize(32, 32))
-        icon3 = QIcon()
-        icon3.addFile(u":/images/images/buttons/save.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnSave.setIcon(icon3)
-        self.btnSave.setIconSize(QSize(24, 24))
-
-        self.horizontalLayout.addWidget(self.btnSave)
+        self.horizontalLayout.addItem(self.horizontalSpacer_5)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -309,9 +315,9 @@ class Ui_WaferWindow(object):
         self.btnOriginPosition.setEnabled(True)
         self.btnOriginPosition.setMinimumSize(QSize(40, 40))
         self.btnOriginPosition.setMaximumSize(QSize(40, 40))
-        icon4 = QIcon()
-        icon4.addFile(u":/images/images/buttons/set_origin.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnOriginPosition.setIcon(icon4)
+        icon2 = QIcon()
+        icon2.addFile(u":/images/images/buttons/set_origin.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnOriginPosition.setIcon(icon2)
         self.btnOriginPosition.setIconSize(QSize(32, 32))
 
         self.horizontalLayout_2.addWidget(self.btnOriginPosition)
@@ -329,9 +335,9 @@ class Ui_WaferWindow(object):
         self.btnHomePosition.setEnabled(True)
         self.btnHomePosition.setMinimumSize(QSize(40, 40))
         self.btnHomePosition.setMaximumSize(QSize(40, 40))
-        icon5 = QIcon()
-        icon5.addFile(u":/images/images/buttons/set_home.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnHomePosition.setIcon(icon5)
+        icon3 = QIcon()
+        icon3.addFile(u":/images/images/buttons/set_home.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnHomePosition.setIcon(icon3)
         self.btnHomePosition.setIconSize(QSize(32, 32))
 
         self.horizontalLayout_2.addWidget(self.btnHomePosition)
@@ -348,9 +354,9 @@ class Ui_WaferWindow(object):
         font2 = QFont()
         font2.setPointSize(8)
         self.btnIDLE.setFont(font2)
-        icon6 = QIcon()
-        icon6.addFile(u":/images/images/buttons/set_idle.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnIDLE.setIcon(icon6)
+        icon4 = QIcon()
+        icon4.addFile(u":/images/images/buttons/set_idle.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnIDLE.setIcon(icon4)
         self.btnIDLE.setIconSize(QSize(32, 32))
 
         self.horizontalLayout_2.addWidget(self.btnIDLE)
@@ -361,9 +367,9 @@ class Ui_WaferWindow(object):
         self.btnIN.setMinimumSize(QSize(70, 40))
         self.btnIN.setMaximumSize(QSize(70, 40))
         self.btnIN.setFont(font2)
-        icon7 = QIcon()
-        icon7.addFile(u":/images/images/buttons/set_in.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnIN.setIcon(icon7)
+        icon5 = QIcon()
+        icon5.addFile(u":/images/images/buttons/set_in.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnIN.setIcon(icon5)
         self.btnIN.setIconSize(QSize(32, 32))
 
         self.horizontalLayout_2.addWidget(self.btnIN)
@@ -374,9 +380,9 @@ class Ui_WaferWindow(object):
         self.btnOUT.setMinimumSize(QSize(70, 40))
         self.btnOUT.setMaximumSize(QSize(70, 40))
         self.btnOUT.setFont(font2)
-        icon8 = QIcon()
-        icon8.addFile(u":/images/images/buttons/set_out.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnOUT.setIcon(icon8)
+        icon6 = QIcon()
+        icon6.addFile(u":/images/images/buttons/set_out.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnOUT.setIcon(icon6)
         self.btnOUT.setIconSize(QSize(32, 32))
 
         self.horizontalLayout_2.addWidget(self.btnOUT)
@@ -387,9 +393,9 @@ class Ui_WaferWindow(object):
         self.btnMEAS.setMinimumSize(QSize(70, 40))
         self.btnMEAS.setMaximumSize(QSize(70, 40))
         self.btnMEAS.setFont(font2)
-        icon9 = QIcon()
-        icon9.addFile(u":/images/images/buttons/set_meas.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS.setIcon(icon9)
+        icon7 = QIcon()
+        icon7.addFile(u":/images/images/buttons/set_meas.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS.setIcon(icon7)
         self.btnMEAS.setIconSize(QSize(32, 32))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS)
@@ -402,9 +408,9 @@ class Ui_WaferWindow(object):
         font3 = QFont()
         font3.setPointSize(6)
         self.btnMEAS_SUCCESS.setFont(font3)
-        icon10 = QIcon()
-        icon10.addFile(u":/images/images/buttons/set_meas_success.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS_SUCCESS.setIcon(icon10)
+        icon8 = QIcon()
+        icon8.addFile(u":/images/images/buttons/set_meas_success.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_SUCCESS.setIcon(icon8)
         self.btnMEAS_SUCCESS.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS_SUCCESS)
@@ -415,9 +421,9 @@ class Ui_WaferWindow(object):
         self.btnMEAS_WARNING.setMinimumSize(QSize(70, 40))
         self.btnMEAS_WARNING.setMaximumSize(QSize(70, 40))
         self.btnMEAS_WARNING.setFont(font3)
-        icon11 = QIcon()
-        icon11.addFile(u":/images/images/buttons/set_meas_warning.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS_WARNING.setIcon(icon11)
+        icon9 = QIcon()
+        icon9.addFile(u":/images/images/buttons/set_meas_warning.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_WARNING.setIcon(icon9)
         self.btnMEAS_WARNING.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS_WARNING)
@@ -428,9 +434,9 @@ class Ui_WaferWindow(object):
         self.btnMEAS_ERROR.setMinimumSize(QSize(70, 40))
         self.btnMEAS_ERROR.setMaximumSize(QSize(70, 40))
         self.btnMEAS_ERROR.setFont(font3)
-        icon12 = QIcon()
-        icon12.addFile(u":/images/images/buttons/set_meas_error.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS_ERROR.setIcon(icon12)
+        icon10 = QIcon()
+        icon10.addFile(u":/images/images/buttons/set_meas_error.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_ERROR.setIcon(icon10)
         self.btnMEAS_ERROR.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS_ERROR)
@@ -459,6 +465,38 @@ class Ui_WaferWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnUnmarkAll)
 
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_4)
+
+        self.btnPrint = QPushButton(self.verticalLayoutWidget)
+        self.btnPrint.setObjectName(u"btnPrint")
+        self.btnPrint.setEnabled(False)
+        self.btnPrint.setMinimumSize(QSize(32, 32))
+        self.btnPrint.setMaximumSize(QSize(32, 32))
+        icon11 = QIcon()
+        icon11.addFile(u":/images/images/buttons/print.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnPrint.setIcon(icon11)
+        self.btnPrint.setIconSize(QSize(24, 24))
+
+        self.horizontalLayout_2.addWidget(self.btnPrint)
+
+        self.btnSave = QPushButton(self.verticalLayoutWidget)
+        self.btnSave.setObjectName(u"btnSave")
+        self.btnSave.setEnabled(False)
+        self.btnSave.setMinimumSize(QSize(32, 32))
+        self.btnSave.setMaximumSize(QSize(32, 32))
+        icon12 = QIcon()
+        icon12.addFile(u":/images/images/buttons/save.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnSave.setIcon(icon12)
+        self.btnSave.setIconSize(QSize(24, 24))
+
+        self.horizontalLayout_2.addWidget(self.btnSave)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_6)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
@@ -472,7 +510,7 @@ class Ui_WaferWindow(object):
         WaferWindow.setStatusBar(self.statusBar)
         self.menuBar = QMenuBar(WaferWindow)
         self.menuBar.setObjectName(u"menuBar")
-        self.menuBar.setGeometry(QRect(0, 0, 1100, 22))
+        self.menuBar.setGeometry(QRect(0, 0, 1200, 22))
         WaferWindow.setMenuBar(self.menuBar)
 
         self.retranslateUi(WaferWindow)
@@ -495,6 +533,8 @@ class Ui_WaferWindow(object):
         self.label_12.setText("")
         self.label_6.setText(QCoreApplication.translate("WaferWindow", u"Dies", None))
         self.label_5.setText(QCoreApplication.translate("WaferWindow", u"Modules", None))
+        self.label_7.setText(QCoreApplication.translate("WaferWindow", u"Init chip", None))
+        self.label_8.setText(QCoreApplication.translate("WaferWindow", u"End chip", None))
         self.label_9.setText(QCoreApplication.translate("WaferWindow", u"Navigation options", None))
         self.cmbWaferSize.setCurrentText("")
         self.cmbWaferOrientation.setCurrentText("")
@@ -519,14 +559,6 @@ class Ui_WaferWindow(object):
         self.cmbMoveBy.setToolTip(QCoreApplication.translate("WaferWindow", u"Move by", None))
 #endif // QT_CONFIG(tooltip)
         self.cmbMoveBy.setCurrentText("")
-#if QT_CONFIG(tooltip)
-        self.btnPrint.setToolTip(QCoreApplication.translate("WaferWindow", u"Print to PNG", None))
-#endif // QT_CONFIG(tooltip)
-        self.btnPrint.setText("")
-#if QT_CONFIG(tooltip)
-        self.btnSave.setToolTip(QCoreApplication.translate("WaferWindow", u"Save as", None))
-#endif // QT_CONFIG(tooltip)
-        self.btnSave.setText("")
 #if QT_CONFIG(tooltip)
         self.txtOriginChip.setToolTip(QCoreApplication.translate("WaferWindow", u"Real Origin position (0,0)", None))
 #endif // QT_CONFIG(tooltip)
@@ -578,5 +610,13 @@ class Ui_WaferWindow(object):
         self.btnUnmarkAll.setToolTip(QCoreApplication.translate("WaferWindow", u"Unmark all", None))
 #endif // QT_CONFIG(tooltip)
         self.btnUnmarkAll.setText(QCoreApplication.translate("WaferWindow", u"UNMARK", None))
+#if QT_CONFIG(tooltip)
+        self.btnPrint.setToolTip(QCoreApplication.translate("WaferWindow", u"Print to PNG", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnPrint.setText("")
+#if QT_CONFIG(tooltip)
+        self.btnSave.setToolTip(QCoreApplication.translate("WaferWindow", u"Save as", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnSave.setText("")
     # retranslateUi
 

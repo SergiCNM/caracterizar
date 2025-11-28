@@ -364,7 +364,7 @@ class SOLARMEMS(FPDF):
 		self.cell(w=80,h=wh,txt=str(counters["rojo"])+ " defective both leakage and CoefVar devices",ln=1, fill=False)
 		yield_value = '0%'
 		if int(counters["verde"])!=0:
-			yield_value = '{:.1%}'.format(1-((counters["naranja"] + counters["naranja-rojo"] + counters["rojo"]) / counters["verde"]))
+			yield_value = '{:.1%}'.format(((counters["verde"]) / (counters["verde"] + counters["naranja"] + counters["naranja-rojo"] + counters["rojo"])))
 		self.ln(2)
 
 		self.cell(w=wh,h=wh,txt="",fill=False,border=0)

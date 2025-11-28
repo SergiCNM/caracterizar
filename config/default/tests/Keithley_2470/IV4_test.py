@@ -33,7 +33,11 @@ def load_IV_parameters():
         "LIGHT": False,
         "LIGHT_TIME": 1,
         "RANGE": "AUTO",
-        "ROUTE_TERM": "REAR"
+        "ROUTE_TERM": "REAR",
+        "MEAS_SOURCE": "VOLT",
+        "MEAS_SENSE": "CURR",
+        "RES_MIN": 100.0,
+        "RES_MAX": 120.0
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2470/IV4.toml'
@@ -42,7 +46,7 @@ def load_IV_parameters():
         toml_info = toml.load(filename_config)
         IV_parameters = toml_info["parameters"]
 
-def save_file(self, voltage, current, namefile):
+def save_file(main, voltage, current, resistance, namefile):
     """
     Save file
     :param self: main program
@@ -53,11 +57,11 @@ def save_file(self, voltage, current, namefile):
     """
     global dieActual, moduleActual
     separation_char = ","
-    lines = ["V" + separation_char + "I"]
+    lines = ["V" + separation_char + "I" + separation_char + "R"]
     for i in range(0,len(voltage)):
-        lines.append(str(voltage[i]) + separation_char + str(current[i]))
+        lines.append(str(voltage[i]) + separation_char + str(current[i]) + separation_char + str(resistance[i]))
     # create folder
-    folder = os.path.join(os.getcwd(), results_dir, username, self.ui.txtProcess.text())
+    folder = os.path.join(os.getcwd(), results_dir, username, main.ui.txtProcess.text())
     namefile = os.path.join(folder, namefile + ".txt").replace("\\", "/")
     f = open(namefile, "w+")
     s1 = '\n'.join(lines)
@@ -66,17 +70,16 @@ def save_file(self, voltage, current, namefile):
 
 def measure_IV(IV_parameters, k2470):
     # create empty list if not exists
-    voltage = []
-    current = []
+    voltage, current, resistance = [], [], []
     if IV_parameters["WAIT_TIME"] > 0:
         time.sleep(IV_parameters["WAIT_TIME"])
     if IV_parameters["LIGHT"]:
         # prober is not initialized when you select single measurement
-        self.init_prober()
-        if self.prober != "":
-            self.prober.light("1")
+        main.init_prober()
+        if main.prober != "":
+            main.prober.light("1")
             time.sleep(IV_parameters["LIGHT_TIME"])
-            self.prober.light("0")
+            main.prober.light("0")
 
     # measure
     if k2470.config_IV(IV_parameters):
@@ -97,10 +100,16 @@ def measure_IV(IV_parameters, k2470):
         current = current + current_h
 
     current_float = list(map(float, current))
-    return [voltage, current_float]
+    # get resistance
+    for i in range(0, len(current_float)):
+        if current_float[i] != 0:
+            resistance.append(float(voltage[i]) / current_float[i])
+        else:
+            resistance.append(0)
+    return [voltage, current_float, resistance]
 
 
-def get_plot_parameters(voltage, current):
+def get_plot_parameters(voltage, current, resistance):
     """
     Get dict for plot parameters
     :param voltage: voltage list
@@ -111,23 +120,28 @@ def get_plot_parameters(voltage, current):
         "name": "Plot IV",
         "x": voltage,
         "y1": current,
+        "y2": resistance,
         "contact_height": "",
         "variables": [{
             "params": [],
             "data": [{"name": "V", "values": voltage, "units": "V"},
-                     {"name": "I", "values": current, "units": "A"}]
+                     {"name": "I", "values": current, "units": "A"},
+                     {"name": "R", "values": resistance, "units": "Ohm"}
+                     ]
         }],
         "titles": {
-            "title": "I-V Measurement",
+            "title": "IV 4 Wire Measurement",
             "left": "Current",
-            "bottom": "Voltage"
+            "bottom": "Voltage",
+            "right": "Resistance"
         },
         "units": {
             "left": "A",
-            "bottom": "V"
+            "bottom": "V",
+            "right": "Ohm"
         },
         "showgrid": {"x": False, "y": False},
-        "legend": False
+        "legend": True
         # "foreground" : "#CCCCCC"
 
     }
@@ -136,33 +150,23 @@ def get_plot_parameters(voltage, current):
 
 if __name__ == "__main__":
     try:
+        # init IV_parameters
+        load_IV_parameters()
         k2470 = Keithley_2470(instruments["Keithley_2470"])
         if cartographic_measurement:
             if str(dieActual)=="1" and str(moduleActual) == "1":
-                # init IV_parameters
-                load_IV_parameters()
-                retval = QMessageBox.question(
-                    self,
-                    "Init instrument for IV!",
-                    "Please, configure instrument for initialization",
-                    buttons=QMessageBox.Yes | QMessageBox.Cancel ,
-                    defaultButton=QMessageBox.Yes,
-                )
+                retval = message_user(main, "Init instrument for IV 4 wire!",
+                                      "Please, configure instrument for initialization",
+                                      "yes_cancel")
                 if retval == QMessageBox.Yes:
-                    if k2470.config_IV(IV_parameters):
-                        test_status.status = "STARTED"
-                    else:
-                        test_status.status = "ABORTED"
-
+                    test_status.status = "STARTED"
                 else:
                     test_status.status = "ABORTED"
 
             if test_status.status == "STARTED":
                 # measure IV
                 time.sleep(1)
-                if k2470.config_IV(IV_parameters):
-                    time.sleep(2)
-                    voltage, current = measure_IV(IV_parameters, k2470)
+                voltage, current, resistance = measure_IV(IV_parameters, k2470)
 
                 # error in measurement if error counts >0
                 meas_status = "meas_error"
@@ -176,50 +180,66 @@ if __name__ == "__main__":
                     if k2470.get_error_count() == 0:
                         meas_status = "meas_warning"  # if not reach the stop voltage
                         message = f"Current at {voltage_end} V : {current_end} A"
+                # get average of resistance, strip first and last 2 points
+                if len(resistance) > 4:
+                    resistance_avg = sum(resistance[2:-2]) / (len(resistance) - 4)
+                else:
+                    resistance_avg = sum(resistance) / len(resistance)
 
-                plot_parameters = get_plot_parameters(voltage, current)
+                if meas_status == "meas_success":
+                    if resistance_avg < IV_parameters["RES_MIN"] or resistance_avg > IV_parameters["RES_MAX"]:
+                        meas_status = "meas_warning"
+                        message = f"R_avg ({resistance_avg:.4e} Ohms) out of limits)"
+                # show results resistance average in description
+                main.updateTextDescription(f"R_avg: {resistance_avg:.4e} Ohm", "RESULT")
+                # get plot parameters
+                plot_parameters = get_plot_parameters(voltage, current, resistance)
                 # save results
-                self.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
+                main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
                     "status": meas_status,
                     "message": message,
                     "contact_height": "",
                     "variables": [{
-                        "params": [{"name" : "pass", "value" : str(meas_status)}],
+                        "params": [{"name": "pass", "value": str(meas_status)},
+                                   {"name": "R_avg", "value": str(resistance_avg)}],
                         "data": [{"name": "V", "values": voltage, "units": "V"},
-                                 {"name": "I", "values": current, "units": "A"}
+                                 {"name": "I", "values": current, "units": "A"},
+                                 {"name": "R", "values": resistance, "units": "Ohm"}
                                  ]
                     }],
                     "plot_parameters": plot_parameters
 
                 }
 
-                namefile = f"{self.ui.txtLot.text()}_W" + f"{int(self.ui.txtWafer.text()):02d}_{str(dieActual)}_{str(moduleActual)}"
-                save_file(self, voltage, current, namefile)
+                namefile = f"IV4_{main.ui.txtLot.text()}_W" + f"{int(main.ui.txtWafer.text()):02d}_{str(dieActual)}_{str(moduleActual)}"
+                save_file(main, voltage, current, resistance, namefile)
         else:
-            # init IV_parameters
-            load_IV_parameters()
             # single measure
             if k2470.config_IV(IV_parameters):
-                voltage, current = measure_IV(IV_parameters, k2470)
+                voltage, current, resistance = measure_IV(IV_parameters, k2470)
+                # get average of resistance, strip first and last 2 points
+                if len(resistance) > 4:
+                    resistance_avg = sum(resistance[2:-2]) / (len(resistance) - 4)
+                else:
+                    resistance_avg = sum(resistance) / len(resistance)
+
+                # show results resistance average in description
+                main.updateTextDescription(f"R_avg: {resistance_avg:.4e} Ohm", "RESULT")
                 # self.updateTextDescription(txt_result)
-                plot_parameters = get_plot_parameters(voltage, current)
+                plot_parameters = get_plot_parameters(voltage, current, resistance)
                 # Single measurement, view plot
-                self.show_graph(plot_parameters)
+                emit_plot(plot_parameters)
                 # Save file in results
-                namefile = f"{self.ui.txtLot.text()}_W{int(self.ui.txtWafer.text()):02d}_0_1"
-                save_file(self, voltage,current, namefile)
+                namefile = f"IV4_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
+                save_file(main, voltage, current, resistance, namefile)
 
         # stop process, put instrument in local mode
-        # k2470.stop()
-        # k2470.local()
-
-
+        k2470.stop()
+        k2470.close()
 
     except:
-        message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<","").replace(">","") + " occurred. " + str(sys.exc_info()[1])
-        self.updateTextDescription(message,"ERROR")
-        retval = messageBox(self,"ERROR",message,"critical")
-
-        #print("ERROR: " + "Oops! " + str(sys.exc_info()[0]) + " occurred. " + str(sys.exc_info()[1]))
-
+        message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<", "").replace(">", "") + " occurred. " + str(
+            sys.exc_info()[1])
+        main.updateTextDescription(message, "ERROR")
+        message_user(main, "ERROR", message, "ok_error")
 

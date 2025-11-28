@@ -4,14 +4,14 @@ author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
-darkmode = false
+darkmode = true
 estepa = true
-txtprocess = "14733"
-txtlot = "14733"
-txtwafer = "6"
-txtmask = "CNM004"
-txttemperature = "25.0"
-txthumidity = "48"
+txtprocess = "19143"
+txtlot = "19143"
+txtwafer = "2"
+txtmask = "CNM863"
+txttemperature = "22.5"
+txthumidity = "47"
 
 [dirs]
 base = "config"
@@ -51,7 +51,7 @@ mysqlpassword = "Mysql123"
 mysqldatabase = "labs_new"
 
 [reports]
-title = "CAP REPORT"
-subtitle = "18933"
-date = "JUL 2025"
+title = "SOLARMEMS REPORT"
+subtitle = "19143"
+date = "NOV 2025"
 author = "Sergi Sànchez"

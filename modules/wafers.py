@@ -34,6 +34,11 @@ class Wafer(QMainWindow):
                 self.set_wafer_size()
                 self.xsize = float(wafer_parameters["xsize"])
                 self.ysize = float(wafer_parameters["ysize"])
+                # init chip
+                if "init_chip" in wafer_parameters:
+                    self.init_chip = int(wafer_parameters["init_chip"])
+                else:
+                    self.init_chip = 1
 
                 # xmax & ymax optionals
                 if "xmax" in wafer_parameters:
@@ -48,6 +53,11 @@ class Wafer(QMainWindow):
 
                 #self.ymax = 0
                 self.nchips = int(wafer_parameters["nchips"])
+                # end chip
+                if "end_chip" in wafer_parameters:
+                    self.end_chip = int(wafer_parameters["end_chip"])
+                else:
+                    self.end_chip = int(self.nchips)
                 self.nmodules = int(wafer_parameters["nmodules"])
                 self.origin_chip = wafer_parameters["origin_chip"]
                 self.home_chip = wafer_parameters["home_chip"]
@@ -101,6 +111,12 @@ class Wafer(QMainWindow):
         if self.flat_orientation not in flat_orientation_array:
             check_wafer_parameters = False
             print("Error checking flat orientation...")
+
+        # check init_Chip, end_chip
+        if self.init_chip<1 or self.end_chip>self.nchips or self.init_chip>self.end_chip:
+            check_wafer_parameters = False
+            print("Error checking init_chip & end_chip...")
+
         # set xmax & ymax
         if check_wafer_parameters:
             xmax_detected = 0
@@ -355,6 +371,8 @@ nmodules = ' + str(self.nmodules) + '\n\
 real_origin_chip = "' + str(self.real_origin_chip) + '"\n\
 origin_chip = "' + str(self.origin_chip) + '" # normaly start with 0,0\n\
 home_chip = "' + str(self.home_chip) + '" # home (0um , 0um) could be different to origin (first die to measure)\n\
+init_chip = ' + str(self.init_chip) + '\n\
+end_chip = ' + str(self.end_chip) + '\n\
 flat_orientation = ' + str(self.flat_orientation) + ' # flat orientation: 0, 90, 180 or 270\n\
 \n\
 # navigation options\n\
@@ -365,7 +383,7 @@ wafer_positions = ' + str(self.wafer_positions) + '\n\
 # distances from chip origin\n\
 wafer_modules = ' + str(self.wafer_modules) + '\n\
 # modules name\n\
-wafer_modules_name = ' + str(self.wafer_modules_name) + '\n\
+wafer_modules_name = ' + str(self.wafer_modules_name) + ('\n\
 \n\
 # wafer parameters\n\
 wafer_parameters = {\n\
@@ -378,6 +396,8 @@ wafer_parameters = {\n\
 "nmodules": nmodules,\n\
 "origin_chip": origin_chip,\n\
 "home_chip": home_chip,\n\
+"init_chip": init_chip,\n\
+"end_chip": end_chip,\n\
 "flat_orientation": flat_orientation,\n\
 "wafer_positions": wafer_positions,\n\
 "wafer_modules": wafer_modules,\n\
@@ -385,7 +405,7 @@ wafer_parameters = {\n\
 "real_origin_chip": real_origin_chip,\n\
 "navigation_options": navigation_options\n\
 \n\
-}'
+}')
 
         if nameFile!="":
             # create texto
@@ -495,6 +515,8 @@ class WaferWindow(QMainWindow):
         # create wafer modules name if not exists
         self.wafer_modules_name = wafer.wafer_modules_name
         self.wafer_nmodules = wafer.nmodules
+        self.wafer.init_chip = wafer.init_chip
+        self.wafer.end_chip = wafer.end_chip
         self.view_modules = wafer.nmodules # see last module (default)
         self.max_size = 860 # MAX_SIZE w/h BUTTONS
         self.max_window_size = 1100 # MAX WINDOW SIZE w/h
@@ -515,6 +537,8 @@ class WaferWindow(QMainWindow):
         #widgets.txtXmax.setValue(wafer.xmax)
         #widgets.txtYmax.setValue(wafer.ymax)
         widgets.txtHomeChip.setText(wafer.home_chip)
+        widgets.txtInitChip.setText(str(wafer.init_chip))
+        widgets.txtEndChip.setText(str(wafer.end_chip))
         widgets.txtOriginChip.setText(wafer.real_origin_chip)
 
         widgets.cmbWaferSize.clear()
@@ -631,6 +655,8 @@ class WaferWindow(QMainWindow):
         self.wafer.ysize = self.widgets.txtYSize.value()
         self.wafer.home_chip = self.widgets.txtHomeChip.text()
         self.wafer.real_origin_chip = self.widgets.txtOriginChip.text()
+        self.wafer.init_chip = self.widgets.txtInitChip.text()
+        self.wafer.end_chip = self.widgets.txtEndChip.text()
         self.wafer.navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
 
     def create_meas_result(self, totalDies, totalModules):
@@ -794,6 +820,8 @@ class WaferWindow(QMainWindow):
         self.widgets.txtYSize.setEnabled(enable)
         self.widgets.txtNumberDies.setEnabled(enable)
         self.widgets.txtNumberModules.setEnabled(enable)
+        self.widgets.txtInitChip.setEnabled(enable)
+        self.widgets.txtEndChip.setEnabled(enable)
         #self.widgets.txtXmax.setEnabled(enable)
         #self.widgets.txtYmax.setEnabled(enable)
         # Combos
@@ -908,6 +936,17 @@ class WaferWindow(QMainWindow):
         nchips = self.widgets.txtNumberDies.value()
         nmodules = self.widgets.txtNumberModules.value()
         flat_orientation = self.widgets.cmbWaferOrientation.currentText()
+        init_chip = self.widgets.txtInitChip.text()
+        end_chip = self.widgets.txtEndChip.text()
+        # init & end chip check
+        if init_chip=="" or end_chip=="":
+            retval = messageBox(self,"Problem with Init/End chip","Please, fill Init chip & End chip","warning")
+            return
+        else:
+        # else check if init_chip >=1 and end_chip <= nchips and init_chip < end_chip
+            if int(init_chip)<1 or int(end_chip)>int(nchips) or int(init_chip)>=int(end_chip):
+                retval = messageBox(self,"Problem with Init/End chip","Please, check Init chip & End chip values","warning")
+                return
 
         origin_chip = "0 0"
         real_origin_chip = self.widgets.txtOriginChip.text()
@@ -995,7 +1034,6 @@ class WaferWindow(QMainWindow):
         wafer_modules_name = self.wafer_modules_name
 
         wafer_parameters = {
-
             "wafer_name": wafer_name,
             "wafer_size": wafer_size,
             "xsize": xsize,
@@ -1004,6 +1042,8 @@ class WaferWindow(QMainWindow):
             "nmodules": nmodules,
             "origin_chip": origin_chip,
             "home_chip": home_chip,
+            "init_chip": init_chip,
+            "end_chip": end_chip,
             "flat_orientation": flat_orientation,
             "wafer_positions": wafer_positions,
             "wafer_modules": wafer_modules,

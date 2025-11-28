@@ -32,6 +32,8 @@ HYSTERESIS_TIME = "s"
 WAIT_TIME = "s"
 LIGHT_TIME = "s"
 RANGE = "V"
+RES_MIN = "Ohm"
+RES_MAX = "Ohm"
 
 [help]
 START = "Start voltage"
