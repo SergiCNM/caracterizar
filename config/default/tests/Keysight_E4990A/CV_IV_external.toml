@@ -1,0 +1,76 @@
+title = "CV_IV_external parameters"
+width = 350
+
+[parameters]
+START = 0.0
+STOP = 40.0
+STEP = 1.0
+FREQ = "100"
+OSC = 500
+APERTURE = "5"
+POINT_AVERAGE = false
+AVERAGE_POINTS = 8
+SWEEP_AVERAGE = false
+AVERAGE_SWEEPS = 8
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 0.5
+SETTLE_TIME = 0.1
+LIGHT = false
+LIGHT_TIME = 3
+COMPLIANCE = 0.01
+RANGE = "AUTO"
+ROUTE_TERM = "REAR"
+COMPENSATION_OPEN = false
+COMPENSATION_SHORT = false
+COMPENSATION_DONE = false
+GRAPH1 = "CP"
+GRAPH2 = "G"
+
+[options]
+RANGE = "AUTO,0.2,2,20,200,1000"
+ROUTE_TERM = "FRONT,REAR"
+APERTURE = "1,2,3,4,5"
+GRAPH1 = "CS,CP"
+GRAPH2 = "NONE,G"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+FREQ = "kHz"
+OSC = "mV"
+APERTURE = ""
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+SETTLE_TIME = "s"
+LIGHT_TIME = "s"
+COMPLIANCE = "mA"
+RANGE = "V"
+
+[help]
+START = "Start voltage from -40V to 40V"
+STOP = "Stop voltage from -40V to 40V"
+STEP = "Voltage step"
+FREQ = "Measurement frequency in kHz (comma separated values allowed)"
+OSC = "Oscillation voltage from 5mV to 1000mV"
+APERTURE = "Measurement speed. 1 is the fastest setting."
+POINT_AVERAGE = "Enable point averaging"
+AVERAGE_POINTS = "Number of points to average from 1 to 999"
+SWEEP_AVERAGE = "Enable sweep averaging"
+AVERAGE_SWEEPS = "Number of sweeps to average from 1 to 999"
+HYSTERESIS = "Enable hysteresis measurement"
+HYSTERESIS_TIME = "Time to wait between forward and reverse sweeps"
+WAIT_TIME = "Time to wait before starting measurement"
+SETTLE_TIME = "Time to wait after setting voltage at each step"
+LIGHT = "Light on/off"
+LIGHT_TIME = "Light time"
+COMPLIANCE = "Current compliance for Keithley 2470"
+RANGE = "Voltage range for Keithley 2470"
+ROUTE_TERM = "Terminal routing for Keithley 2470 (FRONT or REAR)"
+COMPENSATION_OPEN = "Compensate for open circuit"
+COMPENSATION_SHORT = "Compensate for short circuit"
+COMPENSATION_DONE = "Compensations done"
+GRAPH1 = "Parameter 1 to measure (CS or CP)"
+GRAPH2 = "Parameter 2 to measure (NONE or G)"
+

@@ -108,6 +108,11 @@ def measure_IV(IV_parameters, k2470):
             time.sleep(IV_parameters["HYSTERESIS_TIME"])
         # swap variables
         IV_parameters["START"], IV_parameters["STOP"] = IV_parameters["STOP"], IV_parameters["START"]
+        # Step calculation
+        if IV_parameters["START"] < IV_parameters["STOP"]:
+            IV_parameters["STEP"] = abs(IV_parameters["STEP"])
+        else:
+            IV_parameters["STEP"] = -abs(IV_parameters["STEP"])
         if k2470.config_IV_temp(IV_parameters):
             source_h, sense_h = k2470.measure_temp(IV_parameters)
         # union lists
