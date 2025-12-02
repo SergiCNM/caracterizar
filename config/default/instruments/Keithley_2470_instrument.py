@@ -25,11 +25,56 @@ class Keithley_2470:
         self.read_termination(parameters["read_termination"])
         self.write_termination(parameters["write_termination"])
 
-        self.buffer_name = 'defbuffer1'
-        if "buffer_name" in parameters:
-            self.buffer_name = parameters["buffer_name"]
+        self.bufferName = "defbuffer1"
+        if "bufferName" in parameters:
+            if parameters["bufferName"] in ["defbuffer1", "devbuffer2"]:
+                self.bufferName = parameters["bufferName"]
+            else:
+                print("Buffer name not correct (defbuffer1 or devbuffer2), set to defbuffer1")
+                self.bufferName = 'defbuffer1'
         if "timeout" in parameters:
             self.timeout(int(parameters["timeout"]))
+        # The delay between measurement points; default is 0 for no delay or you can set a
+        # specific delay value from 50 µs to 10,000 s
+        self.delay = 0
+        if "delay" in parameters:
+            if 50E-6 <= float(parameters["delay"]) <= 10000:
+                self.delay = float(parameters["delay"])
+            else:
+                print("Delay not correct (50 us to 10000 s), set to 0")
+                self.delay = 0
+        # The number of times to run the sweep; default is 1:
+        # Infinite loop: 0, Finite loop: 1 to 268435455
+        self.count = 1
+        if "count" in parameters:
+            if 0 <= int(parameters["count"]) <= 268435455:
+                self.count = int(parameters["count"])
+            else:
+                print("Count not correct (0 to 268435455), set to 1")
+                self.count = 1
+        self.rangeType = "BEST"
+        if "rangeType" in parameters:
+            if parameters["rangeType"] in ["AUTO", "BEST", "FIXed"]:
+                self.rangeType = parameters["rangeType"]
+            else:
+                print("Range type not correct (AUTO, BEST or FIXed), set to BEST")
+                self.rangeType = "BEST"
+        # Fail abort: ON or OFF
+        self.failAbort = "OFF"
+        if "failAbort" in parameters:
+            if parameters["failAbort"] in ["ON", "OFF"]:
+                self.failAbort = parameters["failAbort"]
+            else:
+                print("Fail abort not correct (ON or OFF), set to OFF")
+                self.failAbort = "OFF"
+        # Dual parameter
+        self.dual = "OFF"
+        if "dual" in parameters:
+            if parameters["dual"] in ["ON", "OFF"]:
+                self.dual = parameters["dual"]
+            else:
+                print("Dual parameter not correct (ON or OFF), set to OFF")
+                self.dual = "OFF"
         self.parameters = parameters
 
     def reset(self):
@@ -114,7 +159,7 @@ class Keithley_2470:
         else:
             raise ValueError("Function not possible (VOLT or CURR)")
 
-    def set_lin_sweep(self, function, start, stop, points, delay=-1, count=1):
+    def set_lin_sweep(self, function, start, stop, points):
         """
 		Make a linear sweep
 		Before setting up the sweep, set up the instrument for the test you will run.
@@ -130,23 +175,27 @@ class Keithley_2470:
 		:param start: start value Current: -1.05 A to 1.05 A, Voltage: -1100 V to 1100 V
 		:param stop: end value Current: -1.05 A to 1.05 A, Voltage: -1100 V to 1100 V
 		:param points: The number of source-measure points between the start and stop values. Points = [(Stop - Start) / Step] + 1
-		:param delay: The delay between measurement points; default is -1, which enables autodelay, or
-a specific delay value from 50 μs to 10,000 s, or 0 for no delay
 		:return: data
 		"""
         if function in self.function_values:
-            # Set up a linear sweep from 0 V to 5 V in 51 steps, with a delay of 10 ms
-            cmd = f":SOUR:SWE:{function}:LIN {start}, {stop}, {points}, {delay}, {count}"
+            # Set up a linear sweep from 0 V to 5 V in 51 steps
+            cmd = f':SOUR:SWE:{function}:LIN {start}, {stop}, {points}, {self.delay}, {self.count}, {self.rangeType}, {self.failAbort}, {self.dual}, "{self.bufferName}"'
             self.instrument.write(cmd)
         else:
             raise ValueError("Function not possible (VOLT or CURR)")
 
-    def set_list_sweep(self, function, startIndex, delay=0, count=1):
+    def set_list_sweep(self, function, startIndex):
         if function in self.function_values:
-            cmd = f":SOUR:SWE:{function}:LIST {startIndex}, {delay}, {count}"
+            cmd = f":SOUR:SWE:{function}:LIST {startIndex}, {self.delay}, {self.count}, {self.failAbort}"
             self.instrument.write(cmd)
         else:
             raise ValueError("Value error: Function not correct!")
+
+    def source_delay(self, delay):
+        self.instrument.write(f"SOUR:DEL {delay}")
+
+    def sense_count(self, count):
+        self.instrument.write(f":COUN {count}")
 
     def set_list(self, function, lista):
         if function in self.function_values:
@@ -223,7 +272,7 @@ a specific delay value from 50 μs to 10,000 s, or 0 for no delay
         data = self.instrument.query(cmd)
         return data.split(",")
 
-    def get_buffer_end(self, bufferName="devbuffer1"):
+    def get_buffer_end(self):
         """
         Read buffer end
         :param bufferName name of the buffer
@@ -284,6 +333,12 @@ a specific delay value from 50 μs to 10,000 s, or 0 for no delay
             self.set_range("SOUR", "VOLT", "ON")
         else:
             self.set_range("SOUR", "VOLT", IV_parameters["RANGE"])
+
+        if IV_parameters["COUNT"]:
+            self.sense_count(IV_parameters["COUNT"])
+        if IV_parameters["SOURCE_DELAY"]:
+            self.source_delay(IV_parameters["SOURCE_DELAY"])
+
         return True
 
     def config_IV4(self, IV_parameters):

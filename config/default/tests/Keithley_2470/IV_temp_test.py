@@ -38,6 +38,8 @@ def load_IV_parameters():
         "ROUTE_TERM": "REAR",
         "MEAS_SOURCE": "VOLT",
         "MEAS_SENSE": "CURR",
+        "SOURCE_DELAY": 1.0,
+        "COUNTS": 3,
         "RES_MIN": 100.0,
         "RES_MAX": 120.0
     }
@@ -64,6 +66,7 @@ def save_file(self, voltage, current, namefile):
         lines.append(str(voltage[i]) + separation_char + str(current[i]))
     # create folder
     folder = os.path.join(os.getcwd(), results_dir, username, self.ui.txtProcess.text())
+    os.makedirs(folder, exist_ok=True)
     namefile = os.path.join(folder, namefile + ".txt").replace("\\", "/")
     f = open(namefile, "w+")
     s1 = '\n'.join(lines)

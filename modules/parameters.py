@@ -189,6 +189,11 @@ class DeviceParametersWindow(QWidget):
         self.device_data = self.toml_data[device_name]
         self.fields = {}
 
+        # --- OPCIONES ---
+        raw_options = self.device_data.get("options", {})
+        self.options = {k: v.split(",") if isinstance(v, str) else v
+                        for k, v in raw_options.items()}
+
         tabs = QTabWidget()
         tabs.addTab(self._build_form(self.device_data, device_name), "Main")
 
@@ -214,31 +219,39 @@ class DeviceParametersWindow(QWidget):
             self.fields[section_name] = {}
 
         for key, value in section_data.items():
-            # ⚠️ Ignorar subdiccionarios (que ya tendrán su pestaña)
+            # Ignorar subdiccionarios
             if isinstance(value, dict):
                 continue
-            if isinstance(value, bool):
-                widget = QCheckBox()
-                widget.setChecked(value)
-            elif isinstance(value, int):
-                widget = QSpinBox()
-                widget.setMaximum(9999999)
-                widget.setMinimum(-9999999)
-                widget.setValue(value)
-            elif isinstance(value, float):
-                widget = QDoubleSpinBox()
-                widget.setMaximum(9999999)
-                widget.setMinimum(-9999999)
-                widget.setDecimals(3)
-                widget.setValue(value)
+
+            # Si existen opciones, usar QComboBox
+            if key in self.options:
+                widget = QComboBox()
+                opts = self.options[key]
+                widget.addItems(opts)
+
+                # Establecer valor actual si existe
+                if str(value) in opts:
+                    widget.setCurrentText(str(value))
+
             else:
-                # Mostrar secuencias de escape visibles
-                display_value = (
-                    str(value)
-                    .replace("\r", "\\r")
-                    .replace("\n", "\\n")
-                )
-                widget = QLineEdit(display_value)
+                # Widgets normales
+                if isinstance(value, bool):
+                    widget = QCheckBox()
+                    widget.setChecked(value)
+                elif isinstance(value, int):
+                    widget = QSpinBox()
+                    widget.setMaximum(9999999)
+                    widget.setMinimum(-9999999)
+                    widget.setValue(value)
+                elif isinstance(value, float):
+                    widget = QDoubleSpinBox()
+                    widget.setMaximum(9999999)
+                    widget.setMinimum(-9999999)
+                    widget.setDecimals(3)
+                    widget.setValue(value)
+                else:
+                    display_value = str(value).replace("\r", "\\r").replace("\n", "\\n")
+                    widget = QLineEdit(display_value)
 
             form.addRow(QLabel(key), widget)
             self.fields[section_name][key] = widget
@@ -263,6 +276,8 @@ class DeviceParametersWindow(QWidget):
                     val = widget.isChecked()
                 elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
                     val = widget.value()
+                elif isinstance(widget, QComboBox):
+                    val = widget.currentText()
                 elif isinstance(widget, QLineEdit):
                     val = widget.text().replace("\\r", "\r").replace("\\n", "\n")
                     if val.isdigit():

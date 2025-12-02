@@ -36,7 +36,18 @@ address = "GPIB0::4::INSTR"
 read_termination = "\n"
 write_termination = "\n"
 timeout = 50000
-buffer_name = "defbuffer1"
+delay = 0.0
+count = 1
+rangeType = "BEST"
+failAbort = "OFF"
+dual = "OFF"
+bufferName = "defbuffer1"
+
+[Keithley_2470.options]
+rangeType = "AUTO,BEST,FIXed"
+dual="ON,OFF"
+failAbort="ON,OFF"
+bufferName="defbuffer1,defbuffer2"
 
 [DEEPDETECTION_LINDA]
 address = "FPGA"

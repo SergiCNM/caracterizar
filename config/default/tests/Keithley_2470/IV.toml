@@ -14,6 +14,8 @@ RANGE = "1000"
 ROUTE_TERM = "REAR"
 MEAS_SOURCE = "VOLT"
 MEAS_SENSE = "CURR"
+SOURCE_DELAY = 1.0
+COUNT = 3
 RES_MIN = 100.0
 RES_MAX = 120.0
 
@@ -32,6 +34,7 @@ HYSTERESIS_TIME = "s"
 WAIT_TIME = "s"
 LIGHT_TIME = "s"
 RANGE = "V"
+SOURCE_DELAY = "s"
 RES_MIN = "Ohm"
 RES_MAX = "Ohm"
 
@@ -49,5 +52,7 @@ RANGE = "Measurement range"
 ROUTE_TERM = "Measurement terminal"
 MEAS_SOURCE = "Measurement source"
 MEAS_SENSE = "Measurement sense"
+SOURCE_DELAY = "Source delay"
+COUNT = "Count number"
 RES_MIN = "Minimum resistance for resistance measurement"
 RES_MAX = "Maximum resistance for resistance measurement"
