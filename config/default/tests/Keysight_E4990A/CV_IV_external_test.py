@@ -132,14 +132,17 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
     :return: capacitance, conductance
     """
     try:
+        start_time = time.time()
         # Trigger single measurement
         keysightE4990A.instrument.write(':TRIG:SOUR BUS')
         keysightE4990A.instrument.write(':INIT:IMM')
         keysightE4990A.instrument.write(':TRIG:SING')
 
         # Wait for measurement to complete
-        opc = keysightE4990A.instrument.query('*OPC?')
-        
+        # opc = keysightE4990A.instrument.query('*OPC?')
+        keysightE4990A.instrument.write('*WAI')
+
+
         # Check for errors
         error = keysightE4990A.error()
         if error != '+0,"No error"':
@@ -169,7 +172,9 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
         # Data format: real, imag - get real part of capacitance
         capacitance = ra1[0] if len(ra1) > 0 else None
 
-        return capacitance, conductance
+        elapsed = time.time() - start_time
+
+        return capacitance, conductance, elapsed
 
     except Exception as ex:
         print(f"Error measuring capacitance: {ex}")
@@ -188,7 +193,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
     voltage_list = []
     capacitance_list = []
     conductance_list = []
-
+    print("measuring CV_IV_external...")
     # Generate voltage steps
     start = CV_IV_external_parameters["START"]
     stop = CV_IV_external_parameters["STOP"]
@@ -225,6 +230,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
     for voltage in voltage_steps:
         try:
             # Set voltage on Keithley 2470
+            print("Setting voltage to:", voltage)
             k2470.set_voltage(voltage)
             
             # Wait for voltage to settle
@@ -232,8 +238,9 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
                 time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
             # Measure capacitance with E4990A
-            capacitance, conductance = measure_single_capacitance(keysightE4990A, CV_IV_external_parameters)
-
+            capacitance, conductance, t_meas = measure_single_capacitance(keysightE4990A, CV_IV_external_parameters)
+            print("measured capacitance: ", capacitance)
+            print(f"tmeas: {t_meas*1000:.1f} ms")
             if capacitance is not None:
                 voltage_list.append(voltage)
                 capacitance_list.append(capacitance)
