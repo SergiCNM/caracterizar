@@ -191,10 +191,24 @@ class Keithley_2470:
         else:
             raise ValueError("Value error: Function not correct!")
 
-    def source_delay(self, delay):
-        self.instrument.write(f"SOUR:DEL {delay}")
+    def source_delay(self, function, delay):
+        # This command contains the source delay.
+        # The delay in seconds (0 to 10 ks)
+        # If you send this command without the <function> parameter, it sets the delay for all functions.
+        if function in self.function_values or function == "":
+            if not (0 <= delay <= 10000):
+                raise ValueError("Value error: Delay not correct (0 to 10000 s)!")
+            if function == "":
+                # send
+                self.instrument.write(f":SOUR:DEL {delay}")
+            else:
+                self.instrument.write(f":SOUR:{function}:DEL {delay}")
+        else:
+            raise ValueError("Value error: Function not correct!")
 
     def sense_count(self, count):
+        # This command sets the number of measurements to make when a measurement is requested
+        # count: The number of measurements (1 to 300,000 or buffer capacity)
         self.instrument.write(f":COUN {count}")
 
     def set_list(self, function, lista):
@@ -337,7 +351,7 @@ class Keithley_2470:
         if IV_parameters["COUNT"]:
             self.sense_count(IV_parameters["COUNT"])
         if IV_parameters["SOURCE_DELAY"]:
-            self.source_delay(IV_parameters["SOURCE_DELAY"])
+            self.source_delay("", IV_parameters["SOURCE_DELAY"])
 
         return True
 
