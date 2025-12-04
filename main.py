@@ -521,7 +521,8 @@ class MainWindow(QMainWindow):
                 self.load_cmbTechnology()
                 self.load_cmbMask()
             else:
-                messageBox(self, "Error loading ESTEPA class", self.estepa.error_message, "error")
+                # messageBox(self, "Error loading ESTEPA class", self.estepa.error_message, "error")
+                print(">> [MainWindow.__init__] Error loading ESTEPA class: %s" % self.estepa.error_message)
         widgets.cmbParametersFile.clear()
         widgets.cmbParametersBBDD.clear()
 
