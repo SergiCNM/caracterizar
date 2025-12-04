@@ -25,6 +25,9 @@ class Keithley_2470:
         self.read_termination(parameters["read_termination"])
         self.write_termination(parameters["write_termination"])
 
+        if "chunk_size" in parameters:
+            self.instrument.chunk_size = int(parameters["chunk_size"])
+
         self.bufferName = "defbuffer1"
         if "bufferName" in parameters:
             if parameters["bufferName"] in ["defbuffer1", "devbuffer2"]:
@@ -67,14 +70,7 @@ class Keithley_2470:
             else:
                 print("Fail abort not correct (ON or OFF), set to OFF")
                 self.failAbort = "OFF"
-        # Dual parameter
-        self.dual = "OFF"
-        if "dual" in parameters:
-            if parameters["dual"] in ["ON", "OFF"]:
-                self.dual = parameters["dual"]
-            else:
-                print("Dual parameter not correct (ON or OFF), set to OFF")
-                self.dual = "OFF"
+
         self.parameters = parameters
 
     def reset(self):
@@ -228,10 +224,10 @@ class Keithley_2470:
     def start(self):
 
         self.instrument.write("INIT")
-        self.instrument.write("*WAI")
-        time.sleep(0.5)
-        # self.instrument.write("*OPC")
-        # self.dataready()  # espera hasta que el instrumento acaba
+        # self.instrument.write("*WAI")
+        # time.sleep(0.5)
+        self.instrument.write("*OPC")
+        self.dataready()  # espera hasta que el instrumento acaba
 
 
     def stop(self):
@@ -356,6 +352,13 @@ class Keithley_2470:
         if IV_parameters["SOURCE_DELAY"]:
             self.source_delay("", IV_parameters["SOURCE_DELAY"])
 
+        # set dual
+        if IV_parameters["HYSTERESIS"]:
+            self.dual = "ON"
+        else:
+            self.dual = "OFF"
+
+
         return True
 
     def config_IV4(self, IV_parameters):
@@ -439,6 +442,50 @@ class Keithley_2470:
         source = source[0:len(sense)]
         self.reset()
         return source, sense
+
+    def measure_normal_IV(self, IV_parameters):
+        """
+        Perform a standard linear IV sweep (no list mode).
+        Uses :SOUR:SWE:<FUNC>:LIN to avoid long SCPI list commands.
+
+        :param IV_parameters: dict with keys START, STOP, STEP, MEAS_SOURCE, etc.
+        :return: (source_values, sense_values)
+        """
+
+        # Clear buffer
+        self.clear_buffer()
+        # 1) Generate source vector
+        Start = float(IV_parameters["START"])
+        Stop = float(IV_parameters["STOP"])
+        Step = float(IV_parameters["STEP"])
+        func = IV_parameters["MEAS_SOURCE"]  # VOLT or CURR
+
+        # Make the array of points
+        source_values = np.arange(Start, Stop + Step, Step)
+        source_values = np.round(source_values, 6)
+        points = len(source_values)
+
+        # 2) Configure buffer for the number of sweep points
+        self.config_buffer(points)
+
+        # 3) Configure linear sweep
+        #    :SOUR:SWE:<FUNC>:LIN start, stop, points, delay, count, rangeType, failAbort, dual, "buffer"
+        self.set_lin_sweep(func, Start, Stop, points)
+
+        # 4) Start sweep and wait until it's finished
+        self.start()
+
+        # 5) Read buffer
+        lastIndex = self.get_buffer_end()
+        sense = self.read_buffer(1, lastIndex)
+
+        # Truncate source to real number of points
+        source_values = source_values[:len(sense)]
+
+        # 6) Reset instrument state
+        self.reset()
+
+        return source_values, sense
 
     def measure_temp(self, IV_parameters):
         """

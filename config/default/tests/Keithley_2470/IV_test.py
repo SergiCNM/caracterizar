@@ -28,7 +28,6 @@ def load_IV_parameters():
         "STEP": 0.1,
         "COMPLIANCE": 0.1,
         "HYSTERESIS": False,
-        "HYSTERESIS_TIME": 0,
         "WAIT_TIME": 0,
         "LIGHT": False,
         "LIGHT_TIME": 1,
@@ -88,25 +87,25 @@ def measure_IV(IV_parameters, k2470):
     # measure
     if k2470.config_IV(IV_parameters):
         voltage, current = k2470.measure_list_IV(IV_parameters)
-    # hysteresis?
-    if IV_parameters["HYSTERESIS"]:
-        voltage_h = []
-        current_h = []
-        # wait time between hysteresis
-        if IV_parameters["HYSTERESIS_TIME"] > 0:
-            time.sleep(IV_parameters["HYSTERESIS_TIME"])
-        # swap variables
-        IV_parameters["START"], IV_parameters["STOP"] = IV_parameters["STOP"], IV_parameters["START"]
-        # Step calculation
-        if IV_parameters["START"] < IV_parameters["STOP"]:
-            IV_parameters["STEP"] = abs(IV_parameters["STEP"])
-        else:
-            IV_parameters["STEP"] = -abs(IV_parameters["STEP"])
-        if k2470.config_IV(IV_parameters):
-            voltage_h, current_h = k2470.measure_list_IV(IV_parameters)
-        # union lists
-        voltage = voltage + voltage_h
-        current = current + current_h
+    # # hysteresis?
+    # if IV_parameters["HYSTERESIS"]:
+    #     voltage_h = []
+    #     current_h = []
+    #     # wait time between hysteresis
+    #     if IV_parameters["HYSTERESIS_TIME"] > 0:
+    #         time.sleep(IV_parameters["HYSTERESIS_TIME"])
+    #     # swap variables
+    #     IV_parameters["START"], IV_parameters["STOP"] = IV_parameters["STOP"], IV_parameters["START"]
+    #     # Step calculation
+    #     if IV_parameters["START"] < IV_parameters["STOP"]:
+    #         IV_parameters["STEP"] = abs(IV_parameters["STEP"])
+    #     else:
+    #         IV_parameters["STEP"] = -abs(IV_parameters["STEP"])
+    #     if k2470.config_IV(IV_parameters):
+    #         voltage_h, current_h = k2470.measure_list_IV(IV_parameters)
+    #     # union lists
+    #     voltage = voltage + voltage_h
+    #     current = current + current_h
 
     current_float = list(map(float, current))
     # get resistance

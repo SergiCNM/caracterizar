@@ -199,7 +199,7 @@ class DeviceParametersWindow(QWidget):
 
         # Buscar subbloques dentro del diccionario principal (anidados)
         for subname, subdata in self.device_data.items():
-            if isinstance(subdata, dict):
+            if isinstance(subdata, dict) and subname != "options":
                 tabs.addTab(self._build_form(subdata, subname), subname)
         self.layout.addWidget(tabs)
 
@@ -261,6 +261,8 @@ class DeviceParametersWindow(QWidget):
     def save_configuration(self):
         """Guardar cambios en el fichero TOML."""
         for section_name, section_fields in self.fields.items():
+            if section_name == "options":
+                continue
             # Referencia al bloque correcto dentro del diccionario principal
             if section_name == self.device_name:
                 target_dict = self.toml_data[self.device_name]
