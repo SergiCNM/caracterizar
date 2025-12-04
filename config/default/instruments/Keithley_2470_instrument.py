@@ -30,10 +30,10 @@ class Keithley_2470:
 
         self.bufferName = "defbuffer1"
         if "bufferName" in parameters:
-            if parameters["bufferName"] in ["defbuffer1", "devbuffer2"]:
+            if parameters["bufferName"] in ["defbuffer1", "defbuffer2"]:
                 self.bufferName = parameters["bufferName"]
             else:
-                print("Buffer name not correct (defbuffer1 or devbuffer2), set to defbuffer1")
+                print("Buffer name not correct (defbuffer1 or defbuffer2), set to defbuffer1")
                 self.bufferName = 'defbuffer1'
         if "timeout" in parameters:
             self.timeout(int(parameters["timeout"]))
