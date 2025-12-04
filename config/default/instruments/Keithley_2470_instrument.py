@@ -186,7 +186,7 @@ class Keithley_2470:
 
     def set_list_sweep(self, function, startIndex):
         if function in self.function_values:
-            cmd = f":SOUR:SWE:{function}:LIST {startIndex}, {self.delay}, {self.count}, {self.failAbort}"
+            cmd = f':SOUR:SWE:{function}:LIST {startIndex}, {self.delay}, {self.count}, {self.failAbort}, "{self.bufferName}"'
             self.instrument.write(cmd)
         else:
             raise ValueError("Value error: Function not correct!")
@@ -226,11 +226,12 @@ class Keithley_2470:
         self.instrument.write(":SENS:CURR:RSEN ON")
 
     def start(self):
-        cmd = "INIT"
-        self.instrument.write(cmd)
-        cmd = "*WAI"
-        self.instrument.write(cmd)
+
+        self.instrument.write("INIT")
+        self.instrument.write("*WAI")
         time.sleep(0.5)
+        # self.instrument.write("*OPC")
+        # self.dataready()  # espera hasta que el instrumento acaba
 
 
     def stop(self):
@@ -256,7 +257,7 @@ class Keithley_2470:
 		:param type: Type integration time
 		:return: None
 		"""
-        cmd = ":SENS:CURR:APER " + time_us
+        cmd = ":SENS:CURR:APER " + str(time_us)
         self.instrument.write(cmd)
 
     def clear_buffer(self):
@@ -264,7 +265,7 @@ class Keithley_2470:
 		Clear instrument buffer
 		:return: None
 		"""
-        self.instrument.write(":TRAC:CLE")
+        self.instrument.write(':TRAC:CLE "' + self.bufferName + '"')
 
     def config_buffer(self, steps):
         """
@@ -272,8 +273,10 @@ class Keithley_2470:
 		:param steps: number of steps
 		:return: None
 		"""
-        self.instrument.write(":TRAC:FEED:CONT NEXT")
-        self.instrument.write(":TRAC:POIN {0}".format(steps))
+        # first clear buffer
+        self.clear_buffer()
+        # self.instrument.write(":TRAC:FEED:CONT NEXT")
+        self.instrument.write(f':TRAC:POIN {steps}, "{self.bufferName}"')
 
     def read_buffer(self, startIndex, endIndex, bufferElements="READ"):
         """
@@ -282,7 +285,7 @@ class Keithley_2470:
 		:param endIndex endIndex
 		:return: data
 		"""
-        cmd = f":TRAC:DATA? {startIndex}, {endIndex}, \"{self.buffer_name}\", {bufferElements}"
+        cmd = f':TRAC:DATA? {startIndex}, {endIndex}, "{self.bufferName}", {bufferElements}'
         data = self.instrument.query(cmd)
         return data.split(",")
 
@@ -292,10 +295,10 @@ class Keithley_2470:
         :param bufferName name of the buffer
         :return end
         """
-        cmd = f":TRAC:ACT:END?"
+        cmd = f':TRAC:ACT:END? "{self.bufferName}"'
         data = self.instrument.query(cmd)
 
-        return data
+        return int(data.strip())
 
     def set_measurement_unit(self, function, unit):
         if function in self.function_values:
@@ -445,9 +448,7 @@ class Keithley_2470:
         """
         self.clear_buffer()
         if IV_parameters["MEAS_SWEEP"]:
-            print("measurement sweep")
             source = self.get_source_list(IV_parameters)
-            print(source)
             self.set_list(IV_parameters["MEAS_SOURCE"], source)
             self.set_list_sweep(IV_parameters["MEAS_SOURCE"], 1)
             self.start()
@@ -456,7 +457,6 @@ class Keithley_2470:
             sens = self.read_buffer(1, lastIndex_buffer)
             source = source[0:(int(lastIndex_buffer))]
         else:
-            print("spot measurement")
             # spot measurements
             Start = IV_parameters["START"]
             Meas_source = IV_parameters["MEAS_SOURCE"]
@@ -464,17 +464,11 @@ class Keithley_2470:
             sens = []
             for i in range(0,10):
                 source.append(Start)
-            print(f"Source: {source}")
-            print(f"set volt/curr spot to {Start}")
             cmd = f":SOURC:{Meas_source} {Start}"
             self.instrument.write(cmd)
-            time.sleep(3)
-            print("Count")
             cmd = f":COUN 10"
             # self.instrument.write(cmd)
-            print("Start measurement")
             self.output("ON")
-            time.sleep(3)
             # get measurements
             lastIndex_buffer = self.get_buffer_end()
 
@@ -482,9 +476,8 @@ class Keithley_2470:
                 sens = self.read_buffer(1, lastIndex_buffer)
                 source = source[0:(int(lastIndex_buffer))]
             self.output("OFF")
-        print(f"last index buffer: {lastIndex_buffer}")
         self.reset()
-        print(source, sens)
+
         return source, sens
 
     def get_source_list(self, IV_parameters):
