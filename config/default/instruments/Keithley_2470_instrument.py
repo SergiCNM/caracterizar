@@ -465,8 +465,16 @@ class Keithley_2470:
         source_values = np.round(source_values, 6)
         points = len(source_values)
 
+        # Set dual
+        points_buffer = points
+        if IV_parameters["HYSTERESIS"]:
+            self.dual = "ON"
+            # For hysteresis, we need to double the number of points in the buffer
+            points_buffer = (points * 2) - 1
+            source_values = np.concatenate((source_values, source_values[-2::-1]))
+
         # 2) Configure buffer for the number of sweep points
-        self.config_buffer(points)
+        self.config_buffer(points_buffer)
 
         # 3) Configure linear sweep
         #    :SOUR:SWE:<FUNC>:LIN start, stop, points, delay, count, rangeType, failAbort, dual, "buffer"
@@ -533,7 +541,7 @@ class Keithley_2470:
         Step = IV_parameters["STEP"]
         # Points = (Stop - Start) / Step
         source_values = np.arange(Start, Stop + Step, Step)
-        source_values = np.round(source_values, decimals=6)
+        source_values = np.round(source_values, 6)
 
         return source_values.tolist()
 
