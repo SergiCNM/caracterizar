@@ -38,7 +38,8 @@ def load_IV_parameters():
         "SOURCE_DELAY": 1.0,
         "COUNTS": 3,
         "RES_MIN": 100.0,
-        "RES_MAX": 120.0
+        "RES_MAX": 120.0,
+        "DISPLAY_GRAPH": False
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2470/IV.toml'

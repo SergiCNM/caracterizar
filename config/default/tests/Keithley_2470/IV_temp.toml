@@ -11,7 +11,6 @@ STOP = 0.001
 STEP = 0.0001
 COMPLIANCE = 1000.0
 HYSTERESIS = false
-HYSTERESIS_TIME = 1
 WAIT_TIME = 0.0
 LIGHT = false
 LIGHT_TIME = 0.0
@@ -20,6 +19,12 @@ CURR_RANGE = "AUTO"
 TEMP_LIST = "25, 30, 25"
 HYSTERESIS_TEMP = false
 STABLE_TIME = 5
+DISPLAY_GRAPH = true
+SOURCE_DELAY = 1.0
+COUNT = 3
+RES_MIN = 100.0
+RES_MAX = 120.0
+DISPLAY_GRAPH = true
 
 [options]
 VOLT_RANGE = "AUTO,0.2,2,20,200,1000"
@@ -33,12 +38,14 @@ START = "V or A"
 STOP = "V or A"
 STEP = "V or A"
 COMPLIANCE = "mA or mV"
-HYSTERESIS_TIME = "s"
 WAIT_TIME = "s"
 LIGHT_TIME = "s"
 RANGE = "V"
 TEMP_LIST = "ºC"
 STABLE_TIME = "s"
+SOURCE_DELAY = "s"
+RES_MIN = "Ohm"
+RES_MAX = "Ohm"
 
 [help]
 START = "Start voltage"
@@ -47,3 +54,9 @@ TEMP_LIST = "Temperature list"
 STABLE_TIME = "Time to wait after reach temperature setpoint"
 MEAS_SWEEP = "Spot or Sweep measurement. Spot apply START value"
 FOUR_TERMINAL = "Two or four terminal measurements"
+SOURCE_DELAY = "Source delay"
+COUNT = "Count number"
+RES_MIN = "Minimum resistance for resistance measurement"
+RES_MAX = "Maximum resistance for resistance measurement"
+DISPLAY_GRAPH = "Display graph after measurement"
+

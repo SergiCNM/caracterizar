@@ -30,7 +30,6 @@ def load_IV_parameters():
         "STEP": 0.1,
         "COMPLIANCE": 0.1,
         "HYSTERESIS": False,
-        "HYSTERESIS_TIME": 0,
         "WAIT_TIME": 0,
         "LIGHT": False,
         "LIGHT_TIME": 1,
@@ -41,7 +40,8 @@ def load_IV_parameters():
         "SOURCE_DELAY": 1.0,
         "COUNTS": 3,
         "RES_MIN": 100.0,
-        "RES_MAX": 120.0
+        "RES_MAX": 120.0,
+        "DISPLAY_GRAPH": False
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2470/IV_temp.toml'
@@ -90,37 +90,23 @@ def measure_IV(IV_parameters, k2470):
     source = []
     sense = []
     if IV_parameters["WAIT_TIME"] > 0:
+        # put start voltage in keithley 2470
+        k2470.set_voltage(IV_parameters["START"])
+        # output voltage ON
+        k2470.output("ON")
         time.sleep(IV_parameters["WAIT_TIME"])
     if IV_parameters["LIGHT"]:
         # prober is not initialized when you select single measurement
-        self.init_prober()
-        if self.prober != "":
-            self.prober.light("1")
+        main.init_prober()
+        if main.prober != "":
+            main.prober.light("1")
             time.sleep(IV_parameters["LIGHT_TIME"])
-            self.prober.light("0")
+            main.prober.light("0")
 
     # measure
     if k2470.config_IV_temp(IV_parameters):
         source, sense = k2470.measure_temp(IV_parameters)
-    # hysteresis?
-    if IV_parameters["HYSTERESIS"]:
-        source_h = []
-        sense_h = []
-        # wait time between hysteresis
-        if IV_parameters["HYSTERESIS_TIME"] > 0:
-            time.sleep(IV_parameters["HYSTERESIS_TIME"])
-        # swap variables
-        IV_parameters["START"], IV_parameters["STOP"] = IV_parameters["STOP"], IV_parameters["START"]
-        # Step calculation
-        if IV_parameters["START"] < IV_parameters["STOP"]:
-            IV_parameters["STEP"] = abs(IV_parameters["STEP"])
-        else:
-            IV_parameters["STEP"] = -abs(IV_parameters["STEP"])
-        if k2470.config_IV_temp(IV_parameters):
-            source_h, sense_h = k2470.measure_temp(IV_parameters)
-        # union lists
-        source = source + source_h
-        sense = sense + sense_h
+
 
     source_float = []
     sense_float = []

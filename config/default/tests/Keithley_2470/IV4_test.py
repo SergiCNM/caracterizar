@@ -28,7 +28,6 @@ def load_IV_parameters():
         "STEP": 0.1,
         "COMPLIANCE": 0.1,
         "HYSTERESIS": False,
-        "HYSTERESIS_TIME": 0,
         "WAIT_TIME": 0,
         "LIGHT": False,
         "LIGHT_TIME": 1,
@@ -39,7 +38,8 @@ def load_IV_parameters():
         "SOURCE_DELAY": 1.0,
         "COUNTS": 3,
         "RES_MIN": 100.0,
-        "RES_MAX": 120.0
+        "RES_MAX": 120.0,
+        "DISPLAY_GRAPH": False
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2470/IV4.toml'
@@ -75,6 +75,10 @@ def measure_IV(IV_parameters, k2470):
     # create empty list if not exists
     voltage, current, resistance = [], [], []
     if IV_parameters["WAIT_TIME"] > 0:
+        # put start voltage in keithley 2470
+        k2470.set_voltage(IV_parameters["START"])
+        # output voltage ON
+        k2470.output("ON")
         time.sleep(IV_parameters["WAIT_TIME"])
     if IV_parameters["LIGHT"]:
         # prober is not initialized when you select single measurement
@@ -85,28 +89,9 @@ def measure_IV(IV_parameters, k2470):
             main.prober.light("0")
 
     # measure
-    if k2470.config_IV(IV_parameters):
-        voltage, current = k2470.measure_list_IV(IV_parameters)
-    # hysteresis?
-    if IV_parameters["HYSTERESIS"]:
-        voltage_h = []
-        current_h = []
-        # wait time between hysteresis
-        if IV_parameters["HYSTERESIS_TIME"] > 0:
-            time.sleep(IV_parameters["HYSTERESIS_TIME"])
-        # swap variables
-        IV_parameters["START"], IV_parameters["STOP"] = IV_parameters["STOP"], IV_parameters["START"]
-        # Step calculation
-        if IV_parameters["START"] < IV_parameters["STOP"]:
-            IV_parameters["STEP"] = abs(IV_parameters["STEP"])
-        else:
-            IV_parameters["STEP"] = -abs(IV_parameters["STEP"])
-        if k2470.config_IV(IV_parameters):
-            voltage_h, current_h = k2470.measure_list_IV(IV_parameters)
-        # union lists
-        voltage = voltage + voltage_h
-        current = current + current_h
-
+    if k2470.config_IV4(IV_parameters):
+        voltage, current = k2470.measure_normal_IV(IV_parameters)
+    # convert current to float
     current_float = list(map(float, current))
     # get resistance
     for i in range(0, len(current_float)):
@@ -241,6 +226,8 @@ if __name__ == "__main__":
                 namefile = f"IV4_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
                 save_file(main, voltage, current, resistance, namefile)
 
+        if "DISPLAY_GRAPH" in IV_parameters and IV_parameters["DISPLAY_GRAPH"]:
+            k2470.display_graph()
         # stop process, put instrument in local mode
         k2470.stop()
         k2470.close()
