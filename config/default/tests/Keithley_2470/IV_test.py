@@ -75,6 +75,10 @@ def measure_IV(IV_parameters, k2470):
     # create empty list if not exists
     voltage, current, resistance = [], [], []
     if IV_parameters["WAIT_TIME"] > 0:
+        # put start voltage in keithley 2470
+        k2470.set_voltage(IV_parameters["START"])
+        # output voltage ON
+        k2470.output("ON")
         time.sleep(IV_parameters["WAIT_TIME"])
     if IV_parameters["LIGHT"]:
         # prober is not initialized when you select single measurement
@@ -86,27 +90,8 @@ def measure_IV(IV_parameters, k2470):
 
     # measure
     if k2470.config_IV(IV_parameters):
-        voltage, current = k2470.measure_list_IV(IV_parameters)
-    # # hysteresis?
-    # if IV_parameters["HYSTERESIS"]:
-    #     voltage_h = []
-    #     current_h = []
-    #     # wait time between hysteresis
-    #     if IV_parameters["HYSTERESIS_TIME"] > 0:
-    #         time.sleep(IV_parameters["HYSTERESIS_TIME"])
-    #     # swap variables
-    #     IV_parameters["START"], IV_parameters["STOP"] = IV_parameters["STOP"], IV_parameters["START"]
-    #     # Step calculation
-    #     if IV_parameters["START"] < IV_parameters["STOP"]:
-    #         IV_parameters["STEP"] = abs(IV_parameters["STEP"])
-    #     else:
-    #         IV_parameters["STEP"] = -abs(IV_parameters["STEP"])
-    #     if k2470.config_IV(IV_parameters):
-    #         voltage_h, current_h = k2470.measure_list_IV(IV_parameters)
-    #     # union lists
-    #     voltage = voltage + voltage_h
-    #     current = current + current_h
-
+        voltage, current = k2470.measure_normal_IV(IV_parameters)
+    # convert current to float
     current_float = list(map(float, current))
     # get resistance
     for i in range(0, len(current_float)):
@@ -242,6 +227,8 @@ if __name__ == "__main__":
                 namefile = f"IV_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
                 save_file(main, voltage,current, resistance, namefile)
 
+        if "DISPLAY_GRAPH" in IV_parameters and IV_parameters["DISPLAY_GRAPH"]:
+            k2470.display_graph()
         # stop process, close instrument
         k2470.stop()
         k2470.close()

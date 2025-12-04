@@ -44,7 +44,8 @@ class Keithley_2470:
             if 50E-6 <= float(parameters["delay"]) <= 10000:
                 self.delay = float(parameters["delay"])
             else:
-                print("Delay not correct (50 us to 10000 s), set to 0")
+                delay = parameters["delay"]
+                print(f"Delay ({delay}) not correct (50 us to 10000 s), set to 0")
                 self.delay = 0
         # The number of times to run the sweep; default is 1:
         # Infinite loop: 0, Finite loop: 1 to 268435455
@@ -205,6 +206,8 @@ class Keithley_2470:
     def sense_count(self, count):
         # This command sets the number of measurements to make when a measurement is requested
         # count: The number of measurements (1 to 300,000 or buffer capacity)
+        if not (1 <= count <= 300000):
+            raise ValueError("Value error: Count not correct (1 to 300000)!")
         self.instrument.write(f":COUN {count}")
 
     def set_list(self, function, lista):
@@ -551,3 +554,58 @@ class Keithley_2470:
 		@return: None
 		"""
         self.instrument.close()
+
+    def sense_zero(self):
+        """
+        This command causes the instrument to refresh the reference and zero measurements once.
+        :return: None
+        """
+        self.instrument.write(":SENS:AZER:ONCE")
+
+
+    def display_screen(self, screenName):
+        """
+        This command displays a stored screen image on the instrument's display.
+        :param screenName: Name of the screen image to display.
+        :return: None
+        """
+        screenName_values = ["HOME", "HOME_LARG", "READ", "HIST", "SWIPE_USER", "GRAPH", "SWIPE_GRAP", "SWIPE_SETT",
+                             "SOUR", "SWIPE:STAT", "PROC"]
+        if screenName not in screenName_values:
+            raise ValueError(f"Screen name {screenName} not correct ({', '.join(screenName_values)})")
+        self.instrument.write(f':DISP:SCR "{screenName}"')
+
+    def display_graph(self):
+        """
+        This command displays the graph screen on the instrument's display.
+        :return: None
+        """
+        self.display_screen("GRAPH")
+
+    def display_clear(self):
+        """
+        This command clears the text from the front-panel USER swipe screen.
+        :return: None
+        """
+        self.instrument.write(':DISP:CLE')
+
+    def display_user_text(self, line, text):
+        """
+        This command defines the text that is displayed on the front-panel USER swipe screen.
+        :param line:
+        :param text:
+        :return: None
+        """
+        if line not in [1, 2]:
+            raise ValueError("Line number must be between 1 and 2.")
+        self.instrument.write(f':DISP:USER{line}:TEXT , "{text}"')
+
+    def display_light_state(self, state):
+        """
+        This command sets the display backlight state.
+        :param state: ON or OFF
+        :return: None
+        """
+        if state not in ["ON100", "ON75", "ON50", "ON25", "OFF", "BLAC"]:
+            raise ValueError("State must be 'ON' or 'OFF'.")
+        self.instrument.write(f':DISP:LIGH:STAT {state}')

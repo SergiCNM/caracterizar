@@ -17,6 +17,7 @@ SOURCE_DELAY = 1.0
 COUNT = 3
 RES_MIN = 100.0
 RES_MAX = 120.0
+DISPLAY_GRAPH = true
 
 [options]
 RANGE = "AUTO,0.2,2,20,200,1000"
@@ -53,3 +54,4 @@ SOURCE_DELAY = "Source delay"
 COUNT = "Count number"
 RES_MIN = "Minimum resistance for resistance measurement"
 RES_MAX = "Maximum resistance for resistance measurement"
+DISPLAY_GRAPH = "Display graph after measurement"
