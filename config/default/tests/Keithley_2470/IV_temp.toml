@@ -3,7 +3,7 @@ title = "IV TEMP parameters"
 [parameters]
 ROUTE_TERM = "FRONT"
 FOUR_TERMINAL = true
-MEAS_SWEEP = true
+MEAS_TYPE = "SWEEP"
 MEAS_SOURCE = "CURR"
 MEAS_SENSE = "RES"
 START = 0.0001
@@ -19,7 +19,6 @@ CURR_RANGE = "AUTO"
 TEMP_LIST = "25, 30, 25"
 HYSTERESIS_TEMP = false
 STABLE_TIME = 5
-DISPLAY_GRAPH = true
 SOURCE_DELAY = 1.0
 COUNT = 3
 RES_MIN = 100.0
@@ -27,6 +26,7 @@ RES_MAX = 120.0
 DISPLAY_GRAPH = true
 
 [options]
+MEAS_TYPE = "SPOT,SWEEP"
 VOLT_RANGE = "AUTO,0.2,2,20,200,1000"
 CURR_RANGE = "AUTO,10e-9,100e-9,1e-6,10e-6,100e-6,1e-3,10e-3,100e-3,1"
 ROUTE_TERM = "FRONT,REAR"
@@ -52,7 +52,7 @@ START = "Start voltage"
 STOP = "Stop voltage"
 TEMP_LIST = "Temperature list"
 STABLE_TIME = "Time to wait after reach temperature setpoint"
-MEAS_SWEEP = "Spot or Sweep measurement. Spot apply START value"
+MEAS_TYPE = "Measurement type (spot or sweep)"
 FOUR_TERMINAL = "Two or four terminal measurements"
 SOURCE_DELAY = "Source delay"
 COUNT = "Count number"

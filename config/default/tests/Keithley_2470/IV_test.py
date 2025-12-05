@@ -145,6 +145,7 @@ if __name__ == "__main__":
     try:
         # init IV_parameters
         load_IV_parameters()
+        instruments = load_toml_config("instruments.toml")
         k2470 = Keithley_2470(instruments["Keithley_2470"])
         if cartographic_measurement:
             if str(dieActual)=="1" and str(moduleActual) == "1":

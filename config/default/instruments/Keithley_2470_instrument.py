@@ -3,7 +3,6 @@ import pyvisa
 import time
 import numpy as np
 
-
 class Keithley_2470:
     function_values = ["VOLT", "CURR", "RES"]
     terminal_values = ["SOUR", "SENSE"]
@@ -37,16 +36,17 @@ class Keithley_2470:
                 self.bufferName = 'defbuffer1'
         if "timeout" in parameters:
             self.timeout(int(parameters["timeout"]))
-        # The delay between measurement points; default is 0 for no delay or you can set a
-        # specific delay value from 50 µs to 10,000 s
-        self.delay = 0
+        # The delay between measurement points; default is -1, which enables autodelay, or
+        # a specific delay value from 50 μs to 10,000 s, or 0 for no delay
+        self.delay = 0 # no delay
         if "delay" in parameters:
-            if 50E-6 <= float(parameters["delay"]) <= 10000:
+            if 50E-6 <= float(parameters["delay"]) <= 10000 or float(parameters["delay"]) == 0:
                 self.delay = float(parameters["delay"])
             else:
+                # set to default (auto delay)
                 delay = parameters["delay"]
-                print(f"Delay ({delay}) not correct (50 us to 10000 s), set to 0")
-                self.delay = 0
+                print(f"Delay ({delay}) not correct (50 us to 10000 s) or 0, set to -1 (auto delay)")
+                self.delay = -1
         # The number of times to run the sweep; default is 1:
         # Infinite loop: 0, Finite loop: 1 to 268435455
         self.count = 1
@@ -350,8 +350,8 @@ class Keithley_2470:
         else:
             self.set_range("SOUR", "VOLT", IV_parameters["RANGE"])
 
-        if IV_parameters["COUNT"]:
-            self.sense_count(IV_parameters["COUNT"])
+        if IV_parameters["SENSE_COUNT"]:
+            self.sense_count(IV_parameters["SENSE_COUNT"])
         if IV_parameters["SOURCE_DELAY"]:
             self.source_delay("", IV_parameters["SOURCE_DELAY"])
 
@@ -374,6 +374,18 @@ class Keithley_2470:
             self.set_range("SOUR", "VOLT", "ON")
         else:
             self.set_range("SOUR", "VOLT", IV_parameters["RANGE"])
+
+        if IV_parameters["SENSE_COUNT"]:
+            self.sense_count(IV_parameters["SENSE_COUNT"])
+        if IV_parameters["SOURCE_DELAY"]:
+            self.source_delay("", IV_parameters["SOURCE_DELAY"])
+
+        # set dual
+        if IV_parameters["HYSTERESIS"]:
+            self.dual = "ON"
+        else:
+            self.dual = "OFF"
+
         return True
 
     def config_IV_temp(self, IV_parameters):
@@ -394,6 +406,17 @@ class Keithley_2470:
             else:
                 self.set_range("SOUR", IV_parameters["MEAS_SOURCE"], IV_parameters["CURR_RANGE"])
             self.set_compliance("VLIM", float(IV_parameters["COMPLIANCE"]) * 1E-3)
+
+        if IV_parameters["SENSE_COUNT"]:
+            self.sense_count(IV_parameters["SENSE_COUNT"])
+        if IV_parameters["SOURCE_DELAY"]:
+            self.source_delay("", IV_parameters["SOURCE_DELAY"])
+
+        # set dual
+        if IV_parameters["HYSTERESIS"]:
+            self.dual = "ON"
+        else:
+            self.dual = "OFF"
 
         return True
 
@@ -455,8 +478,6 @@ class Keithley_2470:
         :return: (source_values, sense_values)
         """
 
-        # Clear buffer
-        self.clear_buffer()
         # 1) Generate source vector
         Start = float(IV_parameters["START"])
         Stop = float(IV_parameters["STOP"])
@@ -476,6 +497,10 @@ class Keithley_2470:
             points_buffer = (points * 2) - 1
             source_values = np.concatenate((source_values, source_values[-2::-1]))
 
+        # self.COUNT parameter increases the number of loop measurements
+        if int(self.count) > 1:
+            points_buffer = points_buffer * int(self.count)
+
         # 2) Configure buffer for the number of sweep points
         self.config_buffer(points_buffer)
 
@@ -489,6 +514,15 @@ class Keithley_2470:
         # 5) Read buffer
         lastIndex = self.get_buffer_end()
         sense = self.read_buffer(1, lastIndex)
+
+        # self.count >1 get the last measurements only
+        if int(self.count) > 1:
+            sense_final = []
+            step_count = int(self.count)
+            for i in range(0, len(sense), step_count):
+                sense_final.append(sense[i + step_count - 1])
+            sense = sense_final
+
 
         # Truncate source to real number of points
         source_values = source_values[:len(sense)]
@@ -504,17 +538,12 @@ class Keithley_2470:
         :param IV_parameters:
         :return:  current, voltage list
         """
-        self.clear_buffer()
-        if IV_parameters["MEAS_SWEEP"]:
-            source = self.get_source_list(IV_parameters)
-            self.set_list(IV_parameters["MEAS_SOURCE"], source)
-            self.set_list_sweep(IV_parameters["MEAS_SOURCE"], 1)
-            self.start()
 
-            lastIndex_buffer = self.get_buffer_end()
-            sens = self.read_buffer(1, lastIndex_buffer)
-            source = source[0:(int(lastIndex_buffer))]
+        if IV_parameters["MEAS_TYPE"] == "SWEEP":
+            source, sens = self.measure_normal_IV(IV_parameters)
         else:
+            # MEAS_TYPE == "SPOT"
+            self.clear_buffer()
             # spot measurements
             Start = IV_parameters["START"]
             Meas_source = IV_parameters["MEAS_SOURCE"]

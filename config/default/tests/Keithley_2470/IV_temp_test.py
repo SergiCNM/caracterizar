@@ -37,6 +37,7 @@ def load_IV_parameters():
         "ROUTE_TERM": "REAR",
         "MEAS_SOURCE": "VOLT",
         "MEAS_SENSE": "CURR",
+        "MEAS_TYPE": "SWEEP",
         "SOURCE_DELAY": 1.0,
         "COUNTS": 3,
         "RES_MIN": 100.0,
@@ -73,9 +74,9 @@ def save_file(self, voltage, current, namefile):
     f.write(s1)
     f.close()
 
-def save_log_file(self, temp_value, res_value):
-    folder = os.path.join(os.getcwd(), results_dir, username, self.ui.txtProcess.text())
-    namefile = os.path.join(folder, self.ui.txtProcess.text() + ".txt").replace("\\", "/")
+def save_log_file(main, temp_value, res_value):
+    folder = os.path.join(os.getcwd(), results_dir, username, main.ui.txtProcess.text())
+    namefile = os.path.join(folder, main.ui.txtProcess.text() + ".txt").replace("\\", "/")
     print(namefile)
     today = date.today()
     now = datetime.now()
@@ -170,7 +171,7 @@ if __name__ == "__main__":
     # Single measurement, view plot
     # self.show_graph(plot_parameters)
     res_value = 10
-    save_log_file(self, actual_temp, res_value)
+    save_log_file(main, actual_temp, res_value)
 
 
     # for temp in temp_list:
