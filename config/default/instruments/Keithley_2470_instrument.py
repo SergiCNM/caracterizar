@@ -350,13 +350,13 @@ class Keithley_2470:
         else:
             self.set_range("SOUR", "VOLT", IV_parameters["RANGE"])
 
-        if IV_parameters["SENSE_COUNT"]:
+        if "SENSE_COUNT" in IV_parameters:
             self.sense_count(IV_parameters["SENSE_COUNT"])
-        if IV_parameters["SOURCE_DELAY"]:
+        if "SOURCE_DELAY" in IV_parameters:
             self.source_delay("", IV_parameters["SOURCE_DELAY"])
 
         # set dual
-        if IV_parameters["HYSTERESIS"]:
+        if "HYSTERESIS" in IV_parameters:
             self.dual = "ON"
         else:
             self.dual = "OFF"
@@ -591,25 +591,25 @@ class Keithley_2470:
         """
         self.instrument.write(":SENS:AZER:ONCE")
 
-
     def display_screen(self, screenName):
         """
         This command displays a stored screen image on the instrument's display.
         :param screenName: Name of the screen image to display.
         :return: None
         """
-        screenName_values = ["HOME", "HOME_LARG", "READ", "HIST", "SWIPE_USER", "GRAPH", "SWIPE_GRAP", "SWIPE_SETT",
-                             "SOUR", "SWIPE:STAT", "PROC"]
+        screenName_values = ["HOME", " HOME_LARGe_reading", "READing_table", "HISTogram", "SWIPE_USER", "GRAPh",
+                             "SWIPE_GRAPh", "SWIPE_SETTings",
+                             "SOURce", "SWIPE_STATistics", "PROCessing"]
         if screenName not in screenName_values:
             raise ValueError(f"Screen name {screenName} not correct ({', '.join(screenName_values)})")
-        self.instrument.write(f':DISP:SCR "{screenName}"')
+        self.instrument.write(f':DISP:SCR {screenName}')
 
     def display_graph(self):
         """
         This command displays the graph screen on the instrument's display.
         :return: None
         """
-        self.display_screen("GRAPH")
+        self.display_screen("GRAPh")
 
     def display_clear(self):
         """
@@ -635,6 +635,6 @@ class Keithley_2470:
         :param state: ON or OFF
         :return: None
         """
-        if state not in ["ON100", "ON75", "ON50", "ON25", "OFF", "BLAC"]:
+        if state not in ["ON100", "ON75", "ON50", "ON25", "OFF", "BLACkout"]:
             raise ValueError("State must be 'ON' or 'OFF'.")
-        self.instrument.write(f':DISP:LIGH:STAT {state}')
+        self.instrument.write(f':DISP:LIGHt:STATe {state}')

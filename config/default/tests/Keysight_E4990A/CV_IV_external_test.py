@@ -96,7 +96,7 @@ def config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters
 
         # Configure AC signal
         keysightE4990A.instrument.write(f':SOUR1:VOLT:LEV {CV_IV_external_parameters["OSC"] * 1e-3}')
-        
+
         # Set frequency to fixed value (convert kHz to Hz) - CW mode
         freq_hz = float(CV_IV_external_parameters["FREQ"]) * 1e3
         keysightE4990A.instrument.write(f':SENS1:FREQ:CW {freq_hz}')
@@ -134,6 +134,7 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
     try:
         start_time = time.time()
         # Trigger single measurement
+        keysightE4990A.instrument.write(':SOUR:BIAS:STAT OFF')  # Turn off Bias
         keysightE4990A.instrument.write(':TRIG:SOUR BUS')
         keysightE4990A.instrument.write(':INIT:IMM')
         keysightE4990A.instrument.write(':TRIG:SING')
@@ -141,7 +142,6 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
         # Wait for measurement to complete
         # opc = keysightE4990A.instrument.query('*OPC?')
         keysightE4990A.instrument.write('*WAI')
-
 
         # Check for errors
         error = keysightE4990A.error()
@@ -207,9 +207,13 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
     num_points = int(abs((stop - start) / step)) + 1
     voltage_steps = np.linspace(start, stop, num_points)
 
-    # Wait time before starting
-    if CV_IV_external_parameters["WAIT_TIME"] > 0:
-        time.sleep(CV_IV_external_parameters["WAIT_TIME"])
+    # Configure Keithley 2470 for voltage source mode
+    if k2470.config_IV(CV_IV_external_parameters):
+        k2470.set_voltage(start)
+        k2470.output("ON")
+    else:
+        print("Error configuring Keithley 2470")
+        return [], [], []
 
     # Light control
     if CV_IV_external_parameters["LIGHT"]:
@@ -219,12 +223,9 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
             time.sleep(CV_IV_external_parameters["LIGHT_TIME"])
             main.prober.light("0")
 
-    # Configure Keithley 2470 for voltage source mode
-    if k2470.config_IV(CV_IV_external_parameters):
-        k2470.output("ON")
-    else:
-        print("Error configuring Keithley 2470")
-        return [], [], []
+    # Wait time before starting
+    if CV_IV_external_parameters["WAIT_TIME"] > 0:
+        time.sleep(CV_IV_external_parameters["WAIT_TIME"])
 
     # Measure at each voltage step
     for voltage in voltage_steps:
@@ -232,7 +233,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
             # Set voltage on Keithley 2470
             print("Setting voltage to:", voltage)
             k2470.set_voltage(voltage)
-            
+
             # Wait for voltage to settle
             if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                 time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
@@ -240,7 +241,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
             # Measure capacitance with E4990A
             capacitance, conductance, t_meas = measure_single_capacitance(keysightE4990A, CV_IV_external_parameters)
             print("measured capacitance: ", capacitance)
-            print(f"tmeas: {t_meas*1000:.1f} ms")
+            print(f"tmeas: {t_meas * 1000:.1f} ms")
             if capacitance is not None:
                 voltage_list.append(voltage)
                 capacitance_list.append(capacitance)
@@ -261,7 +262,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
 
         # Reverse voltage steps
         voltage_steps_reverse = voltage_steps[::-1]
-        
+
         k2470.output("ON")
         for voltage in voltage_steps_reverse:
             try:
@@ -292,7 +293,9 @@ def make_compensation(main, keysightE4990A, CV_IV_external_parameters):
     :param CV_IV_external_parameters: parameters dictionary
     :return: True if successful
     """
-    retval = message_user(main, "Compensation", "Please, make OPEN compensation: remove the device from the fixture and press OK", "ok_cancel")
+    retval = message_user(main, "Compensation",
+                          "Please, make OPEN compensation: remove the device from the fixture and press OK",
+                          "ok_cancel")
     if retval != QMessageBox.Ok:
         return False
     main.updateTextDescription("Making OPEN compensation...<br />")
@@ -301,7 +304,8 @@ def make_compensation(main, keysightE4990A, CV_IV_external_parameters):
     else:
         keysightE4990A.zero_open("OFF")
     time.sleep(1)
-    retval = message_user(main, "Compensation", "Please, make SHORT compensation: short the fixture and press OK", "ok_cancel")
+    retval = message_user(main, "Compensation", "Please, make SHORT compensation: short the fixture and press OK",
+                          "ok_cancel")
     if retval != QMessageBox.Ok:
         return False
     main.updateTextDescription("Making SHORT compensation...<br />")
@@ -337,14 +341,16 @@ def make_full_compensation(main, keysightE4990A, CV_IV_external_parameters):
                 with open(filename_config, 'w', encoding='utf-8') as tomlfile:
                     toml.dump(toml_info, tomlfile)
             main.updateTextDescription("Compensation done!<br />")
-            retval = message_user(main, "Compensation done!", "Please, configure instruments for measurement, make CONTACT and press YES to continue", "yes_cancel")
+            retval = message_user(main, "Compensation done!",
+                                  "Please, configure instruments for measurement, make CONTACT and press YES to continue",
+                                  "yes_cancel")
 
 
 try:
     # Initialize instruments
     k2470 = Keithley_2470(instruments["Keithley_2470"])
     keysightE4990A = Keysight_E4990A(instruments["Keysight_E4990A"])
-    
+
     # Load parameters
     load_CV_IV_external_parameters()
 
@@ -354,7 +360,7 @@ try:
 
     if cartographic_measurement:
         if str(dieActual) == "1" and str(moduleActual) == "1":
-            retval = message_user(main, "Init instruments for CV_IV_external!", 
+            retval = message_user(main, "Init instruments for CV_IV_external!",
                                   "Please, configure instruments for initialization", "yes_cancel")
             if retval == QMessageBox.Yes:
                 test_status.status = "STARTED"
@@ -368,7 +374,7 @@ try:
             for freq in freqs:
                 load_CV_IV_external_parameters()  # Reload parameters
                 CV_IV_external_parameters["FREQ"] = str(freq)
-                
+
                 # Configure E4990A for spot measurement
                 if config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters):
                     # Measure CV curve
@@ -421,13 +427,15 @@ try:
                         }
                     }
 
-                    plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
+                    plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1][
+                        "plot_parameters"]
                     emit_plot(plot_parameters)
 
                     # Save to file
-                    namefile = main.getDirs("results") + f"/CV_IV_external{freq}kHz_{main.ui.txtProcess.text()}_{dieActual}_{moduleActual}.txt"
+                    namefile = main.getDirs(
+                        "results") + f"/CV_IV_external{freq}kHz_{main.ui.txtProcess.text()}_{dieActual}_{moduleActual}.txt"
                     main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                          headers=["V", "C", "G"], separation=",")
+                                           headers=["V", "C", "G"], separation=",")
                 else:
                     meas_status = "meas_error"
                     meas_message = "Error configuring E4990A"
@@ -436,12 +444,12 @@ try:
         # Single measurement mode
         # Make compensation
         make_full_compensation(main, keysightE4990A, CV_IV_external_parameters)
-        
+
         # Measure for each frequency
         for freq in freqs:
             load_CV_IV_external_parameters()
             CV_IV_external_parameters["FREQ"] = str(freq)
-            
+
             if config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters):
                 voltage, capacitance, conductance = measure_CV_IV_external(
                     main, k2470, keysightE4990A, CV_IV_external_parameters)
@@ -472,13 +480,14 @@ try:
                     }
 
                     emit_plot(plot_parameters)
-                    
+
                     # Save to file
                     dieActual = 1
                     moduleActual = 1
-                    namefile = main.getDirs("results") + f"/CV_IV_external{freq}kHz_{main.ui.txtProcess.text()}_single.txt"
+                    namefile = main.getDirs(
+                        "results") + f"/CV_IV_external{freq}kHz_{main.ui.txtProcess.text()}_single.txt"
                     main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                          headers=["V", "C", "G"], separation=",")
+                                           headers=["V", "C", "G"], separation=",")
 
     # Stop and close instruments
     k2470.stop()
@@ -487,7 +496,9 @@ try:
 
 except:
     import sys
-    message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<", "").replace(">", "") + " occurred. " + str(sys.exc_info()[1])
+
+    message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<", "").replace(">", "") + " occurred. " + str(
+        sys.exc_info()[1])
     main.updateTextDescription(message, "ERROR")
     message_user(main, "ERROR", message, "ok_error")
 

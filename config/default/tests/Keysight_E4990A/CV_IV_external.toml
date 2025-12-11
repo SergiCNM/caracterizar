@@ -3,8 +3,8 @@ width = 350
 
 [parameters]
 START = 0.0
-STOP = -40.0
-STEP = 1.0
+STOP = -50.0
+STEP = -1.0
 FREQ = "100"
 OSC = 500
 APERTURE = "3"
@@ -14,13 +14,15 @@ SWEEP_AVERAGE = false
 AVERAGE_SWEEPS = 8
 HYSTERESIS = false
 HYSTERESIS_TIME = 1
-WAIT_TIME = 0.5
+WAIT_TIME = 5.0
 SETTLE_TIME = 0.1
 LIGHT = false
 LIGHT_TIME = 3
-COMPLIANCE = 0.01
-RANGE = "AUTO"
+COMPLIANCE = -1.99
+RANGE = "200"
 ROUTE_TERM = "REAR"
+SOURCE_DELAY = 1.0
+SENSE_COUNT = 3
 COMPENSATION_OPEN = false
 COMPENSATION_SHORT = false
 COMPENSATION_DONE = true
@@ -47,6 +49,7 @@ SETTLE_TIME = "s"
 LIGHT_TIME = "s"
 COMPLIANCE = "mA"
 RANGE = "V"
+SOURCE_DELAY = "s"
 
 [help]
 START = "Start voltage from -40V to 40V"
@@ -73,3 +76,5 @@ COMPENSATION_SHORT = "Compensate for short circuit"
 COMPENSATION_DONE = "Compensations done"
 GRAPH1 = "Parameter 1 to measure (CS or CP)"
 GRAPH2 = "Parameter 2 to measure (NONE or G)"
+SOURCE_DELAY = "Source delay"
+SENSE_COUNT = "Number of measurements to make when a measurement is requested"
