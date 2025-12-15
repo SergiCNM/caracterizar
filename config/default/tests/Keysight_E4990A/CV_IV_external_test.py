@@ -117,13 +117,26 @@ def config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters
         keysightE4990A.instrument.write(':SOUR:BIAS:VOLT 0')
         keysightE4990A.instrument.write(':SOUR:BIAS:STAT OFF')
 
+        # Trigger y modo de adquisición
+        keysightE4990A.instrument.write(':TRIG:SOUR BUS')
+        keysightE4990A.instrument.write(':INIT:CONT OFF')
+
+        # Selección de parámetros (UNA VEZ)
+        keysightE4990A.instrument.write(':CALC1:PAR1:SEL')  # CP
+        if CV_IV_external_parameters["GRAPH2"] != "NONE":
+            keysightE4990A.instrument.write(':CALC1:PAR2:SEL')  # G
+
+        # Formato rápido (mejor incluso binario, pero dejo ASCII por ahora)
+        keysightE4990A.instrument.write(':FORM:DATA ASC')
+        keysightE4990A.instrument.write(':FORM:REAL:ASC:LENG 12')
+
         return True
     except Exception as ex:
         print(f"Error configuring E4990A: {ex}")
         return False
 
 
-def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
+def measure_single_capacitance_old(keysightE4990A, CV_IV_external_parameters):
     """
     Measure single capacitance value at current voltage (set by external source)
     Read the last measured point from continuous measurement
@@ -134,9 +147,7 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
     try:
         start_time = time.time()
         # Trigger single measurement
-        keysightE4990A.instrument.write(':SOUR:BIAS:STAT OFF')  # Turn off Bias
-        keysightE4990A.instrument.write(':TRIG:SOUR BUS')
-        keysightE4990A.instrument.write(':INIT:IMM')
+
         keysightE4990A.instrument.write(':TRIG:SING')
 
         # Wait for measurement to complete
@@ -178,7 +189,33 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
 
     except Exception as ex:
         print(f"Error measuring capacitance: {ex}")
-        return None, None
+        return None, None, None
+
+def measure_single_capacitance(keysightE4990A, measure_G=True):
+    try:
+        t0 = time.time()
+
+        # Disparo de una única medida
+        keysightE4990A.instrument.write(':TRIG:SING')
+        keysightE4990A.instrument.write('*WAI')
+
+        # Leer CP
+        r1 = keysightE4990A.instrument.query(':CALC1:PAR1:DATA:FDAT?')
+        cap = float(r1.split(',')[0])
+
+        # Leer G
+        if measure_G:
+            r2 = keysightE4990A.instrument.query(':CALC1:PAR2:DATA:FDAT?')
+            cond = float(r2.split(',')[0])
+        else:
+            cond = 0.0
+
+        elapsed = time.time() - t0
+        return cap, cond, elapsed
+
+    except Exception as ex:
+        print("Error measuring:", ex)
+        return None, None, None
 
 
 def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameters):
