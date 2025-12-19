@@ -153,6 +153,7 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
     :return: voltage, capacitance, conductance lists
     """
     voltage_list = []
+    current_list = []
     capacitance_list = []
     conductance_list = []
     print("measuring CV_IV_external with HP_4192A...")
@@ -206,6 +207,9 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
             if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                 time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
+            # Measure current with Keithley 2470
+            current = k2470.measure_current_once()
+
             # Measure capacitance with HP_4192A
             capacitance, conductance, t_meas = measure_single_capacitance(
                 hp4192A, CV_IV_external_parameters
@@ -213,8 +217,9 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
             print("measured capacitance: ", capacitance)
             if t_meas is not None:
                 print(f"tmeas: {t_meas * 1000:.1f} ms")
-            if capacitance is not None:
+            if capacitance is not None and current is not None:
                 voltage_list.append(voltage)
+                current_list.append(current)
                 capacitance_list.append(capacitance)
                 conductance_list.append(conductance)
             else:
@@ -241,12 +246,16 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
                 if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                     time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
+                # Measure current with Keithley 2470
+                current = k2470.measure_current_once()
+
                 capacitance, conductance, _ = measure_single_capacitance(
                     hp4192A, CV_IV_external_parameters
                 )
 
-                if capacitance is not None:
+                if capacitance is not None and current is not None:
                     voltage_list.append(voltage)
+                    current_list.append(current)
                     capacitance_list.append(capacitance)
                     conductance_list.append(conductance)
 
@@ -255,7 +264,7 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
 
         k2470.output("OFF")
 
-    return voltage_list, capacitance_list, conductance_list
+    return voltage_list, current_list, capacitance_list, conductance_list
 
 
 def make_compensation(main, hp4192A, CV_IV_external_parameters):
@@ -365,7 +374,7 @@ try:
                 # Configure HP_4192A for spot measurement
                 if config_HP4192A_for_spot_measurement(hp4192A, CV_IV_external_parameters):
                     # Measure CV curve
-                    voltage, capacitance, conductance = measure_CV_IV_external(
+                    voltage, current, capacitance, conductance = measure_CV_IV_external(
                         main, k2470, hp4192A, CV_IV_external_parameters
                     )
 
@@ -378,6 +387,7 @@ try:
 
                     # Convert to numpy arrays for easier manipulation
                     voltage = np.array(voltage)
+                    current = np.array(current)
                     capacitance = np.array(capacitance)
                     conductance = np.array(conductance)
 
@@ -390,6 +400,7 @@ try:
                             "params": [],
                             "data": [
                                 {"name": "V", "values": voltage.tolist(), "units": "V"},
+                                {"name": "I", "values": current.tolist(), "units": "A"},
                                 {"name": "C", "values": (capacitance * 1e12).tolist(), "units": "pF"},
                                 {"name": "G", "values": (conductance * 1e9).tolist(), "units": "nS"},
                             ],
@@ -427,8 +438,8 @@ try:
                     )
                     main.save_lists_to_txt(
                         namefile=namefile,
-                        var_list=[voltage, capacitance, conductance],
-                        headers=["V", "C", "G"],
+                        var_list=[voltage, current, capacitance, conductance],
+                        headers=["V", "I", "C", "G"],
                         separation=",",
                     )
                 else:
@@ -446,12 +457,13 @@ try:
             CV_IV_external_parameters["FREQ"] = str(freq)
 
             if config_HP4192A_for_spot_measurement(hp4192A, CV_IV_external_parameters):
-                voltage, capacitance, conductance = measure_CV_IV_external(
+                voltage, current, capacitance, conductance = measure_CV_IV_external(
                     main, k2470, hp4192A, CV_IV_external_parameters
                 )
 
                 if len(voltage) > 0:
                     voltage = np.array(voltage)
+                    current = np.array(current)
                     capacitance = np.array(capacitance)
                     conductance = np.array(conductance)
 
@@ -486,8 +498,8 @@ try:
                     )
                     main.save_lists_to_txt(
                         namefile=namefile,
-                        var_list=[voltage, capacitance, conductance],
-                        headers=["V", "C", "G"],
+                        var_list=[voltage, current, capacitance, conductance],
+                        headers=["V", "I", "C", "G"],
                         separation=",",
                     )
 

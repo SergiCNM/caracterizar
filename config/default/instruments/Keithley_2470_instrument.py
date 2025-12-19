@@ -424,6 +424,23 @@ class Keithley_2470:
         cmd = f":SOUR:VOLT {voltage}"
         self.instrument.write(cmd)
 
+    def measure_current_once(self):
+        """
+        Perform a single current measurement with the present source settings.
+        Uses MEAS:CURR? and returns the measured current in Amps.
+        """
+        try:
+            # Ensure we are measuring current on the sense side
+            # self.set_function("SENSE", "CURR")
+            # Trigger a single current measurement
+            reading = self.instrument.query(":MEAS:CURR?")
+            # MEAS can return multiple elements depending on format; take first value
+            parts = reading.strip().split(",")
+            return float(parts[0])
+        except Exception as ex:
+            print(f"Error in measure_current_once: {ex}")
+            return None
+
     def get_error_count(self):
         return self.instrument.query(":SYST:ERR:COUN?")
 
