@@ -119,16 +119,7 @@ def config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters
 
         # Trigger y modo de adquisición
         keysightE4990A.instrument.write(':TRIG:SOUR BUS')
-        keysightE4990A.instrument.write(':INIT:CONT OFF')
-
-        # Selección de parámetros (UNA VEZ)
-        keysightE4990A.instrument.write(':CALC1:PAR1:SEL')  # CP
-        if CV_IV_external_parameters["GRAPH2"] != "NONE":
-            keysightE4990A.instrument.write(':CALC1:PAR2:SEL')  # G
-
-        # Formato rápido (mejor incluso binario, pero dejo ASCII por ahora)
-        keysightE4990A.instrument.write(':FORM:DATA ASC')
-        keysightE4990A.instrument.write(':FORM:REAL:ASC:LENG 12')
+        keysightE4990A.instrument.write(':INIT:CONT ON')
 
         return True
     except Exception as ex:
@@ -191,7 +182,7 @@ def measure_single_capacitance_old(keysightE4990A, CV_IV_external_parameters):
         print(f"Error measuring capacitance: {ex}")
         return None, None, None
 
-def measure_single_capacitance(keysightE4990A, measure_G=True):
+def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
     try:
         t0 = time.time()
 
@@ -199,19 +190,32 @@ def measure_single_capacitance(keysightE4990A, measure_G=True):
         keysightE4990A.instrument.write(':TRIG:SING')
         keysightE4990A.instrument.write('*WAI')
 
-        # Leer CP
-        r1 = keysightE4990A.instrument.query(':CALC1:PAR1:DATA:FDAT?')
-        cap = float(r1.split(',')[0])
+        # Read capacitance (PAR1) - read last point
+        keysightE4990A.instrument.write(':CALC1:PAR1:SEL')
+        keysightE4990A.instrument.write(':FORM:DATA ASC')
+        keysightE4990A.instrument.write(':FORM:REAL:ASC:LENG 12')
+        r1 = keysightE4990A.instrument.query(':CALC1:SEL:DATA:FDAT?')
+        ra1 = np.fromstring(r1, sep=',')
 
-        # Leer G
-        if measure_G:
-            r2 = keysightE4990A.instrument.query(':CALC1:PAR2:DATA:FDAT?')
-            cond = float(r2.split(',')[0])
+        # Read conductance (PAR2) - read last point
+        if CV_IV_external_parameters["GRAPH2"] != "NONE":
+            keysightE4990A.instrument.write(':CALC1:PAR2:SEL')
+            keysightE4990A.instrument.write(':FORM:DATA ASC')
+            keysightE4990A.instrument.write(':FORM:REAL:ASC:LENG 12')
+            r2 = keysightE4990A.instrument.query(':CALC1:SEL:DATA:FDAT?')
+            ra2 = np.fromstring(r2, sep=',')
+            # Data format: real, imag for each point - get first point real part
+            conductance = ra2[0] if len(ra2) > 0 else 0.0
         else:
-            cond = 0.0
+            conductance = 0.0
+
+        # Data format: real, imag - get real part of capacitance
+        capacitance = ra1[0] if len(ra1) > 0 else None
+
 
         elapsed = time.time() - t0
-        return cap, cond, elapsed
+        return capacitance, conductance, elapsed
+
 
     except Exception as ex:
         print("Error measuring:", ex)
@@ -245,6 +249,10 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
     voltage_steps = np.linspace(start, stop, num_points)
 
     # Configure Keithley 2470 for voltage source mode
+    compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
+    print("set compliance:", str(compliance))
+    k2470.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
+
     if k2470.config_IV(CV_IV_external_parameters):
         k2470.set_voltage(start)
         k2470.output("ON")
@@ -275,6 +283,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
             if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                 time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
+            print("Measure single capacitance...")
             # Measure capacitance with E4990A
             capacitance, conductance, t_meas = measure_single_capacitance(keysightE4990A, CV_IV_external_parameters)
             print("measured capacitance: ", capacitance)

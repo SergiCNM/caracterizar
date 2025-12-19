@@ -49,8 +49,6 @@ class HP_4192A:
 		time.sleep(1)
 		self.instrument.write('T1')
 
-
-
 	def config_CV(self,CV_parameters):
 		# CV_parameters dictionary with:
 		# "START" (V) (from -35 to 35), "STOP"(V), "STEP" (V) (from 0.01 to 5V), "OSC" (mV from 5 to 1100), "FREQ" (kHz from 0.005 to 13000), 
@@ -156,6 +154,108 @@ class HP_4192A:
 
 		return True
 
+	def config_CV_spot(self, CV_parameters):
+		# CV_parameters dictionary with:
+		# "START" (V) (from -35 to 35), "STOP"(V), "STEP" (V) (from 0.01 to 5V), "OSC" (mV from 5 to 1100), "FREQ" (kHz from 0.005 to 13000),
+		# Optional: "CIRCUIT_MODE" (Series/Paralell), "AVERAGE" (True/False)
+
+		# FIRST CHECK PARAMETERS
+		if "START" in CV_parameters and "STOP" in CV_parameters and "STEP" in CV_parameters and "OSC" in CV_parameters and "FREQ" in CV_parameters:
+			# parameters passed
+			if -35 <= CV_parameters["START"] <= 35:
+				if -35 <= CV_parameters["STOP"] <= 35:
+					if 0.001 <= CV_parameters["STEP"] <= 5 or -5 <= CV_parameters["STEP"] <= -0.001:
+						if 5 <= CV_parameters["OSC"] <= 1100:
+							if not 0.005 <= CV_parameters["FREQ"] <= 13000:
+								print("FREQUENCY not in range (0.005kHz, 13000kHz): " + str(CV_parameters["FREQ"]))
+								return False
+						else:
+							print("OSCILLATION LEVEL not in range (5mV, 1100mv): " + str(CV_parameters["OSC"]))
+							return False
+					else:
+						print("STEP VOLTAGE not in range (0.001V, 5V): " + str(CV_parameters["STEP"]))
+						return False
+
+				else:
+					print("STOP BIAS not in range (-35V, 35V): " + str(CV_parameters["STOP"]))
+					return False
+			else:
+				print("START BIAS not in range (-35V, 35V): " + str(CV_parameters["START"]))
+				return False
+		else:
+			print("Parameters config CV not passed!")
+			return False
+		PN = -1
+		if CV_parameters["START"] > CV_parameters["STOP"]:
+			PN = 1
+		# ------------
+		# CIRCUIT MODE
+		# ------------
+		circuit_mode = "C1"
+		if "CIRCUIT_MODE" in CV_parameters:
+			if CV_parameters["CIRCUIT_MODE"] == "Parallel":
+				circuit_mode = "C3"
+			if CV_parameters["CIRCUIT_MODE"] == "Series":
+				circuit_mode = "C2"
+
+		# --------
+		# DISPLAY
+		# --------
+		cmd = "A4 B3 " + circuit_mode + " F1"  # A4: Display A = C, B3: Display B = R/G, F1: Display A/B/C
+		self.instrument.write(cmd)
+		# -----------------
+		# OSCILLATION LEVEL
+		# -----------------
+		oscillation_level = float(CV_parameters["OSC"] / 1000)
+		cmd = "OL" + str(oscillation_level).replace(",", ".") + "EN"
+		self.instrument.write(cmd)
+		# ---------
+		# FREQUENCY
+		# ---------
+		freq = CV_parameters["FREQ"]
+		cmd = "FR" + str(freq).replace(",", ".") + "EN"
+		self.instrument.write(cmd)
+
+		# ---------
+		# AVERAGE (normally off - V0)
+		# ---------
+		if "AVERAGE" in CV_parameters:
+			if CV_parameters["AVERAGE"]:
+				self.average("ON")
+			else:
+				self.average("OFF")
+		else:
+			self.average("OFF")  # default OFF
+		# ---------
+		# STEP BIAS
+		# ---------
+		step_bias = abs(CV_parameters["STEP"])  # always positive
+		cmd = "SB" + str(step_bias).replace(",", ".") + "EN"
+		self.instrument.write(cmd)
+		# -----------------
+		# START & STOP BIAS
+		# -----------------
+		start_bias = CV_parameters["START"]
+		stop_bias = CV_parameters["STOP"]
+		if stop_bias < start_bias:
+			cmd = "TB" + str(stop_bias).replace(",", ".") + "EN"
+			self.instrument.write(cmd)
+			cmd = "PB" + str(start_bias).replace(",", ".") + "EN"
+			self.instrument.write(cmd)
+			AUTO_SWEEP = "W4"
+		else:
+			cmd = "TB" + str(start_bias).replace(",", ".") + "EN"
+			self.instrument.write(cmd)
+			cmd = "PB" + str(stop_bias).replace(",", ".") + "EN"
+			self.instrument.write(cmd)
+			AUTO_SWEEP = "W2"
+
+		cmd = "AB W1 T3"  # AB: sweep abort, W1: sweep auto, T3: TRIGGER HOLD/MANUAL
+		self.instrument.write(cmd)
+		#cmd = AUTO_SWEEP
+		#self.instrument.write(cmd)
+
+		return True
 
 	def config_CW(self,CW_parameters):
 		# CW_parameters dictionary with:

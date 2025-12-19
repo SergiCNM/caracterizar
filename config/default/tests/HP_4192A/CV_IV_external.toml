@@ -3,9 +3,9 @@ width = 350
 
 [parameters]
 START = 0.0
-STOP = -50.0
+STOP = -500.0
 STEP = -1.0
-FREQ = "100"
+FREQ = "10"
 OSC = 500
 APERTURE = "3"
 POINT_AVERAGE = false
@@ -15,11 +15,11 @@ AVERAGE_SWEEPS = 8
 HYSTERESIS = false
 HYSTERESIS_TIME = 1
 WAIT_TIME = 5.0
-SETTLE_TIME = 0.1
+SETTLE_TIME = 1.0
 LIGHT = false
 LIGHT_TIME = 3
-COMPLIANCE = -1.99
-RANGE = "200"
+COMPLIANCE = 0.1
+RANGE = "1000"
 ROUTE_TERM = "REAR"
 SOURCE_DELAY = 1.0
 SENSE_COUNT = 3
@@ -78,5 +78,3 @@ GRAPH1 = "Parameter 1 to measure (CS or CP)"
 GRAPH2 = "Parameter 2 to measure (NONE or G)"
 SOURCE_DELAY = "Source delay"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"
-
-

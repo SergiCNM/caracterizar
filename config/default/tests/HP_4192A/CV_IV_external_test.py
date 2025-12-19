@@ -101,7 +101,7 @@ def config_HP4192A_for_spot_measurement(hp4192A, CV_IV_external_parameters):
         # Configure the instrument using its existing CV configuration method
         # Even though START/STOP/STEP define an internal sweep, we will only
         # trigger single measurements at the currently applied external bias.
-        if not hp4192A.config_CV(cv_params):
+        if not hp4192A.config_CV_spot(cv_params):
             return False
 
         return True
@@ -125,6 +125,7 @@ def measure_single_capacitance(hp4192A, CV_IV_external_parameters):
         hp4192A.single()
         lectura = hp4192A.read()
         lectura_array = lectura.split(",")
+        print("lectura_array:", lectura_array)
 
         # Expected format similar to CV_test: "Cxxx,...", "R/Gxxx,...", "Vxxx..."
         capacitance_value = lectura_array[0][4:]
@@ -168,6 +169,11 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
 
     num_points = int(abs((stop_v - start_v) / step_v)) + 1
     voltage_steps = np.linspace(start_v, stop_v, num_points)
+
+    # Configure Keithley 2470 for voltage source mode
+    compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
+    print("set compliance:", str(compliance))
+    k2470.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
 
     # Configure Keithley 2470 for voltage source mode
     if k2470.config_IV(CV_IV_external_parameters):
