@@ -1,0 +1,58 @@
+title = "IV_ring parameters"
+
+[parameters]
+START = 0.0
+STOP = -25.0
+STEP = -5.0
+COMPLIANCE = 0.01
+HYSTERESIS = false
+WAIT_TIME = 0.0
+LIGHT = false
+LIGHT_TIME = 3.0
+RANGE = "1000"
+ROUTE_TERM = "REAR"
+MEAS_SOURCE = "VOLT"
+MEAS_SENSE = "CURR"
+SOURCE_DELAY = 1.0
+SENSE_COUNT = 3
+RES_MIN = 100.0
+RES_MAX = 120.0
+DISPLAY_GRAPH = true
+
+[options]
+RANGE = "AUTO,0.2,2,20,200,1000"
+ROUTE_TERM = "FRONT,REAR"
+MEAS_SOURCE = "VOLT,CURR"
+MEAS_SENSE = "CURR,RES"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+COMPLIANCE = "mA"
+WAIT_TIME = "s"
+LIGHT_TIME = "s"
+RANGE = "V"
+SOURCE_DELAY = "s"
+RES_MIN = "Ohm"
+RES_MAX = "Ohm"
+
+[help]
+START = "Start voltage"
+STOP = "Stop voltage"
+STEP = "Voltage step"
+COMPLIANCE = "Current compliance (applies to both pad and ring)"
+HYSTERESIS = "Enable hysteresis (dual)"
+WAIT_TIME = "Time to wait after setting voltage"
+LIGHT = "Enable light"
+LIGHT_TIME = "Time to wait after turning on light"
+RANGE = "Measurement range (applies to both pad and ring)"
+ROUTE_TERM = "Measurement terminal (applies to both pad and ring)"
+MEAS_SOURCE = "Measurement source"
+MEAS_SENSE = "Measurement sense"
+SOURCE_DELAY = "Source delay"
+SENSE_COUNT = "Number of measurements to make when a measurement is requested"
+RES_MIN = "Minimum resistance for resistance measurement (applies to both pad and ring)"
+RES_MAX = "Maximum resistance for resistance measurement (applies to both pad and ring)"
+DISPLAY_GRAPH = "Display graph after measurement"
+

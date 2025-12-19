@@ -43,6 +43,18 @@ rangeType = "BEST"
 failAbort = "OFF"
 bufferName = "defbuffer1"
 
+[Keithley_2470_ring]
+address = "GPIB0::5::INSTR"
+read_termination = "\n"
+write_termination = "\n"
+timeout = 50000
+chunk_size = 20480
+delay = 0.1
+count = 3
+rangeType = "BEST"
+failAbort = "OFF"
+bufferName = "defbuffer1"
+
 [DEEPDETECTION_LINDA]
 address = "FPGA"
 read_termination = ""
