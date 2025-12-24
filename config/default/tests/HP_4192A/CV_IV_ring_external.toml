@@ -78,4 +78,3 @@ GRAPH1 = "Parameter 1 to measure (CS or CP)"
 GRAPH2 = "Parameter 2 to measure (NONE or G)"
 SOURCE_DELAY = "Source delay"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"
-

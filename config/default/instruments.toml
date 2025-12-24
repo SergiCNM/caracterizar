@@ -2,7 +2,7 @@
 address = "GPIB0::23::INSTR"
 read_termination = "\r\n"
 write_termination = "\r\n"
-timeout = 20000
+timeout = 5000
 
 [HP_4155B]
 address = "GPIB0::17::INSTR"
@@ -43,8 +43,9 @@ rangeType = "BEST"
 failAbort = "OFF"
 bufferName = "defbuffer1"
 
-[Keithley_2470_ring]
-address = "GPIB0::5::INSTR"
+[Keithley_2470ring]
+driver = "Keithley_2470"
+address = "GPIB0::26::INSTR"
 read_termination = "\n"
 write_termination = "\n"
 timeout = 50000
@@ -80,6 +81,11 @@ write_termination = "\n"
 timeout = 40000
 
 [Keithley_2470.options]
+rangeType = "AUTO,BEST,FIXed"
+failAbort = "ON,OFF"
+bufferName = "defbuffer1,defbuffer2"
+
+[Keithley_2470ring.options]
 rangeType = "AUTO,BEST,FIXed"
 failAbort = "ON,OFF"
 bufferName = "defbuffer1,defbuffer2"

@@ -168,7 +168,7 @@ if __name__ == "__main__":
         load_IV_ring_parameters()
         instruments = load_toml_config("instruments.toml")
         k2470_pad = Keithley_2470(instruments["Keithley_2470"])
-        k2470_ring = Keithley_2470(instruments["Keithley_2470_ring"])
+        k2470_ring = Keithley_2470(instruments["Keithley_2470ring"])
         
         if cartographic_measurement:
             if str(dieActual)=="1" and str(moduleActual) == "1":

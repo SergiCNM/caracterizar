@@ -2,11 +2,11 @@ title = "IV_ring parameters"
 
 [parameters]
 START = 0.0
-STOP = -25.0
+STOP = -500.0
 STEP = -5.0
-COMPLIANCE = 0.01
-HYSTERESIS = false
-WAIT_TIME = 0.0
+COMPLIANCE = 0.1
+HYSTERESIS = true
+WAIT_TIME = 5.0
 LIGHT = false
 LIGHT_TIME = 3.0
 RANGE = "1000"
@@ -55,4 +55,3 @@ SENSE_COUNT = "Number of measurements to make when a measurement is requested"
 RES_MIN = "Minimum resistance for resistance measurement (applies to both pad and ring)"
 RES_MAX = "Maximum resistance for resistance measurement (applies to both pad and ring)"
 DISPLAY_GRAPH = "Display graph after measurement"
-

@@ -361,7 +361,7 @@ def make_full_compensation(main, hp4192A, CV_IV_ring_external_parameters):
 try:
     # Initialize instruments
     k2470_pad = Keithley_2470(instruments["Keithley_2470"])
-    k2470_ring = Keithley_2470(instruments["Keithley_2470_ring"])
+    k2470_ring = Keithley_2470(instruments["Keithley_2470ring"])
     hp4192A = HP_4192A(instruments["HP_4192A"])
 
     # Load parameters
@@ -520,6 +520,7 @@ try:
                         main.getDirs("results")
                         + f"/CV_IV_ring_external_HP_4192A_{freq}kHz_{main.ui.txtProcess.text()}_single.txt"
                     )
+                    print(f"Namefile: {namefile}")
                     main.save_lists_to_txt(
                         namefile=namefile,
                         var_list=[voltage, current_pad, current_ring, capacitance, conductance],

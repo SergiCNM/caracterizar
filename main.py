@@ -2862,8 +2862,15 @@ class MainWindow(QMainWindow):
         self.progress_timer.timeout.connect(lambda: self.on_idn_timeout(instrument_name))
         self.progress_timer.start(self.progress_timeout_ms)
 
+        # check if driver is in instruments[instrument_name]
+        instrument_name_worker = instrument_name
+        if "driver" in instruments[instrument_name]:
+            instrument_name_worker = instruments[instrument_name]["driver"]
+
+        print(f"Instrument_name_worker: {instrument_name_worker}")
+
         # Crear hilo para ejecutar el IDN
-        self.idn_thread = IDNWorker(instrument_name, instruments[instrument_name], False)
+        self.idn_thread = IDNWorker(instrument_name_worker, instruments[instrument_name], False)
         self.idn_thread.finished.connect(self.on_idn_finished)
         self.idn_thread.start()
 
@@ -3307,7 +3314,7 @@ class MainWindow(QMainWindow):
                 widgets.cmbProbers.addItem(fichero.replace("_prober.py", ""))
                 widgets.cmbProbers_2.addItem(fichero.replace("_prober.py", ""))
 
-    def load_instruments(self):
+    def load_instruments_old(self):
         global widgets
         dir_instruments = self.getDirs("instruments") + "/"
         contenido = os.listdir(dir_instruments)
@@ -3319,6 +3326,30 @@ class MainWindow(QMainWindow):
             if os.path.isfile(os.path.join(dir_instruments, fichero)) and fichero.endswith('_instrument.py'):
                 widgets.cmbInstruments.addItem(fichero.replace("_instrument.py", ""))
                 widgets.cmbInstruments_2.addItem(fichero.replace("_instrument.py", ""))
+
+    def is_real_instrument(self, cfg: dict) -> bool:
+        return "address" in cfg or "port" in cfg
+
+    def load_instruments(self):
+        global widgets, instruments
+
+        widgets.cmbInstruments.clear()
+        widgets.cmbInstruments_2.clear()
+
+        widgets.cmbInstruments.addItem("Select instrument")
+        widgets.cmbInstruments_2.addItem("Select instrument")
+
+        for name, cfg in instruments.items():
+            if not self.is_real_instrument(cfg):
+                continue
+
+            widgets.cmbInstruments.addItem(name)
+            widgets.cmbInstruments_2.addItem(name)
+
+    def reload_instruments(self):
+        global instruments
+        instruments = load_toml_config("instruments.toml")
+        self.load_instruments()
 
     def load_tests(self):
         global widgets
