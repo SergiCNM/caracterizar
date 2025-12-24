@@ -1,11 +1,11 @@
 # Test IV_ring in two Keithley 2470 instruments
 import os.path
-import sys
 from config.default.instruments import Keithley_2470
 from config.default.devices import *
 from config.functions import *
 from PySide6.QtWidgets import QMessageBox
 import toml, time
+import numpy as np
 
 global test_status, measurement_status
 global dieActual, moduleActual
@@ -20,7 +20,6 @@ def load_IV_ring_parameters():
     """
     global IV_ring_parameters
 
-    import json
     # default values (same as IV_test)
     IV_ring_parameters = {
         "START": 1,
@@ -74,19 +73,35 @@ def save_file(main, voltage, current_pad, current_ring, resistance_pad, resistan
     f.write(s1)
     f.close()
 
-def measure_IV_ring(IV_ring_parameters, k2470_pad, k2470_ring):
-    # create empty list if not exists
-    voltage_pad, current_pad, voltage_ring, current_ring = [], [], [], []
-    resistance_pad, resistance_ring = [], []
-    
+def measure_IV_ring(k2470_pad, k2470_ring, IV_ring_parameters, main):
+    voltage_list = []
+    current_pad_list = []
+    current_ring_list = []
+    resistance_pad = []
+    resistance_ring = []
+
+    start = IV_ring_parameters["START"]
+    stop = IV_ring_parameters["STOP"]
+    step = abs(IV_ring_parameters["STEP"])
+    delay = IV_ring_parameters.get("SOURCE_DELAY", 0.1)
+
+    if start > stop:
+        step = -step
+
+    npts = int(abs((stop - start) / step)) + 1
+    voltages = np.linspace(start, stop, npts)
+
+    # Enable outputs
+    k2470_pad.set_voltage(start)
+    k2470_ring.set_voltage(start)
+    k2470_pad.output("ON")
+    k2470_ring.output("ON")
+
+    # Optional wait time before sweep
     if IV_ring_parameters["WAIT_TIME"] > 0:
-        # put start voltage in both keithley 2470
-        k2470_pad.set_voltage(IV_ring_parameters["START"])
-        k2470_ring.set_voltage(IV_ring_parameters["START"])
-        # output voltage ON
-        k2470_pad.output("ON")
-        k2470_ring.output("ON")
         time.sleep(IV_ring_parameters["WAIT_TIME"])
+
+    # light time wait
     if IV_ring_parameters["LIGHT"]:
         # prober is not initialized when you select single measurement
         main.init_prober()
@@ -95,32 +110,42 @@ def measure_IV_ring(IV_ring_parameters, k2470_pad, k2470_ring):
             time.sleep(IV_ring_parameters["LIGHT_TIME"])
             main.prober.light("0")
 
-    # measure both SMUs with the same sweep parameters
-    if k2470_pad.config_IV(IV_ring_parameters) and k2470_ring.config_IV(IV_ring_parameters):
-        voltage_pad, current_pad = k2470_pad.measure_normal_IV(IV_ring_parameters)
-        voltage_ring, current_ring = k2470_ring.measure_normal_IV(IV_ring_parameters)
-    
-    # convert current to float
-    current_pad_float = list(map(float, current_pad))
-    current_ring_float = list(map(float, current_ring))
-    
-    # get resistance for pad
-    for i in range(0, len(current_pad_float)):
-        if current_pad_float[i] != 0:
-            resistance_pad.append(float(voltage_pad[i]) / current_pad_float[i])
-        else:
-            resistance_pad.append(0)
-    
-    # get resistance for ring
-    for i in range(0, len(current_ring_float)):
-        if current_ring_float[i] != 0:
-            resistance_ring.append(float(voltage_ring[i]) / current_ring_float[i])
-        else:
-            resistance_ring.append(0)
-    
-    # Both should have the same voltage values (same sweep), use pad voltage
-    return [voltage_pad, current_pad_float, current_ring_float, resistance_pad, resistance_ring]
+    for V in voltages:
+        try:
+            # Apply same voltage to both SMUs
+            k2470_pad.set_voltage(V)
+            k2470_ring.set_voltage(V)
 
+            time.sleep(delay)
+
+            # Measure currents
+            I_pad = float(k2470_pad.measure_current_once())
+            I_ring = float(k2470_ring.measure_current_once())
+
+            voltage_list.append(V)
+            current_pad_list.append(I_pad)
+            current_ring_list.append(I_ring)
+
+            # Resistance (avoid division by zero)
+            resistance_pad.append(V / I_pad if I_pad != 0 else 0.0)
+            resistance_ring.append(V / I_ring if I_ring != 0 else 0.0)
+
+
+        except Exception as ex:
+            print(f"Error at V={V}: {ex}")
+            break
+
+    # Disable outputs
+    k2470_pad.output("OFF")
+    k2470_ring.output("OFF")
+
+    return (
+        voltage_list,
+        current_pad_list,
+        current_ring_list,
+        resistance_pad,
+        resistance_ring,
+    )
 
 def get_plot_parameters(voltage, current_pad, current_ring):
     """
@@ -176,6 +201,9 @@ if __name__ == "__main__":
                                       "Please, configure instruments for initialization",
                                       "yes_cancel")
                 if retval == QMessageBox.Yes:
+                    if not (k2470_pad.config_IV(IV_ring_parameters) and
+                            k2470_ring.config_IV(IV_ring_parameters)):
+                        raise RuntimeError("Error configuring Keithley 2470 instruments")
                     test_status.status = "STARTED"
                 else:
                     test_status.status = "ABORTED"
@@ -184,7 +212,8 @@ if __name__ == "__main__":
             if test_status.status == "STARTED":
                 # measure IV_ring
                 time.sleep(1)
-                voltage, current_pad, current_ring, resistance_pad, resistance_ring = measure_IV_ring(IV_ring_parameters, k2470_pad, k2470_ring)
+                voltage, current_pad, current_ring, resistance_pad, resistance_ring = \
+                    measure_IV_ring(k2470_pad, k2470_ring, IV_ring_parameters, main)
 
                 # error in measurement if error counts >0
                 meas_status = "meas_error"
@@ -193,8 +222,8 @@ if __name__ == "__main__":
                 current_pad_end = float(current_pad[len(current_pad)-1])
                 current_ring_end = float(current_ring[len(current_ring)-1])
                 
-                # Check if both measurements reached stop voltage
-                if float(IV_ring_parameters["STOP"]) == voltage_end:
+                # Check if both measurements reached stop voltage (within a small tolerance)
+                if abs(float(IV_ring_parameters["STOP"]) - voltage_end) < 1e-6:
                     meas_status = "meas_success" # if reach the stop voltage
                     message = f"Current pad at {voltage_end} V : {current_pad_end} A, Current ring: {current_ring_end} A"
                 else:
@@ -258,8 +287,9 @@ if __name__ == "__main__":
         else:
             # single measure
             if k2470_pad.config_IV(IV_ring_parameters) and k2470_ring.config_IV(IV_ring_parameters):
-                time.sleep(2)
-                voltage, current_pad, current_ring, resistance_pad, resistance_ring = measure_IV_ring(IV_ring_parameters, k2470_pad, k2470_ring)
+                time.sleep(1)
+                voltage, current_pad, current_ring, resistance_pad, resistance_ring = \
+                    measure_IV_ring(k2470_pad, k2470_ring, IV_ring_parameters, main)
                 # get average of resistance for pad and ring, strip first and last 2 points
                 if len(resistance_pad) > 4:
                     resistance_pad_avg = sum(resistance_pad[2:-2]) / (len(resistance_pad) - 4)
