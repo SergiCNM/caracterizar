@@ -6,12 +6,12 @@ author = "Sergi Sànchez"
 debugmode = true
 darkmode = true
 estepa = true
-txtprocess = "19143"
-txtlot = "19143"
-txtwafer = "2"
-txtmask = "CNM863"
-txttemperature = "22.5"
-txthumidity = "47"
+txtprocess = "18399"
+txtlot = "18399"
+txtwafer = "9"
+txtmask = "CNM869"
+txttemperature = "23.0"
+txthumidity = "35"
 
 [dirs]
 base = "config"

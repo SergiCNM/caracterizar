@@ -17,7 +17,6 @@ SOURCE_DELAY = 0.1
 SENSE_COUNT = 2
 RES_MIN = 100.0
 RES_MAX = 120.0
-DISPLAY_GRAPH = false
 
 [options]
 RANGE = "AUTO,0.2,2,20,200,1000"
@@ -54,4 +53,3 @@ SOURCE_DELAY = "Source delay to allow settling time"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"
 RES_MIN = "Minimum resistance for resistance measurement (applies to both pad and ring)"
 RES_MAX = "Maximum resistance for resistance measurement (applies to both pad and ring)"
-DISPLAY_GRAPH = "Display graph after measurement"

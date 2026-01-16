@@ -3059,14 +3059,12 @@ class MainWindow(QMainWindow):
                                 # Create BEG WAFER section
                                 file_measurement.MeasurementSectionFile(section="WAFER", tag="BEG")
                                 # Control init chip in wafer parameters (case fail wafers or semi-wafers)
-                                init_chip = 1
-                                if "init_chip" in wafer_parameters and wafer_parameters["init_chip"] != "1":
+                                if int(init_chip)>1:
                                     # set first position to init_chip
-                                    init_chip = wafer_parameters["init_chip"]
                                     dieActual = str(init_chip)
                                     # go to init chip from home
                                     from_coordinate = wafer.wafer_positions[0]
-                                    to_coordinate = wafer.wafer_positions[int(init_chip) - 2]
+                                    to_coordinate = wafer.wafer_positions[int(init_chip) - 1]
                                     X, Y = wafer.calculate_prober_movement(from_coordinate, to_coordinate)
                                     self.prober.move_chuck_xy("R", X, Y)
 
