@@ -201,9 +201,9 @@ if __name__ == "__main__":
                                       "Please, configure instruments for initialization",
                                       "yes_cancel")
                 if retval == QMessageBox.Yes:
-                    if not (k2410_pad.config_IV(IV_ring_parameters) and
-                            k2410_ring.config_IV(IV_ring_parameters)):
-                        raise RuntimeError("Error configuring Keithley 2410 instruments")
+                    # if not (k2410_pad.config_IV(IV_ring_parameters) and
+                    #         k2410_ring.config_IV(IV_ring_parameters)):
+                    #     raise RuntimeError("Error configuring Keithley 2410 instruments")
                     test_status.status = "STARTED"
                 else:
                     test_status.status = "ABORTED"
@@ -286,30 +286,30 @@ if __name__ == "__main__":
                 save_file(main, voltage, current_pad, current_ring, resistance_pad, resistance_ring, namefile)
         else:
             # single measure
-            if k2410_pad.config_IV(IV_ring_parameters) and k2410_ring.config_IV(IV_ring_parameters):
-                time.sleep(1)
-                voltage, current_pad, current_ring, resistance_pad, resistance_ring = \
-                    measure_IV_ring(k2410_pad, k2410_ring, IV_ring_parameters, main)
-                # get average of resistance for pad and ring, strip first and last 2 points
-                if len(resistance_pad) > 4:
-                    resistance_pad_avg = sum(resistance_pad[2:-2]) / (len(resistance_pad) - 4)
-                else:
-                    resistance_pad_avg = sum(resistance_pad) / len(resistance_pad) if len(resistance_pad) > 0 else 0
-                
-                if len(resistance_ring) > 4:
-                    resistance_ring_avg = sum(resistance_ring[2:-2]) / (len(resistance_ring) - 4)
-                else:
-                    resistance_ring_avg = sum(resistance_ring) / len(resistance_ring) if len(resistance_ring) > 0 else 0
+            #if k2410_pad.config_IV(IV_ring_parameters) and k2410_ring.config_IV(IV_ring_parameters):
+            time.sleep(1)
+            voltage, current_pad, current_ring, resistance_pad, resistance_ring = \
+                measure_IV_ring(k2410_pad, k2410_ring, IV_ring_parameters, main)
+            # get average of resistance for pad and ring, strip first and last 2 points
+            if len(resistance_pad) > 4:
+                resistance_pad_avg = sum(resistance_pad[2:-2]) / (len(resistance_pad) - 4)
+            else:
+                resistance_pad_avg = sum(resistance_pad) / len(resistance_pad) if len(resistance_pad) > 0 else 0
 
-                # show results resistance average in description
-                main.updateTextDescription(f"R_pad_avg: {resistance_pad_avg:.4e} Ohm, R_ring_avg: {resistance_ring_avg:.4e} Ohm", "RESULT")
-                # main.updateTextDescription(txt_result)
-                plot_parameters = get_plot_parameters(voltage, current_pad, current_ring)
-                # Single measurement, view plot
-                emit_plot(plot_parameters)
-                # Save file in results
-                namefile = f"IV_ring_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
-                save_file(main, voltage, current_pad, current_ring, resistance_pad, resistance_ring, namefile)
+            if len(resistance_ring) > 4:
+                resistance_ring_avg = sum(resistance_ring[2:-2]) / (len(resistance_ring) - 4)
+            else:
+                resistance_ring_avg = sum(resistance_ring) / len(resistance_ring) if len(resistance_ring) > 0 else 0
+
+            # show results resistance average in description
+            main.updateTextDescription(f"R_pad_avg: {resistance_pad_avg:.4e} Ohm, R_ring_avg: {resistance_ring_avg:.4e} Ohm", "RESULT")
+            # main.updateTextDescription(txt_result)
+            plot_parameters = get_plot_parameters(voltage, current_pad, current_ring)
+            # Single measurement, view plot
+            emit_plot(plot_parameters)
+            # Save file in results
+            namefile = f"IV_ring_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
+            save_file(main, voltage, current_pad, current_ring, resistance_pad, resistance_ring, namefile)
 
         if "DISPLAY_GRAPH" in IV_ring_parameters and IV_ring_parameters["DISPLAY_GRAPH"]:
             k2410_pad.display_graph()

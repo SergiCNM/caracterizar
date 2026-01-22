@@ -20,7 +20,7 @@ class Keithley_2410:
         self.source_delay = parameters.get("source_delay", 0.0)
 
         self.reset()
-        self._basic_config()
+        self._basic_config(parameters)
 
     # --------------------------------------------------
     # Basic instrument control
@@ -45,7 +45,7 @@ class Keithley_2410:
     # Configuration
     # --------------------------------------------------
 
-    def _basic_config(self):
+    def _basic_config(self, parameters):
         """
         Configuración estándar para IV
         """
@@ -62,6 +62,11 @@ class Keithley_2410:
 
         # Formato de lectura: solo valores
         self.instrument.write(":FORM:ELEM CURR")
+
+        # set compliance
+        compliance = parameters.get("COMPLIANCE", 0.01)
+        compliance = compliance * 1E-3
+        self.set_compliance_current(compliance)
 
     def set_mode_4wire(self):
         self.instrument.write(":SYST:RSEN ON")
@@ -121,6 +126,13 @@ class Keithley_2410:
     # --------------------------------------------------
     # Cleanup
     # --------------------------------------------------
+
+    def stop(self):
+        """
+        Stop de measurement
+        :return: None
+        """
+        self.output("OFF")
 
     def close(self):
         try:

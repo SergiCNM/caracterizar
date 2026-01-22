@@ -8,10 +8,10 @@ darkmode = true
 estepa = true
 txtprocess = "18399"
 txtlot = "18399"
-txtwafer = "9"
+txtwafer = "3"
 txtmask = "CNM869"
 txttemperature = "23.0"
-txthumidity = "35"
+txthumidity = "41"
 
 [dirs]
 base = "config"

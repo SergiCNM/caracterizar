@@ -92,16 +92,15 @@ bufferName = "defbuffer1,defbuffer2"
 
 [Keithley_2410]
 driver = "Keithley_2410"
-address = "GPIB0::4::INSTR"
+address = "GPIB0::24::INSTR"
 read_termination = "\n"
 write_termination = "\n"
 timeout = 10000
 source_delay = 0.1
 
-
 [Keithley_2410ring]
 driver = "Keithley_2410"
-address = "GPIB0::26::INSTR"
+address = "GPIB0::25::INSTR"
 read_termination = "\n"
 write_termination = "\n"
 timeout = 10000
