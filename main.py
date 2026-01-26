@@ -275,6 +275,7 @@ class MainWindow(QMainWindow):
         global measurement_status, test_status, contact_status
         global contact_test, contact_errors, actual_height  # control progressive contact
         global dieActual, moduleActual, cartographic_measurement
+        global init_chip, end_chip
         measurement_status = MeasurementStatus()
         test_status = TestStatus()
         contact_status = ContactStatus()
@@ -283,6 +284,8 @@ class MainWindow(QMainWindow):
         actual_height = 0
         dieActual = 1
         moduleActual = 1
+        init_chip = 1
+        end_chip = 1
         cartographic_measurement = False
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -2538,6 +2541,7 @@ class MainWindow(QMainWindow):
 
     def execute_measurement(self):
         global dieActual, moduleActual, wafer_parameters, file_measurement, connDeep
+        global init_chip, end_chip
         # print(">> [execute_measurement] START")
         if self.script_running:
             # print(">> [execute_measurement] Script already running, abort.")
@@ -2633,6 +2637,7 @@ class MainWindow(QMainWindow):
 
     def on_script_finished(self):
         global dieActual, moduleActual, wafer_parameters, file_measurement, measurement_status
+        global init_chip, end_chip
 
         if not self.script_running:
             # print(">> [on_script_finished] Already finished, skipping")
@@ -2958,7 +2963,7 @@ class MainWindow(QMainWindow):
 
     def execute_cartographic_measurement(self):
         global measurement_status, wafer_parameters, test_status, contact_status, contact_test, contact_errors, actual_height, file_measurement
-        global dieActual, moduleActual
+        global dieActual, moduleActual, init_chip, end_chip
         global total_meas  # dict with meas, in , out, meas_success, meas_warning & meas_error numbers
 
         contact_errors = 0
@@ -3085,6 +3090,10 @@ class MainWindow(QMainWindow):
 
                                 # Construcción del rango
                                 chip_range = range(init_chip - 1, end_chip)  # -1 porque el índice interno empieza en 0
+                                # Índice del primer die que realmente se va a medir
+                                start_die_index = init_chip - 1
+                                first_die = True
+                                prev_die = None
 
                                 for die in chip_range:
                                     die_position = self.waferwindow.wafer_parameters["wafer_positions"][die]
@@ -3094,13 +3103,19 @@ class MainWindow(QMainWindow):
                                     file_measurement.MeasurementSectionFile(section="DIE", tag="BEG",
                                                                             die_position=die_position)
                                     QApplication.processEvents()
-                                    if die > 0:
-                                        # get movement XY
-                                        from_coordinate = wafer.wafer_positions[die - 1]
+                                    if first_die:
+                                        # Ya estamos posicionados en este die (HOME->ORIGIN y, si aplica, ORIGIN->init_chip)
+                                        first_die = False
+                                    else:
+                                        # get movement XY desde el die anterior medido
+                                        from_coordinate = wafer.wafer_positions[prev_die]
                                         to_coordinate = wafer.wafer_positions[die]
                                         X, Y = wafer.calculate_prober_movement(from_coordinate, to_coordinate)
-                                    # prober move to die coordinates
-                                    self.prober.move_chuck_xy("R", X, Y)
+                                        # prober move to die coordinates
+                                        self.prober.move_chuck_xy("R", X, Y)
+
+                                    # actualizar die previo
+                                    prev_die = die
                                     # if int(wafer.nmodules) > 1:
                                     #     menu_modules = QMenu()
                                     x_modules_sum = 0.0

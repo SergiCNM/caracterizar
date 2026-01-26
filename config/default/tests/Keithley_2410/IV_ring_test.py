@@ -8,7 +8,7 @@ import toml, time
 import numpy as np
 
 global test_status, measurement_status
-global dieActual, moduleActual
+global dieActual, moduleActual, init_chip, end_chip
 global IV_ring_parameters
 global base_dir, tests_dir, results_dir, username, cartographic_measurement
 
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         k2410_ring = Keithley_2410(instruments["Keithley_2410ring"])
         
         if cartographic_measurement:
-            if str(dieActual)=="1" and str(moduleActual) == "1":
+            if str(dieActual)==str(init_chip) and str(moduleActual) == "1":
                 retval = message_user(main, "Init instruments for IV ring!",
                                       "Please, configure instruments for initialization",
                                       "yes_cancel")
