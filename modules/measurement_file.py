@@ -55,6 +55,8 @@ class MeasurementFile():
             if filename=="":
                 filename = self.process_name + "_" + self.date.replace("/","") + "_" + self.time.replace(":","")
             filename_dat = filename + ".dat"
+            if "output_dir" in parameters:
+                 filename_dat = os.path.join(parameters["output_dir"], filename_dat)
             self.filename = filename_dat
 
             self.created = True

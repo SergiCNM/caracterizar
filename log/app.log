@@ -9240,3 +9240,78 @@
 26-01-23 10:11:01|INFO|35144|closeEvent|2208|Test Status: FINISHED
 26-01-23 10:11:52|INFO|33648|__init__|268|Multithreading with maximum 12 threads
 26-01-24 01:29:28|INFO|33648|closeEvent|2208|Test Status: FINISHED
+26-01-28 12:55:12|INFO|31552|__init__|268|Multithreading with maximum 12 threads
+26-01-28 12:56:57|INFO|31552|closeEvent|2208|Test Status: IDLE
+26-01-28 12:58:18|INFO|13084|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:04:31|INFO|13084|closeEvent|2208|Test Status: IDLE
+26-01-28 13:06:25|INFO|27972|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:07:31|INFO|27972|closeEvent|2208|Test Status: IDLE
+26-01-28 13:07:44|INFO|30872|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:11:22|INFO|30872|closeEvent|2208|Test Status: IDLE
+26-01-28 13:11:32|INFO|29256|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:16:58|INFO|30948|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:20:37|INFO|30948|closeEvent|2208|Test Status: IDLE
+26-01-28 13:22:45|INFO|11120|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:25:03|INFO|11120|closeEvent|2208|Test Status: IDLE
+26-01-28 13:25:33|INFO|31172|__init__|268|Multithreading with maximum 12 threads
+26-01-28 13:59:18|INFO|31172|closeEvent|2208|Test Status: IDLE
+26-01-28 14:05:07|INFO|4280|__init__|268|Multithreading with maximum 12 threads
+26-01-28 14:10:01|INFO|4280|closeEvent|2208|Test Status: IDLE
+26-01-28 14:10:11|INFO|29572|__init__|268|Multithreading with maximum 12 threads
+26-01-28 14:52:30|INFO|29572|closeEvent|2208|Test Status: IDLE
+26-01-28 14:52:46|INFO|23848|__init__|268|Multithreading with maximum 12 threads
+26-01-28 15:03:05|INFO|23848|closeEvent|2208|Test Status: FINISHED
+26-01-28 15:04:22|INFO|29548|__init__|268|Multithreading with maximum 12 threads
+26-01-28 15:54:29|INFO|29548|closeEvent|2208|Test Status: IDLE
+26-01-28 15:54:41|INFO|27828|__init__|268|Multithreading with maximum 12 threads
+26-01-28 15:55:12|INFO|27828|closeEvent|2208|Test Status: IDLE
+26-01-28 15:56:46|INFO|28972|__init__|268|Multithreading with maximum 12 threads
+26-01-28 15:57:31|INFO|28972|closeEvent|2208|Test Status: IDLE
+26-01-28 16:27:49|INFO|30512|__init__|268|Multithreading with maximum 12 threads
+26-01-28 16:28:05|INFO|30512|closeEvent|2208|Test Status: IDLE
+26-01-28 16:28:33|INFO|28992|__init__|268|Multithreading with maximum 12 threads
+26-01-28 16:28:53|INFO|28992|closeEvent|2208|Test Status: IDLE
+26-01-28 16:36:21|INFO|32592|__init__|268|Multithreading with maximum 12 threads
+26-01-28 16:36:44|INFO|32592|closeEvent|2208|Test Status: IDLE
+26-01-28 16:48:41|INFO|13896|__init__|268|Multithreading with maximum 12 threads
+26-01-28 16:49:49|INFO|13896|closeEvent|2208|Test Status: IDLE
+26-01-28 16:50:37|INFO|32720|__init__|268|Multithreading with maximum 12 threads
+26-01-28 16:51:08|INFO|32720|closeEvent|2208|Test Status: IDLE
+26-01-28 17:23:55|INFO|10008|__init__|268|Multithreading with maximum 12 threads
+26-01-28 17:25:03|INFO|10008|closeEvent|2208|Test Status: IDLE
+26-01-28 18:07:48|INFO|30440|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:10:37|INFO|30440|closeEvent|2208|Test Status: IDLE
+26-01-28 18:10:49|INFO|17728|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:12:21|INFO|17728|closeEvent|2208|Test Status: IDLE
+26-01-28 18:12:55|INFO|17356|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:12:59|INFO|17356|closeEvent|2208|Test Status: IDLE
+26-01-28 18:13:12|INFO|28472|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:21:26|INFO|28472|closeEvent|2208|Test Status: IDLE
+26-01-28 18:21:38|INFO|24264|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:25:02|INFO|24264|closeEvent|2208|Test Status: IDLE
+26-01-28 18:25:22|INFO|28692|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:25:56|INFO|28692|closeEvent|2208|Test Status: IDLE
+26-01-28 18:27:43|INFO|10472|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:29:52|INFO|10472|closeEvent|2208|Test Status: IDLE
+26-01-28 18:31:23|INFO|27700|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:40:32|INFO|27700|closeEvent|2208|Test Status: IDLE
+26-01-28 18:40:44|INFO|33316|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:42:06|INFO|33316|closeEvent|2208|Test Status: IDLE
+26-01-28 18:43:45|INFO|25164|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:44:23|INFO|25164|closeEvent|2208|Test Status: IDLE
+26-01-28 18:46:48|INFO|32556|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:48:35|INFO|32556|closeEvent|2208|Test Status: IDLE
+26-01-28 18:51:13|INFO|33548|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:52:32|INFO|33548|closeEvent|2208|Test Status: IDLE
+26-01-28 18:53:52|INFO|24596|__init__|268|Multithreading with maximum 12 threads
+26-01-28 18:54:34|INFO|24596|closeEvent|2208|Test Status: IDLE
+26-01-29 11:06:11|INFO|25664|__init__|268|Multithreading with maximum 12 threads
+26-01-29 11:17:43|INFO|25664|closeEvent|2208|Test Status: FINISHED
+26-01-29 14:43:18|INFO|27748|__init__|268|Multithreading with maximum 12 threads
+26-01-29 14:44:42|INFO|27748|closeEvent|2208|Test Status: IDLE
+26-01-29 14:45:05|INFO|26096|__init__|268|Multithreading with maximum 12 threads
+26-01-29 14:45:30|INFO|26096|closeEvent|2208|Test Status: IDLE
+26-01-29 14:46:27|INFO|35592|__init__|268|Multithreading with maximum 12 threads
+26-01-29 14:47:15|INFO|35592|closeEvent|2208|Test Status: IDLE
+26-01-29 14:49:44|INFO|30408|__init__|268|Multithreading with maximum 12 threads
+26-01-29 14:50:42|INFO|30408|closeEvent|2208|Test Status: IDLE

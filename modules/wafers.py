@@ -355,7 +355,8 @@ class Wafer(QMainWindow):
     def save_wafermap(self):
 
         dir_wafermaps = os.getcwd() + base_dir + wafermaps_dir + "/"
-        nameFile, _ = QFileDialog.getSaveFileName(self, 'Save wafermap', dir_wafermaps,"Wafermaps (*.py)")
+        default_filename = f"{self.wafer_name}_wafermap.py" if self.wafer_name else ""
+        nameFile, _ = QFileDialog.getSaveFileName(self, 'Save wafermap', dir_wafermaps + default_filename,"Wafermaps (*.py)")
         # and then you need to adjust wafer_parameters
         texto = 'global wafer_parameters\n\
 \n\
@@ -559,6 +560,8 @@ class WaferWindow(QMainWindow):
         widgets.txtNumberDies.valueChanged.connect(self.values_changed)
         widgets.txtXSize.valueChanged.connect(self.values_changed)
         widgets.txtYSize.valueChanged.connect(self.values_changed)
+        widgets.txtInitChip.textChanged.connect(self.values_changed)
+        widgets.txtEndChip.textChanged.connect(self.values_changed)
         widgets.txtHomeChip.textChanged.connect(self.values_changed)
         widgets.txtOriginChip.textChanged.connect(self.values_changed)
 
@@ -658,6 +661,7 @@ class WaferWindow(QMainWindow):
         self.wafer.init_chip = self.widgets.txtInitChip.text()
         self.wafer.end_chip = self.widgets.txtEndChip.text()
         self.wafer.navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
+        self.total_meas()
 
     def create_meas_result(self, totalDies, totalModules):
         meas_result = []
@@ -723,36 +727,179 @@ class WaferWindow(QMainWindow):
 
         self.total_meas()
 
+    def get_sorted_measured_buttons(self):
+        """Returns a list of measured buttons sorted according to navigation options."""
+        wafer_positions = []
+        real_origin_chip = self.widgets.txtOriginChip.text()
+
+        navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
+        starting_location = navigation_options[0].split("-")
+        stepx = 1
+        stepy = 1
+        xini = 0
+        xfin = 0
+        yini = 0
+        yfin = 0
+        
+        if starting_location[0]=="UPPER":
+            yini = 0
+            yfin = self.numy-1
+        else:
+            yini = self.numy-1
+            yfin = 0
+            stepy = -1
+        if starting_location[1]=="LEFT":
+            xini = 0
+            xfin = self.numx-1
+        else:
+            xini = self.numx-1
+            xfin = 0
+            stepx = -1
+        
+        change_direction = False
+        if navigation_options[1]=="BI-DIRECTIONAL":
+            change_direction = True
+
+        try:
+            if navigation_options[2]=="ROW":
+                for y in range (yini,yfin+stepy,stepy):
+                    count_found = 0
+                    for x in range(xini,xfin+stepx,stepx):
+                        btn = self.centralWidget().findChild(QPushButton,get_btnName(x,y))
+                        if btn and btn.btnType in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]:
+                            wafer_positions.append(btn)
+                            count_found+=1
+
+                    if change_direction and count_found>0: 
+                        xini, xfin = xfin, xini
+                        stepx = stepx * -1
+
+            else:
+                # COLUMN
+                for x in range (xini,xfin+stepx,stepx):
+                    count_found = 0
+                    for y in range(yini,yfin+stepy,stepy):
+                        btn = self.centralWidget().findChild(QPushButton,get_btnName(x,y))
+                        if btn and btn.btnType in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]:
+                            wafer_positions.append(btn)
+                            count_found+=1
+
+                    if change_direction and count_found>0: 
+                        yini, yfin = yfin, yini
+                        stepy = stepy * -1
+                        
+        except Exception as e:
+            print(f"Error getting sorted buttons: {e}")
+            return []
+
+        return wafer_positions
+
     def total_meas(self):
         # get measured chips
-
         total_meas = 0
         total_in = 0
         total_out = 0
         total_meas_success = 0
         total_meas_warning = 0
         total_meas_error = 0
+        
+        # Validation for init_chip and end_chip calculation
+        try:
+            init_chip_val = int(self.wafer.init_chip) if str(self.wafer.init_chip).isdigit() else 1
+            if init_chip_val < 1: init_chip_val = 1
+        except:
+            init_chip_val = 1
+            
+        # We need to count total selected first to handle end_chip validation logic if needed,
+        # but typically end_chip is user input. 
+        # The user requested: "Init_chip debe ser 1 o superior a 1 mientras end_chip debe ser superior a init_chip e igual o inferior al numero total de chips seleccionados."
+        
+        # We will count totals first
+        sorted_buttons = self.get_sorted_measured_buttons()
+        total_selected = len(sorted_buttons)
+        
+        try:
+            end_chip_val = int(self.wafer.end_chip) if str(self.wafer.end_chip).isdigit() else total_selected
+        except:
+            end_chip_val = total_selected
+
+        # Enforce validation rules for display/logic (soft enforcement or visual feedback)
+        # We update the class variables so other parts use the corrected values, 
+        # BUT updating text widgets here might disrupt typing, so we just use values for calculation/visuals.
+        
+        # Recalculate plan count based on validated range intersecting with available chips
+        # Actually the user said: end_chip <= numero total de chips seleccionados.
+        
+        # Let's just clamp the values for the "Selected Range" logic
+        
+        start_idx = init_chip_val - 1
+        end_idx = end_chip_val
+        
+        # Visual Highlighting Logic
+        # Reset all "meas_selected" back to "meas" first? 
+        # We iterate all buttons or just sorted ones?
+        # Better to iterate all buttons to count types accurately.
+        
+        # But wait, we need to know WHICH ones are in the range to color them.
+        # The sorted_buttons list gives us the order.
+        
+        targets_for_highlight = set()
+        if total_selected > 0:
+            # slice is safe even if out of bounds
+            for btn in sorted_buttons[start_idx:end_idx]:
+                targets_for_highlight.add(btn)
 
         for i in self.centralWidget().findChildren(QWaferButton):
-            if i._btnType == "meas":
-                total_meas += 1
-            if i._btnType == "meas_success":
-                total_meas_success += 1
-                total_meas += 1
+            # Restore visual state if it was highlighted but shouldn't be, or highlight if it should be
+            # We preserve existing status like success/warning/error
+            
+            # Check basic types
             if i._btnType == "in":
                 total_in += 1
-            if i._btnType == "out":
+            elif i._btnType == "out":
                 total_out += 1
-            if i._btnType == "meas_warning":
-                total_meas_warning += 1
+            
+            # Check meas types
+            is_meas_type = i._btnType in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]
+            
+            if is_meas_type:
+                # Logic for counting specific states
+                if i._btnType == "meas_success":
+                    total_meas_success += 1
+                elif i._btnType == "meas_warning":
+                    total_meas_warning += 1
+                elif i._btnType == "meas_error":
+                    total_meas_error += 1
+                
+                # It counts as measured regardless of sub-status
                 total_meas += 1
-            if i._btnType == "meas_error":
-                total_meas_error += 1
-                total_meas += 1
+                
+                # Visual update: only affect "meas" and "meas_selected"
+                # If it has a specific result (success/warn/error), we usually keep that color.
+                # The request: "identificarlos con un color algo más oscuro ... al asignado a los botones de meas".
+                # Implies we only change the "meas" ones, or maybe we overlay?
+                # Usually standard "meas" (blue) vs "meas_selected" (darker blue).
+                # Start by defaulting to "meas" if it was "meas_selected"
+                if i._btnType == "meas_selected":
+                     i.btnType = "meas"
+                
+                # Now apply highlight if it is a target and clearly just "meas"
+                if i in targets_for_highlight and i._btnType == "meas":
+                    i.btnType = "meas_selected"
+                elif i not in targets_for_highlight and i._btnType == "meas_selected":
+                    i.btnType = "meas"
+
+        total_plan = 0
+        if total_selected > 0:
+             # Logic as requested: end_chip - init_chip + 1
+             # We should use the clamped values for the display if we want it to be accurate to what is highlighted
+             total_plan = max(0, end_chip_val - init_chip_val + 1)
+             
         self.widgets.txtNumberDies.setValue(total_meas)
         self.widgets.btnIN.setText("IN\n" + str(total_in))
         self.widgets.btnOUT.setText("OUT\n" + str(total_out))
         self.widgets.btnMEAS.setText("MEAS\n" + str(total_meas))
+        self.widgets.btnMEAS_PLAN.setText("TOTAL\n" + str(total_plan))
         self.widgets.btnMEAS_SUCCESS.setText("SUCCESS\n" + str(total_meas_success))
         self.widgets.btnMEAS_WARNING.setText("WARNING\n" + str(total_meas_warning))
         self.widgets.btnMEAS_ERROR.setText("ERROR\n" + str(total_meas_error))
@@ -939,89 +1086,54 @@ class WaferWindow(QMainWindow):
         init_chip = self.widgets.txtInitChip.text()
         end_chip = self.widgets.txtEndChip.text()
         # init & end chip check
-        if init_chip=="" or end_chip=="":
-            retval = messageBox(self,"Problem with Init/End chip","Please, fill Init chip & End chip","warning")
-            return
-        else:
-        # else check if init_chip >=1 and end_chip <= nchips and init_chip < end_chip
-            if int(init_chip)<1 or int(end_chip)>int(nchips) or int(init_chip)>=int(end_chip):
-                retval = messageBox(self,"Problem with Init/End chip","Please, check Init chip & End chip values","warning")
+        sorted_buttons = self.get_sorted_measured_buttons()
+        
+        # Validation for Init/End Chip
+        if init_chip == "" or end_chip == "":
+             retval = messageBox(self,"Problem with Init/End chip","Please, fill Init chip & End chip","warning")
+             return
+             
+        try:
+            init_val = int(init_chip)
+            end_val = int(end_chip)
+            total_selected = len(sorted_buttons)
+            
+            # Init_chip debe ser 1 o superior a 1
+            # end_chip debe ser superior a init_chip e igual o inferior al numero total de chips seleccionados
+            
+            if init_val < 1:
+                retval = messageBox(self,"Problem with Init Chip","Init chip must be >= 1","warning")
                 return
+            
+            if end_val < init_val:
+                 retval = messageBox(self,"Problem with End Chip","End chip must be >= Init Chip","warning")
+                 return
+                 
+            if total_selected > 0 and end_val > total_selected:
+                 retval = messageBox(self,"Problem with End Chip",f"End chip ({end_val}) cannot be greater than total selected chips ({total_selected})","warning")
+                 return
+                 
+        except ValueError:
+             retval = messageBox(self,"Problem with Init/End chip","Values must integers","warning")
+             return
 
+        # Build wafer_positions using sorted buttons
         origin_chip = "0 0"
         real_origin_chip = self.widgets.txtOriginChip.text()
         home_chip = self.widgets.txtHomeChip.text()
-        if real_origin_chip=="":
-            retval = messageBox(self,"Problem with Origin","Please, mark your origin first!","warning")
-            return
-        if home_chip=="":
-            retval = messageBox(self,"Problem with Home","Please, mark your home first!","warning")
-            return
-        navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
-        starting_location = navigation_options[0].split("-")
-        stepx = 1
-        stepy = 1
-        if starting_location[0]=="UPPER":
-            yini = 0
-            yfin = self.numy-1
-        else:
-            yini = self.numy-1
-            yfin = 0
-            stepy = -1
-        if starting_location[1]=="LEFT":
-            xini = 0
-            xfin = self.numx-1
-        else:
-            xini = self.numx-1
-            xfin = 0
-            stepx = -1
-        change_direction = False
-        if navigation_options[1]=="BI-DIRECTIONAL":
-            change_direction = True
         wafer_positions = []
-
         try:
-            if navigation_options[2]=="ROW":
-                for y in range (yini,yfin+stepy,stepy):
-                    count_found = 0
-                    for x in range(xini,xfin+stepx,stepx):
-                        # coordenadas negativas
-                        btn = self.centralWidget().findChild(QPushButton,get_btnName(x,y))
-                        if btn.btnType == "meas":
-                            if len(wafer_positions)==0:
-                                # check origin
-                                if real_origin_chip != str(-x)+" "+str(-y):
-                                    retval = messageBox(self,"Problem with Origin","Please, check your origin in base to navigation options. Origin correct: ("+str(-x)+" "+str(-y)+")!","error")
-                                    return
-
-                            wafer_positions.append(change_coord_to_origin(-x,-y,real_origin_chip))
-                            count_found+=1
-
-                    if change_direction and count_found>0: # only change direction if first chip meas found
-                        xini, xfin = xfin, xini
-                        stepx = stepx * -1
-
-            else:
-                # COLUMN
-                for x in range (xini,xfin+stepx,stepx):
-                    count_found = 0
-                    for y in range(yini,yfin+stepy,stepy):
-                        # coordenadas negativas
-                        btn = self.centralWidget().findChild(QPushButton,get_btnName(x,y))
-                        if btn.btnType == "meas":
-                            if len(wafer_positions)==0:
-                                # check origin
-                                if real_origin_chip != str(-x)+" "+str(-y):
-                                    retval = messageBox(self,"Problem with Origin","Please, check your origin in base to navigation options. Origin correct: ("+str(-x)+" "+str(-y)+")!","error")
-                                    return
-
-                            wafer_positions.append(change_coord_to_origin(-x,-y,real_origin_chip))
-                            count_found+=1
-
-                    if change_direction and count_found>0: # only change direction if first chip meas found
-                        yini, yfin = yfin, yini
-                        stepy = stepy * -1
-
+            for btn in sorted_buttons:
+                x = btn.x 
+                y = btn.y
+                # Checking origin consistency (copied from logic)
+                if len(wafer_positions)==0:
+                     if real_origin_chip != str(x)+" "+str(y):
+                        retval = messageBox(self,"Problem with Origin","Please, check your origin in base to navigation options. Origin correct: ("+str(x)+" "+str(y)+")!","error")
+                        return
+                
+                wafer_positions.append(change_coord_to_origin(x,y,real_origin_chip))
+                
         except Exception as e:
             retval = messageBox(self,"Some problem getting wafer_positions",str(e),"critical")
             return
@@ -1032,6 +1144,7 @@ class WaferWindow(QMainWindow):
 
         wafer_modules = self.wafer_modules
         wafer_modules_name = self.wafer_modules_name
+        navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
 
         wafer_parameters = {
             "wafer_name": wafer_name,
@@ -1141,6 +1254,7 @@ class CallButton:
             "out" : "#FFFFFF",
             "in" : "#FFFF99",
             "meas" : "#33CCFF",
+            "meas_selected" : "#2299FF",
             "meas_success" : "#66CC99",
             "meas_error" : "#FF3300",
             "meas_warning" : "#FFCC33"
@@ -1249,6 +1363,7 @@ class QWaferButton(QPushButton):
             "out" : "#FFFFFF",
             "in" : "#FFFF99",
             "meas" : "#33CCFF",
+            "meas_selected" : "#2299FF",
             "meas_success" : "#66CC99",
             "meas_error" : "#FF3300",
             "meas_warning" : "#FFCC33"
@@ -1336,12 +1451,30 @@ class QWaferButton(QPushButton):
 
     @btnType.setter
     def btnType(self,value):
-        states =["in","out","meas","meas_success","meas_warning","meas_error"]
+        states =["in","out","meas","meas_selected","meas_success","meas_warning","meas_error"]
+        
+        # Avoid recursion and unnecessary updates
+        if self._btnType == value:
+            return
+
+        old_value = self._btnType
         self._btnType = value
+        
         if value in states:
             #self.setStyleSheet("font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: qlineargradient(x1:0, x2:1, stop: 0.24 red, stop: 0.49 blue, stop: 0.74 red, stop: 0.98 blue)")
             self.setStyleSheet("font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: %s;" % self.COLORS_DIES[value])
-            self.waferwindow.total_meas()
+            
+            # Recalculate only if the change affects the total measurement count
+            # meas and meas_selected both count as 'measured', so switching between them shouldn't trigger total_meas
+            # Also, if we are in a visual update loop (managed by logic), we should avoid re-triggering.
+            
+            should_recalculate = True
+            meas_types = ["meas", "meas_selected"]
+            if old_value in meas_types and value in meas_types:
+                should_recalculate = False
+            
+            if should_recalculate:
+                self.waferwindow.total_meas()
         if value!="meas_warning" or value!="meas_error":
             self.setToolTip(self.coord_text)
         if "meas" in value:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'waferFhoZNE.ui'
+## Form generated from reading UI file 'wafertfXXEW.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -400,17 +400,30 @@ class Ui_WaferWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnMEAS)
 
+        self.btnMEAS_PLAN = QPushButton(self.verticalLayoutWidget)
+        self.btnMEAS_PLAN.setObjectName(u"btnMEAS_PLAN")
+        self.btnMEAS_PLAN.setEnabled(True)
+        self.btnMEAS_PLAN.setMinimumSize(QSize(70, 40))
+        self.btnMEAS_PLAN.setMaximumSize(QSize(70, 40))
+        font3 = QFont()
+        font3.setPointSize(6)
+        self.btnMEAS_PLAN.setFont(font3)
+        icon8 = QIcon()
+        icon8.addFile(u":/images/images/buttons/set_meas - plan.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_PLAN.setIcon(icon8)
+        self.btnMEAS_PLAN.setIconSize(QSize(24, 24))
+
+        self.horizontalLayout_2.addWidget(self.btnMEAS_PLAN)
+
         self.btnMEAS_SUCCESS = QPushButton(self.verticalLayoutWidget)
         self.btnMEAS_SUCCESS.setObjectName(u"btnMEAS_SUCCESS")
         self.btnMEAS_SUCCESS.setEnabled(True)
         self.btnMEAS_SUCCESS.setMinimumSize(QSize(70, 40))
         self.btnMEAS_SUCCESS.setMaximumSize(QSize(70, 40))
-        font3 = QFont()
-        font3.setPointSize(6)
         self.btnMEAS_SUCCESS.setFont(font3)
-        icon8 = QIcon()
-        icon8.addFile(u":/images/images/buttons/set_meas_success.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS_SUCCESS.setIcon(icon8)
+        icon9 = QIcon()
+        icon9.addFile(u":/images/images/buttons/set_meas_success.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_SUCCESS.setIcon(icon9)
         self.btnMEAS_SUCCESS.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS_SUCCESS)
@@ -421,9 +434,9 @@ class Ui_WaferWindow(object):
         self.btnMEAS_WARNING.setMinimumSize(QSize(70, 40))
         self.btnMEAS_WARNING.setMaximumSize(QSize(70, 40))
         self.btnMEAS_WARNING.setFont(font3)
-        icon9 = QIcon()
-        icon9.addFile(u":/images/images/buttons/set_meas_warning.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS_WARNING.setIcon(icon9)
+        icon10 = QIcon()
+        icon10.addFile(u":/images/images/buttons/set_meas_warning.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_WARNING.setIcon(icon10)
         self.btnMEAS_WARNING.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS_WARNING)
@@ -434,9 +447,9 @@ class Ui_WaferWindow(object):
         self.btnMEAS_ERROR.setMinimumSize(QSize(70, 40))
         self.btnMEAS_ERROR.setMaximumSize(QSize(70, 40))
         self.btnMEAS_ERROR.setFont(font3)
-        icon10 = QIcon()
-        icon10.addFile(u":/images/images/buttons/set_meas_error.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnMEAS_ERROR.setIcon(icon10)
+        icon11 = QIcon()
+        icon11.addFile(u":/images/images/buttons/set_meas_error.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnMEAS_ERROR.setIcon(icon11)
         self.btnMEAS_ERROR.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnMEAS_ERROR)
@@ -465,7 +478,7 @@ class Ui_WaferWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnUnmarkAll)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_4)
 
@@ -474,9 +487,9 @@ class Ui_WaferWindow(object):
         self.btnPrint.setEnabled(False)
         self.btnPrint.setMinimumSize(QSize(32, 32))
         self.btnPrint.setMaximumSize(QSize(32, 32))
-        icon11 = QIcon()
-        icon11.addFile(u":/images/images/buttons/print.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnPrint.setIcon(icon11)
+        icon12 = QIcon()
+        icon12.addFile(u":/images/images/buttons/print.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnPrint.setIcon(icon12)
         self.btnPrint.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnPrint)
@@ -486,14 +499,14 @@ class Ui_WaferWindow(object):
         self.btnSave.setEnabled(False)
         self.btnSave.setMinimumSize(QSize(32, 32))
         self.btnSave.setMaximumSize(QSize(32, 32))
-        icon12 = QIcon()
-        icon12.addFile(u":/images/images/buttons/save.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btnSave.setIcon(icon12)
+        icon13 = QIcon()
+        icon13.addFile(u":/images/images/buttons/save.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btnSave.setIcon(icon13)
         self.btnSave.setIconSize(QSize(24, 24))
 
         self.horizontalLayout_2.addWidget(self.btnSave)
 
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_6)
 
@@ -590,6 +603,10 @@ class Ui_WaferWindow(object):
         self.btnMEAS.setToolTip(QCoreApplication.translate("WaferWindow", u"Set MEAS", None))
 #endif // QT_CONFIG(tooltip)
         self.btnMEAS.setText(QCoreApplication.translate("WaferWindow", u"MEAS", None))
+#if QT_CONFIG(tooltip)
+        self.btnMEAS_PLAN.setToolTip(QCoreApplication.translate("WaferWindow", u"Set MEAS SUCCESS", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnMEAS_PLAN.setText(QCoreApplication.translate("WaferWindow", u"TOTAL", None))
 #if QT_CONFIG(tooltip)
         self.btnMEAS_SUCCESS.setToolTip(QCoreApplication.translate("WaferWindow", u"Set MEAS SUCCESS", None))
 #endif // QT_CONFIG(tooltip)

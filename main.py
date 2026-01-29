@@ -2370,8 +2370,11 @@ class MainWindow(QMainWindow):
                                 "filename_test": filename_test,
                                 "date": "",
                                 "time": "",
-                                "waferinfo":""
+                                "waferinfo":"",
+                                "output_dir": os.path.join(results_dir, self.username)
                             }
+                            # Ensure output directory exists
+                            os.makedirs(parameters["output_dir"], exist_ok=True)
                             file_measurement = MeasurementFile(parameters)
                             if file_measurement.created:
                                 if file_measurement.MeasurementHeaderFile():
@@ -3075,18 +3078,15 @@ class MainWindow(QMainWindow):
 
 
 
-                                # Validaciones
-                                if not (1 <= init_chip <= total_chips):
-                                    raise ValueError(
-                                        f"init_chip debe estar entre 1 y {total_chips}, recibido: {init_chip}")
-
-                                if not (1 <= end_chip <= total_chips):
-                                    raise ValueError(
-                                        f"end_chip debe estar entre 1 y {total_chips}, recibido: {end_chip}")
-
+                                # Normalización de init_chip y end_chip frente al total de dies disponibles
+                                if init_chip < 1:
+                                    init_chip = 1
+                                if end_chip < 1:
+                                    end_chip = 1
+                                if end_chip > total_chips:
+                                    end_chip = total_chips
                                 if init_chip > end_chip:
-                                    raise ValueError(
-                                        f"init_chip ({init_chip}) no puede ser mayor que end_chip ({end_chip})")
+                                    init_chip, end_chip = end_chip, init_chip
 
                                 # Construcción del rango
                                 chip_range = range(init_chip - 1, end_chip)  # -1 porque el índice interno empieza en 0
@@ -3304,15 +3304,40 @@ class MainWindow(QMainWindow):
         # get Files from config.toml
         return os.path.join(os.getcwd(), self.config["files"][filename])
 
+    def setup_searchable_combo(self, combo):
+        combo.setEditable(True)
+        combo.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
+        combo.completer().setCompletionMode(QtWidgets.QCompleter.CompletionMode.PopupCompletion)
+        try:
+            combo.completer().setFilterMode(Qt.MatchContains)
+        except:
+            pass
+        combo.completer().setCaseSensitivity(Qt.CaseInsensitive)
+        
+        # Style the completer popup
+        popup = combo.completer().popup()
+        popup.setStyleSheet("""
+            QAbstractItemView {
+                color: rgb(255, 121, 198);
+                background-color: rgb(33, 37, 43);
+                border: 1px solid rgb(44, 49, 58);
+                selection-background-color: rgb(39, 44, 54);
+            }
+        """)
+
     def load_wafermaps(self):
         global widgets
         dir_wafermaps = self.getDirs("wafermaps") + "/"
         contenido = os.listdir(dir_wafermaps)
         widgets.cmbWafermaps.clear()
         widgets.cmbWafermaps.addItem("Select wafermap")
-        for fichero in contenido:
-            if os.path.isfile(os.path.join(dir_wafermaps, fichero)) and fichero.endswith('_wafermap.py'):
-                widgets.cmbWafermaps.addItem(fichero.replace("_wafermap.py", ""))
+        
+        sorted_files = sorted([f for f in contenido if os.path.isfile(os.path.join(dir_wafermaps, f)) and f.endswith('_wafermap.py')])
+
+        for fichero in sorted_files:
+            widgets.cmbWafermaps.addItem(fichero.replace("_wafermap.py", ""))
+            
+        self.setup_searchable_combo(widgets.cmbWafermaps)
 
     def load_probers(self):
         global widgets
@@ -3352,12 +3377,15 @@ class MainWindow(QMainWindow):
         widgets.cmbInstruments.addItem("Select instrument")
         widgets.cmbInstruments_2.addItem("Select instrument")
 
-        for name, cfg in instruments.items():
+        for name in sorted(instruments.keys()):
+            cfg = instruments[name]
             if not self.is_real_instrument(cfg):
                 continue
 
             widgets.cmbInstruments.addItem(name)
             widgets.cmbInstruments_2.addItem(name)
+        
+        self.setup_searchable_combo(widgets.cmbInstruments)
 
     def reload_instruments(self):
         global instruments
