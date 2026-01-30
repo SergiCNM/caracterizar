@@ -473,7 +473,7 @@ class CAP(FPDF):
                            "OSC": "mV", "HYSTERESIS_TIME": "s", "WAIT_TIME": "s", "LIGHT_TIME": "s",
                            "TEMPERATURE": "ºC", "AREA": "um²"}
             units["CW"] = {"START": "kHz", "STOP": "kHz", "STEP": "kHz", "SPOT": "V", "OSC": "mV"}
-            image_CV = wafer_path + "/" + self.options["plot_folder"] + "/CV_" + wafer + "_1_1.png"
+            image_CV = wafer_path + "/" + self.options["plot_folder"] + "/CV_" + wafer + "_2_1.png"
             image_CW = wafer_path + "/" + self.options["plot_folder"] + "/CW_" + wafer + "_1_1.png"
             file_config_CV = wafer_path + "/CV.json"
             file_config_CW = wafer_path + "/CW.json"

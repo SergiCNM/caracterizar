@@ -10,6 +10,9 @@ class Keithley_2470:
     unit_values = ["OHM", "WATT", "VOLT", "AMP"]
     route_values = ["REAR", "FRONT"]
     lim_values = ["VLIM", "ILIM"]
+    
+    # Maximum voltage supported by the probe station (mesa de puntas)
+    MAX_VOLTAGE = 500.0
 
     def __init__(self, parameters):
         """
@@ -155,6 +158,22 @@ class Keithley_2470:
             self.instrument.write(f":SOUR:{function}:{lim} {str(value)}")
         else:
             raise ValueError("Function not possible (VOLT or CURR)")
+    
+    def _check_voltage_limit(self, voltage, context=""):
+        """
+        Check if voltage is within safe limits for the probe station.
+        
+        :param voltage: Voltage value to check (in Volts)
+        :param context: Optional context string for error message (e.g., "start", "stop", "list")
+        :raises ValueError: If voltage exceeds MAX_VOLTAGE limit
+        """
+        if abs(voltage) > self.MAX_VOLTAGE:
+            context_str = f" ({context})" if context else ""
+            raise ValueError(
+                f"VOLTAGE SAFETY ERROR: Requested voltage{context_str} ({voltage}V) exceeds the maximum "
+                f"safe limit of ±{self.MAX_VOLTAGE}V supported by the probe station (mesa de puntas). "
+                f"Measurement aborted to prevent equipment damage."
+            )
 
     def set_lin_sweep(self, function, start, stop, points):
         """
@@ -175,6 +194,11 @@ class Keithley_2470:
 		:return: data
 		"""
         if function in self.function_values:
+            # Safety check for voltage sweeps: mesa de puntas soporta máximo ±500V
+            if function == "VOLT":
+                self._check_voltage_limit(start, "sweep start")
+                self._check_voltage_limit(stop, "sweep stop")
+            
             # Set up a linear sweep from 0 V to 5 V in 51 steps
             cmd = f':SOUR:SWE:{function}:LIN {start}, {stop}, {points}, {self.delay}, {self.count}, {self.rangeType}, {self.failAbort}, {self.dual}, "{self.bufferName}"'
             self.instrument.write(cmd)
@@ -212,6 +236,11 @@ class Keithley_2470:
 
     def set_list(self, function, lista):
         if function in self.function_values:
+            # Safety check for voltage lists: mesa de puntas soporta máximo ±500V
+            if function == "VOLT":
+                for i, v in enumerate(lista):
+                    self._check_voltage_limit(v, f"list index {i}")
+            
             lista_values = ", ".join(str(valor) for valor in lista)
             cmd = f":SOUR:LIST:{function} {lista_values}"
             self.instrument.write(cmd)
@@ -421,6 +450,9 @@ class Keithley_2470:
         return True
 
     def set_voltage(self, voltage):
+        # Safety check: mesa de puntas soporta máximo ±500V
+        self._check_voltage_limit(voltage)
+        
         cmd = f":SOUR:VOLT {voltage}"
         self.instrument.write(cmd)
 
