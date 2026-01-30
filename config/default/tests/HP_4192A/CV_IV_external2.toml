@@ -1,0 +1,80 @@
+title = "CV_IV_external2 parameters"
+width = 350
+
+[parameters]
+START = 0.0
+STOP = -500.0
+STEP = -1.0
+FREQ = "10"
+OSC = 500
+APERTURE = "3"
+POINT_AVERAGE = false
+AVERAGE_POINTS = 8
+SWEEP_AVERAGE = false
+AVERAGE_SWEEPS = 8
+HYSTERESIS = false
+HYSTERESIS_TIME = 1
+WAIT_TIME = 5.0
+SETTLE_TIME = 1.0
+LIGHT = false
+LIGHT_TIME = 3
+COMPLIANCE = 0.1
+RANGE = "AUTO"
+ROUTE_TERM = "REAR"
+SOURCE_DELAY = 1.0
+SENSE_COUNT = 3
+COMPENSATION_OPEN = false
+COMPENSATION_SHORT = false
+COMPENSATION_DONE = true
+GRAPH1 = "CP"
+GRAPH2 = "G"
+
+[options]
+RANGE = "AUTO,100,500,1000"
+ROUTE_TERM = "FRONT,REAR"
+APERTURE = "1,2,3,4,5"
+GRAPH1 = "CS,CP"
+GRAPH2 = "NONE,G"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+FREQ = "kHz"
+OSC = "mV"
+APERTURE = ""
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+SETTLE_TIME = "s"
+LIGHT_TIME = "s"
+COMPLIANCE = "mA"
+RANGE = "V"
+SOURCE_DELAY = "s"
+
+[help]
+START = "Start voltage from -500V to 500V"
+STOP = "Stop voltage from -500V to 500V"
+STEP = "Voltage step"
+FREQ = "Measurement frequency in kHz (comma separated values allowed)"
+OSC = "Oscillation voltage from 5mV to 1100mV"
+APERTURE = "Measurement speed (HP_4192A internal setting)"
+POINT_AVERAGE = "Enable point averaging"
+AVERAGE_POINTS = "Number of points to average from 1 to 999"
+SWEEP_AVERAGE = "Enable sweep averaging"
+AVERAGE_SWEEPS = "Number of sweeps to average from 1 to 999"
+HYSTERESIS = "Enable hysteresis measurement"
+HYSTERESIS_TIME = "Time to wait between forward and reverse sweeps"
+WAIT_TIME = "Time to wait before starting measurement"
+SETTLE_TIME = "Time to wait after setting voltage at each step"
+LIGHT = "Light on/off"
+LIGHT_TIME = "Light time"
+COMPLIANCE = "Current compliance for Keithley 2410"
+RANGE = "Voltage range for Keithley 2410"
+ROUTE_TERM = "Terminal routing for Keithley 2410 (Hardware switch on 2410)"
+COMPENSATION_OPEN = "Compensate for open circuit"
+COMPENSATION_SHORT = "Compensate for short circuit"
+COMPENSATION_DONE = "Compensations done"
+GRAPH1 = "Parameter 1 to measure (CS or CP)"
+GRAPH2 = "Parameter 2 to measure (NONE or G)"
+SOURCE_DELAY = "Source delay"
+SENSE_COUNT = "Number of measurements to make when a measurement is requested"

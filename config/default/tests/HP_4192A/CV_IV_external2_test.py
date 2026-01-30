@@ -69,7 +69,7 @@ def load_CV_IV_external_parameters():
         "GRAPH2": "G",
     }
     # load from external toml file in tests_dir (if exists, if not default values)
-    filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV_IV_external.toml'
+    filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV_IV_external2.toml'
     file_exists = os.path.exists(filename_config)
     if file_exists:
         toml_info = toml.load(filename_config)

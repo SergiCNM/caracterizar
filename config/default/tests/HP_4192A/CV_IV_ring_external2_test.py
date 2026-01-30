@@ -69,7 +69,7 @@ def load_CV_IV_ring_external_parameters():
         "GRAPH2": "G",
     }
     # load from external toml file in tests_dir (if exists, if not default values)
-    filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV_IV_ring_external.toml'
+    filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV_IV_ring_external2.toml'
     file_exists = os.path.exists(filename_config)
     if file_exists:
         toml_info = toml.load(filename_config)
@@ -333,7 +333,7 @@ def make_full_compensation(main, hp4192A, CV_IV_ring_external_parameters):
         else:
             # Modify toml file to indicate that compensation is done
             CV_IV_ring_external_parameters["COMPENSATION_DONE"] = True
-            filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV_IV_ring_external.toml'
+            filename_config = os.getcwd() + base_dir + tests_dir + '/HP_4192A/CV_IV_ring_external2.toml'
             file_exists = os.path.exists(filename_config)
             if file_exists:
                 toml_info = toml.load(filename_config)
