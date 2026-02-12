@@ -127,7 +127,6 @@ def measure_single_capacitance(hp4192A, CV_IV_external_parameters):
         hp4192A.single()
         lectura = hp4192A.read()
         lectura_array = lectura.split(",")
-        print("lectura_array:", lectura_array)
 
         # Expected format similar to CV_test: "Cxxx,...", "R/Gxxx,...", "Vxxx..."
         capacitance_value = lectura_array[0][4:]
@@ -158,7 +157,6 @@ def measure_CV_IV_external(main, source_smu, hp4192A, CV_IV_external_parameters)
     current_list = []
     capacitance_list = []
     conductance_list = []
-    print("measuring CV_IV_external with HP_4192A...")
 
     # Generate voltage steps
     start_v = CV_IV_external_parameters["START"]
@@ -176,7 +174,6 @@ def measure_CV_IV_external(main, source_smu, hp4192A, CV_IV_external_parameters)
     # Configure source SMU for voltage source mode
     if source_smu.driver_name == "Keithley_2470":
         compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
-        print("set compliance:", str(compliance))
         source_smu.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
 
     if source_smu.config_IV(CV_IV_external_parameters):
@@ -202,7 +199,6 @@ def measure_CV_IV_external(main, source_smu, hp4192A, CV_IV_external_parameters)
     for voltage in voltage_steps:
         try:
             # Set voltage on source SMU
-            print("Setting voltage to:", voltage)
             source_smu.set_voltage(voltage)
 
             # Wait for voltage to settle
@@ -216,7 +212,6 @@ def measure_CV_IV_external(main, source_smu, hp4192A, CV_IV_external_parameters)
             capacitance, conductance, t_meas = measure_single_capacitance(
                 hp4192A, CV_IV_external_parameters
             )
-            print("measured capacitance: ", capacitance)
             if t_meas is not None:
                 print(f"tmeas: {t_meas * 1000:.1f} ms")
             if capacitance is not None and current is not None:
