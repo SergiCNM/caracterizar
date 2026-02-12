@@ -24,6 +24,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
 from config.default.instruments import Keithley_2470
+from config.default.instruments import Keithley_2410
 from config.default.devices import *
 from config.functions import *
 import toml
@@ -65,6 +66,7 @@ def load_CV_IV_ring_external_parameters():
         "COMPENSATION_OPEN": False,
         "COMPENSATION_SHORT": False,
         "COMPENSATION_DONE": False,
+        "SOURCE_INSTRUMENT": "Keithley_2470",
         "GRAPH1": "CP",
         "GRAPH2": "G",
     }
@@ -79,7 +81,7 @@ def load_CV_IV_ring_external_parameters():
 def config_HP4192A_for_spot_measurement(hp4192A, CV_IV_ring_external_parameters):
     """
     Configure HP 4192A for spot capacitance measurement at fixed frequency.
-    The DC bias is assumed to be provided by external voltage sources (Keithley 2470 pad and ring),
+    The DC bias is assumed to be provided by external voltage sources,
     so the internal sweep of the HP 4192A is not used.
     :param hp4192A: HP_4192A instrument instance
     :param CV_IV_ring_external_parameters: parameters dictionary
@@ -143,13 +145,13 @@ def measure_single_capacitance(hp4192A, CV_IV_ring_external_parameters):
         return None, None, None
 
 
-def measure_CV_IV_ring_external(main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring_external_parameters):
+def measure_CV_IV_ring_external(main, source_pad, source_ring, hp4192A, CV_IV_ring_external_parameters):
     """
-    Measure CV curve using two external voltage sources (Keithley 2470 pad and ring)
+    Measure CV curve using two external voltage sources
     Both SMUs apply the same voltage simultaneously
     :param main: main program instance
-    :param k2470_pad: Keithley 2470 instrument instance for pad
-    :param k2470_ring: Keithley 2470 instrument instance for ring
+    :param source_pad: Keithley instrument instance for pad
+    :param source_ring: Keithley instrument instance for ring
     :param hp4192A: HP_4192A instrument instance
     :param CV_IV_ring_external_parameters: parameters dictionary
     :return: voltage, current_pad, current_ring, capacitance, conductance lists
@@ -174,23 +176,24 @@ def measure_CV_IV_ring_external(main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring
     num_points = int(abs((stop_v - start_v) / step_v)) + 1
     voltage_steps = np.linspace(start_v, stop_v, num_points)
 
-    # Configure Keithley 2470 pad for voltage source mode
-    compliance = float(CV_IV_ring_external_parameters["COMPLIANCE"] * 1E-3)
-    print("set compliance pad:", str(compliance))
-    k2470_pad.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
+    # Configure both source SMUs for voltage source mode
+    if source_pad.driver_name == "Keithley_2470":
+        compliance = float(CV_IV_ring_external_parameters["COMPLIANCE"] * 1E-3)
+        print("set compliance pad:", str(compliance))
+        source_pad.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
+    
+    if source_ring.driver_name == "Keithley_2470":
+        compliance = float(CV_IV_ring_external_parameters["COMPLIANCE"] * 1E-3)
+        print("set compliance ring:", str(compliance))
+        source_ring.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
 
-    # Configure Keithley 2470 ring for voltage source mode
-    print("set compliance ring:", str(compliance))
-    k2470_ring.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
-
-    # Configure both Keithley 2470 for voltage source mode
-    if k2470_pad.config_IV(CV_IV_ring_external_parameters) and k2470_ring.config_IV(CV_IV_ring_external_parameters):
-        k2470_pad.set_voltage(start_v)
-        k2470_ring.set_voltage(start_v)
-        k2470_pad.output("ON")
-        k2470_ring.output("ON")
+    if source_pad.config_IV(CV_IV_ring_external_parameters) and source_ring.config_IV(CV_IV_ring_external_parameters):
+        source_pad.set_voltage(start_v)
+        source_ring.set_voltage(start_v)
+        source_pad.output("ON")
+        source_ring.output("ON")
     else:
-        print("Error configuring Keithley 2470 instruments")
+        print("Error configuring source SMU instruments")
         return [], [], [], [], []
 
     # Light control
@@ -208,18 +211,18 @@ def measure_CV_IV_ring_external(main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring
     # Measure at each voltage step
     for voltage in voltage_steps:
         try:
-            # Set voltage on both Keithley 2470 (same voltage on pad and ring)
+            # Set voltage on both source SMUs (same voltage on pad and ring)
             print("Setting voltage to:", voltage)
-            k2470_pad.set_voltage(voltage)
-            k2470_ring.set_voltage(voltage)
+            source_pad.set_voltage(voltage)
+            source_ring.set_voltage(voltage)
 
             # Wait for voltage to settle
             if CV_IV_ring_external_parameters["SETTLE_TIME"] > 0:
                 time.sleep(CV_IV_ring_external_parameters["SETTLE_TIME"])
 
-            # Measure current with both Keithley 2470
-            current_pad = k2470_pad.measure_current_once()
-            current_ring = k2470_ring.measure_current_once()
+            # Measure current with both source SMUs
+            current_pad = source_pad.measure_current_once()
+            current_ring = source_ring.measure_current_once()
 
             # Measure capacitance with HP_4192A
             capacitance, conductance, t_meas = measure_single_capacitance(
@@ -242,9 +245,9 @@ def measure_CV_IV_ring_external(main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring
         except Exception as ex:
             print(f"Error at voltage {voltage}V: {ex}")
 
-    # Turn off both Keithley outputs
-    k2470_pad.output("OFF")
-    k2470_ring.output("OFF")
+    # Turn off both source SMU outputs
+    source_pad.output("OFF")
+    source_ring.output("OFF")
 
     # Hysteresis measurement (reverse direction)
     if CV_IV_ring_external_parameters["HYSTERESIS"]:
@@ -254,18 +257,18 @@ def measure_CV_IV_ring_external(main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring
         # Reverse voltage steps
         voltage_steps_reverse = voltage_steps[::-1]
 
-        k2470_pad.output("ON")
-        k2470_ring.output("ON")
+        source_pad.output("ON")
+        source_ring.output("ON")
         for voltage in voltage_steps_reverse:
             try:
-                k2470_pad.set_voltage(voltage)
-                k2470_ring.set_voltage(voltage)
+                source_pad.set_voltage(voltage)
+                source_ring.set_voltage(voltage)
                 if CV_IV_ring_external_parameters["SETTLE_TIME"] > 0:
                     time.sleep(CV_IV_ring_external_parameters["SETTLE_TIME"])
 
-                # Measure current with both Keithley 2470
-                current_pad = k2470_pad.measure_current_once()
-                current_ring = k2470_ring.measure_current_once()
+                # Measure current with both source SMUs
+                current_pad = source_pad.measure_current_once()
+                current_ring = source_ring.measure_current_once()
 
                 capacitance, conductance, _ = measure_single_capacitance(
                     hp4192A, CV_IV_ring_external_parameters
@@ -281,8 +284,8 @@ def measure_CV_IV_ring_external(main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring
             except Exception as ex:
                 print(f"Error at voltage {voltage}V (hysteresis): {ex}")
 
-        k2470_pad.output("OFF")
-        k2470_ring.output("OFF")
+        source_pad.output("OFF")
+        source_ring.output("OFF")
 
     return voltage_list, current_pad_list, current_ring_list, capacitance_list, conductance_list
 
@@ -360,12 +363,21 @@ def make_full_compensation(main, hp4192A, CV_IV_ring_external_parameters):
 
 try:
     # Initialize instruments
-    k2470_pad = Keithley_2470(instruments["Keithley_2470"])
-    k2470_ring = Keithley_2470(instruments["Keithley_2470ring"])
-    hp4192A = HP_4192A(instruments["HP_4192A"])
-
-    # Load parameters
     load_CV_IV_ring_external_parameters()
+    instr_name = CV_IV_ring_external_parameters.get("SOURCE_INSTRUMENT", "Keithley_2470")
+
+    if instr_name == "Keithley_2410":
+        source_pad = Keithley_2410(instruments["Keithley_2410"])
+        source_pad.driver_name = "Keithley_2410"
+        source_ring = Keithley_2410(instruments["Keithley_2410ring"])
+        source_ring.driver_name = "Keithley_2410"
+    else:
+        source_pad = Keithley_2470(instruments["Keithley_2470"])
+        source_pad.driver_name = "Keithley_2470"
+        source_ring = Keithley_2470(instruments["Keithley_2470ring"])
+        source_ring.driver_name = "Keithley_2470"
+
+    hp4192A = HP_4192A(instruments["HP_4192A"])
 
     # Extract frequencies (comma-separated list)
     freqs = CV_IV_ring_external_parameters["FREQ"].replace(" ", "").split(",")
@@ -396,7 +408,7 @@ try:
                 if config_HP4192A_for_spot_measurement(hp4192A, CV_IV_ring_external_parameters):
                     # Measure CV curve
                     voltage, current_pad, current_ring, capacitance, conductance = measure_CV_IV_ring_external(
-                        main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring_external_parameters
+                        main, source_pad, source_ring, hp4192A, CV_IV_ring_external_parameters
                     )
 
                     if len(voltage) > 0:
@@ -481,7 +493,7 @@ try:
 
             if config_HP4192A_for_spot_measurement(hp4192A, CV_IV_ring_external_parameters):
                 voltage, current_pad, current_ring, capacitance, conductance = measure_CV_IV_ring_external(
-                    main, k2470_pad, k2470_ring, hp4192A, CV_IV_ring_external_parameters
+                    main, source_pad, source_ring, hp4192A, CV_IV_ring_external_parameters
                 )
 
                 if len(voltage) > 0:
@@ -529,10 +541,10 @@ try:
                     )
 
     # Stop and close instruments
-    k2470_pad.stop()
-    k2470_pad.close()
-    k2470_ring.stop()
-    k2470_ring.close()
+    source_pad.stop()
+    source_pad.close()
+    source_ring.stop()
+    source_ring.close()
     hp4192A.stop()
     hp4192A.close()
 

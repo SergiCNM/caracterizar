@@ -2,6 +2,7 @@ title = "CV_IV_ring_external parameters"
 width = 350
 
 [parameters]
+SOURCE_INSTRUMENT = "Keithley_2470"
 START = 0.0
 STOP = -500.0
 STEP = -1.0
@@ -35,6 +36,7 @@ ROUTE_TERM = "FRONT,REAR"
 APERTURE = "1,2,3,4,5"
 GRAPH1 = "CS,CP"
 GRAPH2 = "NONE,G"
+SOURCE_INSTRUMENT = "Keithley_2470,Keithley_2410"
 
 [units]
 START = "V"
@@ -78,3 +80,4 @@ GRAPH1 = "Parameter 1 to measure (CS or CP)"
 GRAPH2 = "Parameter 2 to measure (NONE or G)"
 SOURCE_DELAY = "Source delay"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"
+SOURCE_INSTRUMENT = "Instrument(s) to use as voltage source (pad and ring will use the same type)"

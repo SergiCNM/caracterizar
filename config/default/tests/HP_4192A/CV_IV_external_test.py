@@ -24,6 +24,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
 from config.default.instruments import Keithley_2470
+from config.default.instruments import Keithley_2410
 from config.default.devices import *
 from config.functions import *
 import toml
@@ -65,6 +66,7 @@ def load_CV_IV_external_parameters():
         "COMPENSATION_OPEN": False,
         "COMPENSATION_SHORT": False,
         "COMPENSATION_DONE": False,
+        "SOURCE_INSTRUMENT": "Keithley_2470",
         "GRAPH1": "CP",
         "GRAPH2": "G",
     }
@@ -79,7 +81,7 @@ def load_CV_IV_external_parameters():
 def config_HP4192A_for_spot_measurement(hp4192A, CV_IV_external_parameters):
     """
     Configure HP 4192A for spot capacitance measurement at fixed frequency.
-    The DC bias is assumed to be provided by an external voltage source (Keithley 2470),
+    The DC bias is assumed to be provided by an external voltage source,
     so the internal sweep of the HP 4192A is not used.
     :param hp4192A: HP_4192A instrument instance
     :param CV_IV_external_parameters: parameters dictionary
@@ -143,11 +145,11 @@ def measure_single_capacitance(hp4192A, CV_IV_external_parameters):
         return None, None, None
 
 
-def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
+def measure_CV_IV_external(main, source_smu, hp4192A, CV_IV_external_parameters):
     """
-    Measure CV curve using external voltage source (Keithley 2470)
+    Measure CV curve using external voltage source
     :param main: main program instance
-    :param k2470: Keithley 2470 instrument instance
+    :param source_smu: Keithley instrument instance
     :param hp4192A: HP_4192A instrument instance
     :param CV_IV_external_parameters: parameters dictionary
     :return: voltage, capacitance, conductance lists
@@ -171,18 +173,18 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
     num_points = int(abs((stop_v - start_v) / step_v)) + 1
     voltage_steps = np.linspace(start_v, stop_v, num_points)
 
-    # Configure Keithley 2470 for voltage source mode
-    compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
-    print("set compliance:", str(compliance))
-    k2470.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
+    # Configure source SMU for voltage source mode
+    if source_smu.driver_name == "Keithley_2470":
+        compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
+        print("set compliance:", str(compliance))
+        source_smu.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
 
-    # Configure Keithley 2470 for voltage source mode
-    if k2470.config_IV(CV_IV_external_parameters):
-        k2470.set_voltage(start_v)
-        k2470.output("ON")
+    if source_smu.config_IV(CV_IV_external_parameters):
+        source_smu.set_voltage(start_v)
+        source_smu.output("ON")
     else:
-        print("Error configuring Keithley 2470")
-        return [], [], []
+        print("Error configuring source SMU")
+        return [], [], [], []
 
     # Light control
     if CV_IV_external_parameters["LIGHT"]:
@@ -199,16 +201,16 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
     # Measure at each voltage step
     for voltage in voltage_steps:
         try:
-            # Set voltage on Keithley 2470
+            # Set voltage on source SMU
             print("Setting voltage to:", voltage)
-            k2470.set_voltage(voltage)
+            source_smu.set_voltage(voltage)
 
             # Wait for voltage to settle
             if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                 time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
-            # Measure current with Keithley 2470
-            current = k2470.measure_current_once()
+            # Measure current with source SMU
+            current = source_smu.measure_current_once()
 
             # Measure capacitance with HP_4192A
             capacitance, conductance, t_meas = measure_single_capacitance(
@@ -228,8 +230,8 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
         except Exception as ex:
             print(f"Error at voltage {voltage}V: {ex}")
 
-    # Turn off Keithley output
-    k2470.output("OFF")
+    # Turn off source SMU output
+    source_smu.output("OFF")
 
     # Hysteresis measurement (reverse direction)
     if CV_IV_external_parameters["HYSTERESIS"]:
@@ -239,15 +241,15 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
         # Reverse voltage steps
         voltage_steps_reverse = voltage_steps[::-1]
 
-        k2470.output("ON")
+        source_smu.output("ON")
         for voltage in voltage_steps_reverse:
             try:
-                k2470.set_voltage(voltage)
+                source_smu.set_voltage(voltage)
                 if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                     time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
-                # Measure current with Keithley 2470
-                current = k2470.measure_current_once()
+                # Measure current with source SMU
+                current = source_smu.measure_current_once()
 
                 capacitance, conductance, _ = measure_single_capacitance(
                     hp4192A, CV_IV_external_parameters
@@ -262,7 +264,7 @@ def measure_CV_IV_external(main, k2470, hp4192A, CV_IV_external_parameters):
             except Exception as ex:
                 print(f"Error at voltage {voltage}V (hysteresis): {ex}")
 
-        k2470.output("OFF")
+        source_smu.output("OFF")
 
     return voltage_list, current_list, capacitance_list, conductance_list
 
@@ -340,11 +342,17 @@ def make_full_compensation(main, hp4192A, CV_IV_external_parameters):
 
 try:
     # Initialize instruments
-    k2470 = Keithley_2470(instruments["Keithley_2470"])
-    hp4192A = HP_4192A(instruments["HP_4192A"])
-
-    # Load parameters
     load_CV_IV_external_parameters()
+    instr_name = CV_IV_external_parameters.get("SOURCE_INSTRUMENT", "Keithley_2470")
+    
+    if instr_name == "Keithley_2410":
+        source_smu = Keithley_2410(instruments["Keithley_2410"])
+        source_smu.driver_name = "Keithley_2410"
+    else:
+        source_smu = Keithley_2470(instruments["Keithley_2470"])
+        source_smu.driver_name = "Keithley_2470"
+
+    hp4192A = HP_4192A(instruments["HP_4192A"])
 
     # Extract frequencies (comma-separated list)
     freqs = CV_IV_external_parameters["FREQ"].replace(" ", "").split(",")
@@ -375,7 +383,7 @@ try:
                 if config_HP4192A_for_spot_measurement(hp4192A, CV_IV_external_parameters):
                     # Measure CV curve
                     voltage, current, capacitance, conductance = measure_CV_IV_external(
-                        main, k2470, hp4192A, CV_IV_external_parameters
+                        main, source_smu, hp4192A, CV_IV_external_parameters
                     )
 
                     if len(voltage) > 0:
@@ -458,7 +466,7 @@ try:
 
             if config_HP4192A_for_spot_measurement(hp4192A, CV_IV_external_parameters):
                 voltage, current, capacitance, conductance = measure_CV_IV_external(
-                    main, k2470, hp4192A, CV_IV_external_parameters
+                    main, source_smu, hp4192A, CV_IV_external_parameters
                 )
 
                 if len(voltage) > 0:
@@ -504,8 +512,8 @@ try:
                     )
 
     # Stop and close instruments
-    k2470.stop()
-    k2470.close()
+    source_smu.stop()
+    source_smu.close()
     hp4192A.stop()
     hp4192A.close()
 
