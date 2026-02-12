@@ -1,0 +1,78 @@
+title = "CV_IV_ring_external parameters"
+width = 350
+
+[parameters]
+START = 0.0
+STOP = 40.0
+STEP = 1.0
+FREQ = "100"
+OSC = 500
+APERTURE = "5"
+POINT_AVERAGE = false
+AVERAGE_POINTS = 8
+SWEEP_AVERAGE = false
+AVERAGE_SWEEPS = 8
+HYSTERESIS = false
+HYSTERESIS_TIME = 0
+WAIT_TIME = 0.5
+SETTLE_TIME = 0.1
+LIGHT = false
+LIGHT_TIME = 1
+COMPLIANCE = 0.01
+RANGE = "AUTO"
+ROUTE_TERM = "REAR"
+COMPENSATION_OPEN = false
+COMPENSATION_SHORT = false
+COMPENSATION_DONE = false
+SOURCE_INSTRUMENT = "Keithley_2470"
+GRAPH1 = "CP"
+GRAPH2 = "G"
+
+[options]
+RANGE = "AUTO,0.1,1,10,100,500,1000"
+ROUTE_TERM = "FRONT,REAR"
+APERTURE = "1,2,3,4,5"
+GRAPH1 = "CS,CP"
+GRAPH2 = "NONE,G"
+SOURCE_INSTRUMENT = "Keithley_2470,Keithley_2410"
+
+[units]
+START = "V"
+STOP = "V"
+STEP = "V"
+FREQ = "kHz"
+OSC = "mV"
+APERTURE = ""
+HYSTERESIS_TIME = "s"
+WAIT_TIME = "s"
+SETTLE_TIME = "s"
+LIGHT_TIME = "s"
+COMPLIANCE = "mA"
+RANGE = "V"
+
+[help]
+START = "Start voltage"
+STOP = "Stop voltage"
+STEP = "Voltage step"
+FREQ = "Measurement frequency in kHz"
+OSC = "Oscillation voltage in mV"
+APERTURE = "Measurement speed (E4990A setting 1-5)"
+POINT_AVERAGE = "Enable point averaging"
+AVERAGE_POINTS = "Number of points to average"
+SWEEP_AVERAGE = "Enable sweep averaging"
+AVERAGE_SWEEPS = "Number of sweeps to average"
+HYSTERESIS = "Enable hysteresis measurement"
+HYSTERESIS_TIME = "Time to wait between sweeps"
+WAIT_TIME = "Initial wait time"
+SETTLE_TIME = "Wait time at each voltage step"
+LIGHT = "Light on/off"
+LIGHT_TIME = "Light duration"
+COMPLIANCE = "Current compliance (applies to both SMUs)"
+RANGE = "Source voltage range"
+ROUTE_TERM = "Routing (FRONT/REAR)"
+COMPENSATION_OPEN = "Open compensation"
+COMPENSATION_SHORT = "Short compensation"
+COMPENSATION_DONE = "Compensation status"
+SOURCE_INSTRUMENT = "Instrument to use as voltage source"
+GRAPH1 = "Parameter 1 (CS/CP)"
+GRAPH2 = "Parameter 2 (NONE/G)"

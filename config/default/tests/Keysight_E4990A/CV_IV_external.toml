@@ -26,6 +26,7 @@ SENSE_COUNT = 3
 COMPENSATION_OPEN = false
 COMPENSATION_SHORT = false
 COMPENSATION_DONE = true
+SOURCE_INSTRUMENT = "Keithley_2470"
 GRAPH1 = "CP"
 GRAPH2 = "G"
 
@@ -35,6 +36,7 @@ ROUTE_TERM = "FRONT,REAR"
 APERTURE = "1,2,3,4,5"
 GRAPH1 = "CS,CP"
 GRAPH2 = "NONE,G"
+SOURCE_INSTRUMENT = "Keithley_2470,Keithley_2410"
 
 [units]
 START = "V"
@@ -76,5 +78,6 @@ COMPENSATION_SHORT = "Compensate for short circuit"
 COMPENSATION_DONE = "Compensations done"
 GRAPH1 = "Parameter 1 to measure (CS or CP)"
 GRAPH2 = "Parameter 2 to measure (NONE or G)"
+SOURCE_INSTRUMENT = "Instrument to use as voltage source (Keithley_2470 or Keithley_2410)"
 SOURCE_DELAY = "Source delay"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"

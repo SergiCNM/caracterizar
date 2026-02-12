@@ -24,6 +24,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import Keysight_E4990A
 from config.default.instruments import Keithley_2470
+from config.default.instruments import Keithley_2410
 from config.default.devices import *
 from config.functions import *
 import toml
@@ -65,6 +66,7 @@ def load_CV_IV_external_parameters():
         "COMPENSATION_OPEN": False,
         "COMPENSATION_SHORT": False,
         "COMPENSATION_DONE": False,
+        "SOURCE_INSTRUMENT": "Keithley_2470",
         "GRAPH1": "CP",
         "GRAPH2": "G",
     }
@@ -222,11 +224,11 @@ def measure_single_capacitance(keysightE4990A, CV_IV_external_parameters):
         return None, None, None
 
 
-def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameters):
+def measure_CV_IV_external(main, source_smu, keysightE4990A, CV_IV_external_parameters):
     """
-    Measure CV curve using external voltage source (Keithley 2470)
+    Measure CV curve using external voltage source
     :param main: main program instance
-    :param k2470: Keithley 2470 instrument instance
+    :param source_smu: Keithley instrument instance
     :param keysightE4990A: Keysight E4990A instrument instance
     :param CV_IV_external_parameters: parameters dictionary
     :return: voltage, capacitance, conductance lists
@@ -248,16 +250,17 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
     num_points = int(abs((stop - start) / step)) + 1
     voltage_steps = np.linspace(start, stop, num_points)
 
-    # Configure Keithley 2470 for voltage source mode
-    compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
-    print("set compliance:", str(compliance))
-    k2470.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
+    # Configure source SMU for voltage source mode
+    if source_smu.driver_name == "Keithley_2470":
+        compliance = float(CV_IV_external_parameters["COMPLIANCE"] * 1E-3)
+        print("set compliance:", str(compliance))
+        source_smu.instrument.write(f":SENS:CURR:RANGE {str(compliance)}")
 
-    if k2470.config_IV(CV_IV_external_parameters):
-        k2470.set_voltage(start)
-        k2470.output("ON")
+    if source_smu.config_IV(CV_IV_external_parameters):
+        source_smu.set_voltage(start)
+        source_smu.output("ON")
     else:
-        print("Error configuring Keithley 2470")
+        print("Error configuring source SMU")
         return [], [], []
 
     # Light control
@@ -275,9 +278,9 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
     # Measure at each voltage step
     for voltage in voltage_steps:
         try:
-            # Set voltage on Keithley 2470
+            # Set voltage on source SMU
             print("Setting voltage to:", voltage)
-            k2470.set_voltage(voltage)
+            source_smu.set_voltage(voltage)
 
             # Wait for voltage to settle
             if CV_IV_external_parameters["SETTLE_TIME"] > 0:
@@ -298,8 +301,8 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
         except Exception as ex:
             print(f"Error at voltage {voltage}V: {ex}")
 
-    # Turn off Keithley output
-    k2470.output("OFF")
+    # Turn off source SMU output
+    source_smu.output("OFF")
 
     # Hysteresis measurement (reverse direction)
     if CV_IV_external_parameters["HYSTERESIS"]:
@@ -309,10 +312,10 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
         # Reverse voltage steps
         voltage_steps_reverse = voltage_steps[::-1]
 
-        k2470.output("ON")
+        source_smu.output("ON")
         for voltage in voltage_steps_reverse:
             try:
-                k2470.set_voltage(voltage)
+                source_smu.set_voltage(voltage)
                 if CV_IV_external_parameters["SETTLE_TIME"] > 0:
                     time.sleep(CV_IV_external_parameters["SETTLE_TIME"])
 
@@ -326,7 +329,7 @@ def measure_CV_IV_external(main, k2470, keysightE4990A, CV_IV_external_parameter
             except Exception as ex:
                 print(f"Error at voltage {voltage}V (hysteresis): {ex}")
 
-        k2470.output("OFF")
+        source_smu.output("OFF")
 
     return voltage_list, capacitance_list, conductance_list
 
@@ -394,11 +397,17 @@ def make_full_compensation(main, keysightE4990A, CV_IV_external_parameters):
 
 try:
     # Initialize instruments
-    k2470 = Keithley_2470(instruments["Keithley_2470"])
-    keysightE4990A = Keysight_E4990A(instruments["Keysight_E4990A"])
-
-    # Load parameters
     load_CV_IV_external_parameters()
+    instr_name = CV_IV_external_parameters.get("SOURCE_INSTRUMENT", "Keithley_2470")
+
+    if instr_name == "Keithley_2410":
+        source_smu = Keithley_2410(instruments["Keithley_2410"])
+        source_smu.driver_name = "Keithley_2410"
+    else:
+        source_smu = Keithley_2470(instruments["Keithley_2470"])
+        source_smu.driver_name = "Keithley_2470"
+
+    keysightE4990A = Keysight_E4990A(instruments["Keysight_E4990A"])
 
     # Extract frequencies (comma-separated list)
     freqs = CV_IV_external_parameters["FREQ"].replace(" ", "").split(",")
@@ -425,7 +434,7 @@ try:
                 if config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters):
                     # Measure CV curve
                     voltage, capacitance, conductance = measure_CV_IV_external(
-                        main, k2470, keysightE4990A, CV_IV_external_parameters)
+                        main, source_smu, keysightE4990A, CV_IV_external_parameters)
 
                     if len(voltage) > 0:
                         meas_status = "meas_success"
@@ -498,7 +507,7 @@ try:
 
             if config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters):
                 voltage, capacitance, conductance = measure_CV_IV_external(
-                    main, k2470, keysightE4990A, CV_IV_external_parameters)
+                    main, source_smu, keysightE4990A, CV_IV_external_parameters)
 
                 if len(voltage) > 0:
                     voltage = np.array(voltage)
@@ -536,8 +545,8 @@ try:
                                            headers=["V", "C", "G"], separation=",")
 
     # Stop and close instruments
-    k2470.stop()
-    k2470.close()
+    source_smu.stop()
+    source_smu.close()
     keysightE4990A.stop()
 
 except:
