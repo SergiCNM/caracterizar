@@ -2888,6 +2888,7 @@ class MainWindow(QMainWindow):
         # === Abrir ventana de parámetros ===
         try:
             self.instrument_window = DeviceParametersWindow(target_file, instrument_name)
+            self.instrument_window.configuration_saved.connect(self.reload_instruments)
             self.instrument_window.show()
         except Exception as e:
             QMessageBox.critical(
@@ -2934,6 +2935,7 @@ class MainWindow(QMainWindow):
         # === Abrir ventana de parámetros ===
         try:
             self.prober_window = DeviceParametersWindow(target_file, prober_name)
+            self.prober_window.configuration_saved.connect(self.reload_probers)
             self.prober_window.show()
         except Exception as e:
             QMessageBox.critical(
@@ -3501,6 +3503,13 @@ class MainWindow(QMainWindow):
         global instruments
         instruments = load_toml_config("instruments.toml")
         self.load_instruments()
+
+    def reload_probers(self):
+        global probers
+        probers = load_toml_config("probers.toml")
+        self.load_probers()
+        self.prober = None
+        print("Probers reloaded.")
 
     def load_tests(self):
         global widgets

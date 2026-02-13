@@ -168,7 +168,10 @@ class ParametersWindow(QWidget):
         toml_file.close()
 
 
+from PySide6.QtCore import Signal
+
 class DeviceParametersWindow(QWidget):
+    configuration_saved = Signal()
     def __init__(self, toml_path, device_name):
         super().__init__()
         self.toml_path = toml_path
@@ -298,3 +301,4 @@ class DeviceParametersWindow(QWidget):
             toml.dump(self.toml_data, f)
 
         QMessageBox.information(self, "Saved", f"Configuration saved for {self.device_name}")
+        self.configuration_saved.emit()

@@ -3,6 +3,10 @@
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
 
+## [2.2.1] - 2026-02-13
+### Added
+- **Configuration Reloading**: Recarga automática e inmediata de la configuración de instrumentos y probers al guardar cambios en la interfaz.
+
 ## [2.2.0] - 2026-02-13
 ### Added
 - **Global Temperature Control**: Soporte para ejecutar tests (simples y cartográficos) a múltiples temperaturas definidas en la configuración del prober.
