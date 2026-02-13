@@ -2301,6 +2301,29 @@ class MainWindow(QMainWindow):
         # PRINT BTN NAME
         # print(f'Button "{btnName}" pressed!')
 
+    def wait_for_temperature(self, target_temp, timeout=300):
+        self.updateTextDescription(f"- Waiting for temperature: {target_temp:.1f} °C (Timeout: {timeout}s)...")
+        # timeout in seconds
+        start_time = time.time()
+        while True:
+            QApplication.processEvents()
+            current_temp = float(self.prober.get_chuck_temp())
+            # Tolerance 1 degree
+            if abs(current_temp - target_temp) < 1.0:
+                 self.updateTextDescription(f"- Temperature reached: {current_temp:.1f} °C")
+                 break
+            
+            if (time.time() - start_time) > timeout:
+                messageBox(self, "Temperature Timeout", "Timeout waiting for temperature!", "warning")
+                return False
+            
+            # check abort
+            if test_status.status == "ABORTED" or measurement_status.status == "STOP":
+                 return False
+
+            time.sleep(1)
+        return True
+
     def IsMeasurement(self):
         if widgets.cmbTests.currentIndex() > 0 and widgets.cmbInstruments.currentIndex() > 0:
             return True
@@ -2345,75 +2368,154 @@ class MainWindow(QMainWindow):
         # SHOW HOME PAGE
         if btnName == "btnStart":
             if self.IsMeasurement():
-                if self.IsCartographyMeasurement():
-                    # START OR CONTINUE
-                    self.change_state_process("START")  # update status global (need previous state)
-                    if test_status_previous != "PAUSED":
+                # GET TEMPERATURES
+                temperatures = [None]
+                prober_name = widgets.cmbProbers.currentText()
+                use_temperature = False
+                if prober_name in probers:
+                    if "temperature" in probers[prober_name] and probers[prober_name]["temperature"]["enable"]:
+                        # parsing
+                        try:
+                            temps_str = probers[prober_name]["temperature"]["temperature_list"]
+                            temperatures = [float(x.strip()) for x in temps_str.split(",")]
+                            use_temperature = True
+                            # notify user
+                            self.updateTextDescription(f"Temperature control ENABLED. List: {temperatures}")
+                            retval = messageBox(self, "Temperature Control",
+                                       f"Temperature control is ENABLED.\nList: {temperatures}\n\nDo you want to continue?", "question")
+                            if retval != QMessageBox.Yes:
+                                self.updateTextDescription("Measurement cancelled by user.")
+                                return
+                        except:
+                            pass
 
-                        # Start cartographic measurement
-                        retval = messageBox(self, "Starting cartographic measurement!", "Are you sure?", "question")
-                        if retval == QMessageBox.Yes:
-                            # create header file
-                            # create file measurement
-                            process_name = widgets.txtProcess.text()
-                            lot_name = widgets.txtLot.text()
-                            wafer_name = widgets.txtWafer.text()
-                            mask_name = widgets.txtMask.text()
-                            operator_name = username
-                            filename_test = self.get_filename_test()
-                            parameters = {
-                                "process_name": process_name,
-                                "lot_name": lot_name,
-                                "wafer_name": wafer_name,
-                                "mask_name": mask_name,
-                                "operator_name": operator_name,
-                                "filename_test": filename_test,
-                                "date": "",
-                                "time": "",
-                                "waferinfo":"",
-                                "output_dir": os.path.join(results_dir, self.username)
-                            }
-                            # Ensure output directory exists
-                            os.makedirs(parameters["output_dir"], exist_ok=True)
-                            file_measurement = MeasurementFile(parameters)
-                            if file_measurement.created:
-                                if file_measurement.MeasurementHeaderFile():
-                                    widgets.btnPause.setEnabled(True)
-                                    widgets.btnStop.setEnabled(True)
-                                    # Estado de la medida en START
-                                    measurement_status.status = "START"
-                                    # iniciamos medida cartográfica
-                                    self.updateTextDescription("START CARTOGRAPHIC MEASUREMENT")
-                                    self.execute_cartographic_measurement()
-                                    self.updateTextDescription("FINISH CARTOGRAPHIC MEASUREMENT")
-                                    QApplication.processEvents()
-                                else:
-                                    retval = messageBox(self, "Not header file created!",
-                                                        "An error occurs while adding header to measurement file",
-                                                        "warning")
+                # Loop Init
+                auto_carto = False
+
+                for temp in temperatures:
+                    # CHECK STOP/PAUSE
+                    if test_status.status == "ABORTED" or test_status.status == "STOP" or measurement_status.status == "STOP":
+                        break
+                    
+                    if temp is not None:
+                        # SET TEMPERATURE
+                        widgets.txtTemperature.setText(str(temp))
+                        self.updateTextDescription(f"- Setting temperature to {temp} °C...")
+                        
+                        # Ensure prober is initialized
+                        if self.prober is None or self.name_prober != prober_name:
+                            self.name_prober = prober_name
+                            try:
+                                self.prober = eval(self.name_prober)(probers[self.name_prober])
+                            except Exception as e:
+                                self.updateTextDescription(f"- Error initializing prober: {e}")
+                                continue
+                        
+                        valid_temp = False
+                        # Check min/max
+                        min_t = probers[prober_name]["temperature"].get("min_temperature", -40)
+                        max_t = probers[prober_name]["temperature"].get("max_temperature", 300)
+                        timeout = probers[prober_name]["temperature"].get("temperature_timeout", 300)
+                        
+                        if min_t <= temp <= max_t:
+                            self.prober.set_chuck_temp(temp)
+                            # Wait
+                            if not self.wait_for_temperature(temp, timeout=timeout):
+                                break # Error or Abort
+                        else:
+                            self.updateTextDescription(f"- Temperature {temp} out of range ({min_t}, {max_t}). Skipping.")
+                            continue
+
+                    if self.IsCartographyMeasurement():
+                        # START OR CONTINUE
+                        self.change_state_process("START")  # update status global (need previous state)
+                        if test_status_previous != "PAUSED":
+
+                            # Start cartographic measurement
+                            if not auto_carto:
+                                retval = messageBox(self, "Starting cartographic measurement!", "Are you sure?", "question")
                             else:
-                                retval = messageBox(self, "Not file created!",
-                                                    "An error occurs while creating measurement file", "warning")
+                                retval = QMessageBox.Yes
 
-                        self.change_state_process("FINISH")
+                            if retval == QMessageBox.Yes:
+                                # create header file
+                                # create file measurement
+                                process_name = widgets.txtProcess.text()
+                                lot_name = widgets.txtLot.text()
+                                wafer_name = widgets.txtWafer.text()
+                                mask_name = widgets.txtMask.text()
+                                operator_name = username
+                                filename_test = self.get_filename_test()
+                                parameters = {
+                                    "process_name": process_name,
+                                    "lot_name": lot_name,
+                                    "wafer_name": wafer_name,
+                                    "mask_name": mask_name,
+                                    "operator_name": operator_name,
+                                    "filename_test": filename_test,
+                                    "date": "",
+                                    "time": "",
+                                    "waferinfo":"",
+                                    "output_dir": os.path.join(results_dir, self.username)
+                                }
+                                # Ensure output directory exists
+                                os.makedirs(parameters["output_dir"], exist_ok=True)
+                                file_measurement = MeasurementFile(parameters)
+                                if file_measurement.created:
+                                    if file_measurement.MeasurementHeaderFile():
+                                        widgets.btnPause.setEnabled(True)
+                                        widgets.btnStop.setEnabled(True)
+                                        # Estado de la medida en START
+                                        measurement_status.status = "START"
+                                        # iniciamos medida cartográfica
+                                        self.updateTextDescription("START CARTOGRAPHIC MEASUREMENT")
+                                        self.execute_cartographic_measurement(auto=auto_carto)
+                                        self.updateTextDescription("FINISH CARTOGRAPHIC MEASUREMENT")
+                                        QApplication.processEvents()
+                                        
+                                        # Set auto true for next iterations
+                                        auto_carto = True
 
-                else:
-                    test_status.status = "IDLE"
-                    contact_status.status = "IDLE"
-                    # Normal measurement
-                    # Put progressBar to 0% and btnStart False
-                    self.change_state_process("START")
-                    # Estado de la medida en START + STOP (cuando acaba)
-                    self.updateTextDescription("Start single measure")
-                    # Execute single measurement
-                    self.execute_measurement()
-                    # When finish 100% and btnStart true
-                    while measurement_status.status != "FINISH":
+                                    else:
+                                        retval = messageBox(self, "Not header file created!",
+                                                            "An error occurs while adding header to measurement file",
+                                                            "warning")
+                                else:
+                                    retval = messageBox(self, "Not file created!",
+                                                        "An error occurs while creating measurement file", "warning")
+
+                            # self.change_state_process("FINISH") # REMOVE THIS, leave it control by loop or finish?
+                            # Wait, execute_cartographic_measurement handles its own status?
+                            # It sets test_status.status = "FINISHED" at end.
+                            # But change_state_process("FINISH") resets buttons.
+                            # If we loop, we don't want to reset buttons until ALL loops done?
+                            # But execute_cartographic_measurement resets widgets at end of execution via change_state_process?
+                            # Let's check execute_cartographic_measurement line 3280: It calls toggle_widgets(True) at end.
+                            # And change_state_process("STOP") on error.
+                            # It does NOT call change_state_process("FINISH")?
+                            pass
+
+                    else:
+                        test_status.status = "IDLE"
+                        contact_status.status = "IDLE"
+                        # Normal measurement
+                        # Put progressBar to 0% and btnStart False
+                        self.change_state_process("START")
+                        # Estado de la medida en START + STOP (cuando acaba)
+                        self.updateTextDescription("Start single measure")
+                        # Execute single measurement
+                        self.execute_measurement()
+                        # When finish 100% and btnStart true
+                        while measurement_status.status != "FINISH":
+                            QApplication.processEvents()
+                            QThread.msleep(50)
+                        #
+                        self.updateTextDescription("Finish single measure")
                         QApplication.processEvents()
-                        QThread.msleep(50)
-                    #
-                    self.updateTextDescription("Finish single measure")
-                    QApplication.processEvents()
+                
+                # FINISH LOOP
+                if self.IsCartographyMeasurement():
+                     self.change_state_process("FINISH")
 
             else:
                 retval = messageBox(self, "Not a valid measurement!",
@@ -2964,7 +3066,7 @@ class MainWindow(QMainWindow):
             self.prober_window2.activateWindow()
             self.prober_window2.raise_()
 
-    def execute_cartographic_measurement(self):
+    def execute_cartographic_measurement(self, auto=False):
         global measurement_status, wafer_parameters, test_status, contact_status, contact_test, contact_errors, actual_height, file_measurement
         global dieActual, moduleActual, init_chip, end_chip
         global total_meas  # dict with meas, in , out, meas_success, meas_warning & meas_error numbers
@@ -3007,9 +3109,13 @@ class MainWindow(QMainWindow):
 
                     if str(vacuum) == "1":
                         # 4) put message to user to advice process
-                        retval = messageBox(self, "Cartographic process starting",
-                                            "Please, check you are in HOME position. The system will go to the ORIGIN position and starts process automatically! Are you ready?",
-                                            "question")
+                        if not auto:
+                            retval = messageBox(self, "Cartographic process starting",
+                                                "Please, check you are in HOME position. The system will go to the ORIGIN position and starts process automatically! Are you ready?",
+                                                "question")
+                        else:
+                            retval = QMessageBox.Yes
+
                         if retval == QMessageBox.Yes:
                             self.prober.move_separation()
                             contact_status.status = "SEPARATION"
@@ -3022,9 +3128,13 @@ class MainWindow(QMainWindow):
                                 X, Y = wafer.calculate_init_prober_movement()
                             else:
                                 self.updateTextDescription("- Not in HOME position")
-                                retval = messageBox(self, "Home detection failed",
-                                                    "Do you want to go to the HOME position automatically! Are you ready?",
-                                                    "question")
+                                if not auto:
+                                    retval = messageBox(self, "Home detection failed",
+                                                        "Do you want to go to the HOME position automatically! Are you ready?",
+                                                        "question")
+                                else:
+                                    retval = QMessageBox.Yes
+                                
                                 if retval == QMessageBox.Yes:
                                     self.prober.move_home()
                                     self.updateTextDescription("- Go to HOME position")

@@ -1,16 +1,16 @@
 title = "Caracterizar"
-version = "2.1.1"
+version = "2.2.0"
 author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
-darkmode = false
+darkmode = true
 estepa = true
 txtprocess = "19176"
 txtlot = "19176"
 txtwafer = "2"
 txtmask = "CNM004"
-txttemperature = "23.0"
+txttemperature = "35.0"
 txthumidity = "41"
 
 [dirs]

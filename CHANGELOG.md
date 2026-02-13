@@ -2,6 +2,20 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+
+## [2.2.0] - 2026-02-13
+### Added
+- **Global Temperature Control**: Soporte para ejecutar tests (simples y cartográficos) a múltiples temperaturas definidas en la configuración del prober.
+- Helper `wait_for_temperature` en `main.py` para asegurar la estabilidad térmica antes de medir.
+- Parámetro `temperature_timeout` configurable en `probers.toml` (por defecto 300s).
+- Simulación de temperatura en el driver `CNM_TEST_prober` para facilitar el desarrollo y pruebas.
+
+### Changed
+- Las unidades de temperatura ahora se muestran explícitamente como **°C**.
+- El valor por defecto de `min_temperature` para probers se ha actualizado a **-40 °C**.
+- Automatización del bucle cartográfico: se suprimen las confirmaciones de usuario (Home, Start) después de la primera temperatura.
+- Al iniciar un test con control de temperatura, se solicita confirmación explícita al usuario para evitar ejecuciones accidentales.
+
 ## [2.1.1] - 2026-02-12
 ### Added
 - Nuevo test de anillo para Keysight E4990A: `CV_IV_ring_external_test.py`.

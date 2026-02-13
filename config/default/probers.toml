@@ -27,6 +27,13 @@ max_tries = 2
 reach_contact = false
 measure_always = true
 
+[CNM_TEST.temperature]
+enable = true
+max_temperature = 300.0
+min_temperature = -40.0
+temperature_list = "25.0,30.0,35.0"
+temperature_timeout = 300
+
 [MPI_TS2000SE.progressive_contact]
 enable = false
 program = "testcontact_random.py"
@@ -34,6 +41,13 @@ steps = 10
 max_tries = 4
 reach_contact = false
 measure_always = true
+
+[MPI_TS2000SE.temperature]
+enable = false
+max_temperature = 300.0
+min_temperature = -40.0
+temperature_list = "25.0"
+temperature_timeout = 300
 
 [KARLSUSS_PA200.progressive_contact]
 enable = false

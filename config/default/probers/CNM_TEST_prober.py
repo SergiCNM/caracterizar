@@ -6,10 +6,18 @@ import time
 class CNM_TEST:
 	def __init__(self,parameters):
 		self.address = parameters["address"]
+		self.temperature = 25.0
 
 
 	def idn(self):
 		return "TEST PROBER CNM"
+
+	def set_chuck_temp(self, temperature):
+		self.temperature = float(temperature)
+		return True
+
+	def get_chuck_temp(self):
+		return self.temperature
 		
 			
 	def set_soft_contact(self, mode):
