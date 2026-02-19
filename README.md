@@ -1,5 +1,8 @@
 # Caracterizar
 
+<img width="1406" height="922" alt="image" src="https://github.com/user-attachments/assets/61629a7d-422b-4f96-a62f-d10fa4e2ab38" />
+
+
 ## Introduction
 
 **Caracterizar** is a powerful GUI-based software designed for electrical characterization of semiconductor devices. The software provides seamless integration of laboratory instruments such as **semiconductor parameter analyzers, impedance analyzers, and probe stations**, allowing users to execute both individual device tests and complete wafer-level measurements.
