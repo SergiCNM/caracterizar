@@ -3,6 +3,11 @@
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
 
+## [2.2.2] - 2026-02-13
+### Changed
+- **MES_FILE_test.py**: Se ha actualizado el test. Problemas con multitest y variable MEASUREMENT_STATUS.
+- **HP_4155_instrument.py**: Se ha actualizado el driver del instrumento. Añadido sleep 1s despues de guardar datos.
+
 ## [2.2.1] - 2026-02-13
 ### Added
 - **Configuration Reloading**: Recarga automática e inmediata de la configuración de instrumentos y probers al guardar cambios en la interfaz.

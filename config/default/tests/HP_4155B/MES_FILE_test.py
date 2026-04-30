@@ -33,10 +33,8 @@ def load_MES_parameters():
 
 def measure_single(hp4155):
 	# single measurement
-	#measurement_status.status = "START"
 	hp4155.single()
 	hp4155.dataReady()
-	#measurement_status.status = "FINISH"
 
 
 load_MES_parameters()
@@ -66,7 +64,6 @@ else:
 
         if test_status.status=="STARTED":
             for test_name in test_names:
-                measurement_status.status = "START"
                 # set test name
                 hp4155.load_mes(destination=MES_parameters["NET"], namefile=test_name)
                 measure_single(hp4155)
@@ -110,7 +107,6 @@ else:
                     if MES_parameters["MOVE_FILES"]:
                         hp4155.move_files_txt(MES_parameters)
                     count = 0
-                measurement_status.status = "FINISH"
                 print(f"{test_name} for die {dieActual} and module {moduleActual} FINISHED!")
     else:
         dieActual = 1

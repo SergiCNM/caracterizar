@@ -191,7 +191,7 @@ class HP_4155B:
             print(f"name file: {name_file}")
             cmd = ":MMEM:STOR:SSH '" + name_file + "'"
             self.instrument.write(cmd)
-            #time.sleep(3)
+            time.sleep(1)
 
     def refresh_net(self, MES_parameters):
         """
