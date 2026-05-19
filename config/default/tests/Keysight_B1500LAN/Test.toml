@@ -1,11 +1,36 @@
 title = "Test parameters"
 
 [parameters]
-WORKSPACE_NAME = "SOLARMEMS"
-GROUP = "SOLARMEMS"
-TEST_PRESET_GROUP_NAME = "Solarmems"
+WORKSPACE_NAME = "NanoNEMS"
+GROUP = "NanoNEMS"
+TEST_PRESET_GROUP_NAME = "IsVbulk"
+
+[output]
+variables = "Vs,Is,Ibulk,Vbulk"
+separator = "comma"
+prefix = "IV"
+suffix = ""
+
+[plot]
+name = "IV Measurement"
+title = "I-V Measurement"
+x_variable = "Vs"
+y1_variable = "Is"
+y2_variable = "Ibulk"
+left_label = "Is"
+right_label = "Ibulk"
+bottom_label = "Vs"
+left_units = "A"
+right_units = "A"
+bottom_units = "V"
+show_grid = false
+legend = true
+step_variable = ""
+step_label = ""
+step_units = "V"
 
 [options]
+separator = "comma,space,tab"
 
 [units]
 
@@ -13,3 +38,23 @@ TEST_PRESET_GROUP_NAME = "Solarmems"
 WORKSPACE_NAME = "Workspace name"
 GROUP = "Group name"
 TEST_PRESET_GROUP_NAME = "Test preset group name"
+variables = "Variables to save (comma-separated)"
+separator = "Separator for output file: comma, space, or tab"
+prefix = "Prefix for output filename"
+suffix = "Suffix for output filename"
+name = "Plot name"
+title = "Plot title"
+x_variable = "Variable name for X axis"
+y1_variable = "Variable name for Y1 axis (left)"
+y2_variable = "Variable name for Y2 axis (right, optional)"
+left_label = "Left axis label"
+right_label = "Right axis label"
+bottom_label = "Bottom axis label"
+left_units = "Left axis units"
+right_units = "Right axis units"
+bottom_units = "Bottom axis units"
+show_grid = "Show grid (true/false)"
+legend = "Show legend (true/false)"
+step_variable = "Variable name for stepped sweep (e.g. Vd). If set, splits data into multi-series plot."
+step_label = "Label for the stepped variable in legend (e.g. VD)"
+step_units = "Units for the stepped variable in legend (e.g. V)"

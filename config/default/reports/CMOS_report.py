@@ -25,7 +25,7 @@ import datetime
 options = {"wafermap": True, "histogram": True, "plot": True,
            "cmos_data": True, "cmos_image": True, "cmos_plot": True,
            "data_folder": 'data', "image_folder": 'photos', "plot_folder": 'plots', "comparative": "comparative",
-           "compensation": True,
+           "compensation": False,
            "excluded_parameters": ['idsinvn1', 'idsinvn2', 'idsinvn3', 'idsinvn4', 'idsinvn5', 'idsinvn6', 'idsinvp1', 'idsinvp2', 'idsinvp3', 'idsinvp4', 'idsinvp5', 'idsinvp6']}
 
 exists_result_file = False
@@ -82,7 +82,8 @@ if get_report:
         filename_pdf = directoryName + "/" + os.path.basename(os.path.normpath(directoryName)) + ".pdf"
         widgets.txtResultReport.appendPlainText("Checking information and creating plot graphs...")
         QApplication.processEvents()
-        CMOS = CMOS(widgets, options, directoryName, self.config)
+        print("Config:", main.config)
+        CMOS = CMOS(widgets, options, directoryName, main.config)
         print("Wafers detected")
         print(CMOS.wafers)
         for wafer in CMOS.wafers:

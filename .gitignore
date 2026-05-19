@@ -13,6 +13,8 @@ proves/
 
 # Archivos requirements auxiliares
 requirements_*.txt
+!requirements.txt
+requirements_dev.txt
 
 # Archivo readme.txt en la carpeta raíz
 readme.txt
@@ -31,3 +33,6 @@ Thumbs.db
 
 # Log files in folder log
 log/*.log
+
+# Tests (solo desarrollo local)
+tests/

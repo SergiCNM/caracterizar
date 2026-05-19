@@ -45,7 +45,8 @@ class CMOS(FPDF):
         self.dataWafersParameters_list = list()  # list of list with (wafer, parameter, value)
         self.check_wafers()
         self.config_estepa_toml = dict()
-        self.get_toml()
+        #self.get_toml()
+        self.config_estepa_toml = self.config["estepa"]    
         base_dejavu_path = 'c:\\WINDOWS\\FONTS\\'
         # base_dejavu_path = 'C:\\Users\\Sergi\\Downloads\\DejaVuSerif\\'
         self.add_font('DejaVu', '', os.path.join(base_dejavu_path, 'DejaVuSerif.ttf'))
@@ -369,8 +370,8 @@ class CMOS(FPDF):
                                  'VTFN', 'VTFP', 'IOFFN30', 'IOFFP30',
                                  'LEFFN', 'LEFFP', 'RCMP+', 'RCMN+',
                                  'RCMP0', 'RCMP1', 'R#P+', 'R#N+',
-                                 'R#P0', 'R#P1', 'R#M1', 'R#NTUB', 'R#P1AA',
-                                 'DWP+', 'DWN+', 'DWP0', 'DWP1', 'DWM1', 'DWNTUB', 'DWP1AA']
+                                 'R#P0', 'R#P1', 'R#M1', 'R#M1d', 'R#M1g', 'R#NTUB', 'R#P1AA',
+                                 'DWP+', 'DWN+', 'DWP0', 'DWP1', 'DWM1', 'DWM1d', 'DWM1g', 'DWNTUB', 'DWP1AA']
         parameters_excluded = ['IOFFN30x3', 'IOFFP30x3', 'BETAFN', 'BETAFP', 'IOFFFN', 'IOFFFP']
         # Create report
         plt.style.use('default')  # for prevent mpl uses inside Caracterizar

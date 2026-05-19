@@ -1,9 +1,8 @@
 # Keysight B1500 LAN instrument driver
 import pyvisa
 import time
-import sys
 import numpy as np
-from io import StringIO   # StringIO behaves like a file object
+from io import StringIO
 
 class Keysight_B1500LAN:
 	def __init__(self,parameters):
@@ -25,13 +24,22 @@ class Keysight_B1500LAN:
 		self.instrument.write_termination = write_termination
 
 	def timeout(self,timeout):
+		print("setting timeout to: ", timeout)
 		self.instrument.timeout = timeout
 
 	def idn(self):
 		return self.instrument.query('*IDN?')
 
-	def dataready(self):
-		return self.instrument.query('*OPC?')
+	def dataready(self, timeout_ms=120000):
+		self.instrument.write('*OPC?')
+		start = time.time() * 1000
+		while (time.time() * 1000) - start < timeout_ms:
+			try:
+				self.instrument.timeout = 2000
+				return self.instrument.read().strip()
+			except pyvisa.VisaIOError:
+				pass
+		raise TimeoutError(f"dataready timed out after {timeout_ms}ms")
 
 	def open_workspace(self,workspace):
 		self.instrument.write(':WORK:OPEN "'+workspace+'"')
@@ -66,25 +74,32 @@ class Keysight_B1500LAN:
 		self.instrument.write(':RUN')
 
 	def get_data(self):
-		data_returned = self.instrument.query(':RES:FET?')
-		return data_returned.replace('\\r\\n','\r\n')
+		data_returned = self.instrument.query(':RES:FET?').strip()
+
+		if data_returned.startswith('#'):
+			n_digits = int(data_returned[1])
+			length = int(data_returned[2:2 + n_digits])
+			data = data_returned[2 + n_digits:]
+		else:
+			data = data_returned
+
+		data = data.replace('\\r\\n', '\r\n')
+
+		return data
 
 	def configure_format(self):
 		self.instrument.write(':RES:FORM TEXT') # set output format to text
 		self.instrument.write(':RES:FORM:ESC ON') # format escape ON to get all results
 
 	def get_vars(self,texto):
-		vars_array = str(texto).split('\r\n')[0].split(",")
-		longitud = len(vars_array[1]) -1
-		# change var [0]
-		vars_array[0] = vars_array[0][len(vars_array)+longitud:] # asume always all variables with the same lengnt
-
-		return vars_array
+		return texto.split('\r\n')[0].split(',')
 
 	def get_data_numpy(self,texto,variables):
-		c = StringIO(texto) # crete file object from text
-		formats = ['f4'] * len(variables) # all variables are floats
-		results = np.loadtxt(c, dtype={'names': variables,
+		lines = texto.split('\r\n')
+		texto = '\r\n'.join(lines[1:])
+		c = StringIO(texto)
+		formats = ['f4'] * len(variables)
+		results = np.genfromtxt(c, dtype={'names': variables,
 	                     'formats': formats}, delimiter=',')
 		return results
 

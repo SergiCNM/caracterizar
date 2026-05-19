@@ -108,7 +108,7 @@ def main():
     print(f"2. Minor: {v_parts[0]}.{v_parts[1]+1}.0")
     print(f"3. Major: {v_parts[0]+1}.0.0")
     
-    choice = input("\nOpción (1/2/3): ")
+    choice = input("\nOpción (1/2/3 or enter to exit): ")
     if choice == "1":
         new_version = f"{v_parts[0]}.{v_parts[1]}.{v_parts[2]+1}"
     elif choice == "2":

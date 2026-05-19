@@ -1,17 +1,17 @@
 title = "Caracterizar"
-version = "2.2.2"
+version = "2.3.0"
 author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
 darkmode = true
 estepa = true
-txtprocess = "19176"
-txtlot = "19176"
-txtwafer = "2"
-txtmask = "CNM004"
-txttemperature = "35.0"
-txthumidity = "41"
+txtprocess = "18606"
+txtlot = "18606"
+txtwafer = "1"
+txtmask = "CNM1178"
+txttemperature = "25.0"
+txthumidity = "46"
 
 [dirs]
 base = "config"
@@ -37,7 +37,7 @@ password = ""
 autocommit = false
 
 [estepa]
-method = "f-spread"
+method = "k-sigma"
 lna = false
 autolimits = false
 limmin = 0
@@ -51,7 +51,7 @@ mysqlpassword = "Mysql123"
 mysqldatabase = "labs_new"
 
 [reports]
-title = "CAP REPORT"
-subtitle = "19176"
-date = "OCT 2025"
+title = "CMOS REPORT"
+subtitle = "19298"
+date = "APR 2026"
 author = "Sergi Sànchez"

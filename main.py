@@ -197,17 +197,28 @@ class ScriptRunner(QThread):
                 context = globals().copy()
                 context["main"] = self.main_context
                 context["emit_plot"] = self.plot_ready.emit
+                context["base_dir"] = base_dir
+                context["tests_dir"] = tests_dir
+                context["results_dir"] = results_dir
+                context["cartographic_measurement"] = cartographic_measurement
+                context["instruments"] = instruments
+                context["test_status"] = test_status
+                context["measurement_status"] = measurement_status
+                context["dieActual"] = dieActual
+                context["moduleActual"] = moduleActual
+                context["username"] = username
+                context["message_user"] = message_user
                 exec(content, context)
-                # print(">> [ScriptRunner.run] Script executed")
+                self.main_context.log_message("ScriptRunner.run", "Script executed", "SUCCESS")
         except Exception as ex:
             import traceback
             error_msg = (
                 f"Error ejecutando {self.filepath}:\n{type(ex)}\n{ex}\n{traceback.format_exc()}"
             )
-            # print(">> [ScriptRunner.run] Error caught")
+            self.main_context.log_message("ScriptRunner.run", f"Error caught: {error_msg}", "ERROR")
             self.error.emit(error_msg)
         finally:
-            # print(">> [ScriptRunner.run] Emitting finished")
+            self.main_context.log_message("ScriptRunner.run", "Script finished", "INFO")
             self.finished.emit()
 
 class MainWindow(QMainWindow):
@@ -256,8 +267,8 @@ class MainWindow(QMainWindow):
         # Load config file
         cfg = Config(self.path_config_file)
         self.config = cfg.getConfig()
-        print(">> [MainWindow.__init__] Config loaded from %s" % self.path_config_file)
-        print(f">> [MainWindow.__init__] Config: {self.config}")
+        self.log_message("MainWindow.__init__", f"Config loaded from {self.path_config_file}", "INFO")
+        self.log_message("MainWindow.__init__", f"Config loaded: {self.config}", "DEBUG")
         if cfg.error:
             messageBox(self, "Error loading CONFIG", cfg.error_message, "error")
             self.log.error("Error loading CONFIG: %s" % cfg.error_message)
@@ -524,8 +535,7 @@ class MainWindow(QMainWindow):
                 self.load_cmbTechnology()
                 self.load_cmbMask()
             else:
-                # messageBox(self, "Error loading ESTEPA class", self.estepa.error_message, "error")
-                print(">> [MainWindow.__init__] Error loading ESTEPA class: %s" % self.estepa.error_message)
+                self.log_message("MainWindow.__init__", f"Error loading ESTEPA class: {self.estepa.error_message}", "ERROR")
         widgets.cmbParametersFile.clear()
         widgets.cmbParametersBBDD.clear()
 
@@ -597,8 +607,7 @@ class MainWindow(QMainWindow):
         self.config["defaults"]["txtmask"] = widgets.txtMask.text()
         self.config["defaults"]["txttemperature"] = widgets.txtTemperature.text()
         self.config["defaults"]["txthumidity"] = widgets.txtHumidity.text()
-        print(self.config)
-        print(">> [MainWindow.save_config_parameters_file] Saving config parameters to %s" % self.path_config_file)
+        self.log_message("MainWindow.save_config_parameters_file", f"Saving config parameters to {self.path_config_file}", "INFO")
         toml_file = open(self.path_config_file, "w", encoding="utf-8")
         toml.dump(self.config, toml_file)
         toml_file.close()
@@ -657,21 +666,26 @@ class MainWindow(QMainWindow):
                         bottom_title += r" (" + plot_parameters["units"]["bottom"] + ")"
                     _static_ax.set_xlabel(bottom_title)
 
-                if "right" in plot_parameters["titles"]:
+                if plot_parameters.get("y2") and "right" in plot_parameters["titles"]:
                     right_title = plot_parameters["titles"]["right"]
                     if "units" in plot_parameters and "right" in plot_parameters["units"]:
                         right_title += r" (" + plot_parameters["units"]["right"] + ")"
                     _static_ax2.set_ylabel(right_title)
 
             # graphs
-            if "y2" in plot_parameters:
-                _static_ax2.plot(plot_parameters["x"], plot_parameters["y2"], color='blue', label=right_title)
-            _static_ax.plot(plot_parameters["x"], plot_parameters["y1"], color='green', label=left_title)
-
-            # legends
-            if "legend" in plot_parameters and plot_parameters["legend"]:
-                #  static_canvas.figure.legend(loc="upper right")
-                static_canvas.figure.legend(loc="upper right", bbox_to_anchor=(1,1), bbox_transform=_static_ax.transAxes)
+            if "series" in plot_parameters:
+                colors = plt.cm.tab10(np.linspace(0, 1, len(plot_parameters["series"])))
+                for i, s in enumerate(plot_parameters["series"]):
+                    _static_ax.plot(s["x"], s["y"], color=colors[i], label=s.get("label", f"Series {i+1}"))
+                if plot_parameters.get("legend", True):
+                    _static_ax.legend()
+            else:
+                if plot_parameters.get("y2"):
+                    _static_ax2.plot(plot_parameters["x"], plot_parameters["y2"], color='blue', label=right_title)
+                if plot_parameters.get("y1"):
+                    _static_ax.plot(plot_parameters["x"], plot_parameters["y1"], color='green', label=left_title)
+                if "legend" in plot_parameters and plot_parameters["legend"]:
+                    static_canvas.figure.legend(loc="upper right", bbox_to_anchor=(1,1), bbox_transform=_static_ax.transAxes)
 
             # logarithmic scale
             if "logarithmic" in plot_parameters:
@@ -817,7 +831,6 @@ class MainWindow(QMainWindow):
             # BBDD
             wafer = widgets.cmbWafers.currentText()
             wafer_parameters = self.estepa.get_wafer_parameters(widgets.cmbWafers.currentText())
-            print(wafer_parameters)
             wafer = Wafer(wafer_parameters)
 
         if not wafer.wafer_error:
@@ -1146,8 +1159,6 @@ class MainWindow(QMainWindow):
             texto += '- Chi-square values: %.3f, %.3f, %.3f' % (kf[0], kf[1], kf[2]) + salto_linea + salto_linea
             kf_data2 = np.array([[data1, data2]]).T
             kf = chisquare(kf_data2)
-            print(kf)
-            # texto += '- Chi-square values: %.3f, %.3f' % (kf[0], kf[1]) + salto_linea + salto_linea
             # linregress
             result = linregress(data1, data2)
             texto += f"Intercept (a): {result.intercept:.3f}" + salto_linea
@@ -1184,7 +1195,6 @@ class MainWindow(QMainWindow):
                 if btnName == "btnOpenDataFile":
                     widgets.txtDataFile.setText(fileName)
 
-                print(file_result.info())
             else:
                 # show error
                 retval = messageBox(self, "Error loading DAT File", file_result.error_message, "error")
@@ -1208,8 +1218,6 @@ class MainWindow(QMainWindow):
                     widgets.txtWafermapFileInbase.setText(fileName)
                 if btnName == "btnOpenWafermapFile":
                     widgets.txtWafermapFile.setText(fileName)
-
-                print(file_wafermap.info())
 
             else:
                 # show error
@@ -1824,9 +1832,6 @@ class MainWindow(QMainWindow):
                                     insert = False
                             if insert:
                                 self.estepa.upload_analisis(wafer, valores)
-                print(runs_info)
-                print()
-                print(wafers_info)
                 messageBox(self, "Upload historical", "Historical data uploaded to BBDD", "information")
             else:
                 messageBox(self, "Upload historical", "No data to upload", "information")
@@ -2176,13 +2181,10 @@ class MainWindow(QMainWindow):
                     try:
                         self.parameterwindow.show()
                     except Exception as e:
-                        print(str(e))
+                        self.log_message("parameters_config", str(e), "ERROR")
                 else:
-                    retval = messageBox(self, "Error getting parameters from file", self.parameterwindow.error_message,
-                                        "critical")
-            else:
-                print(f"{filename_parameters} doesn't exists!")
-                messageBox(self, "Error getting parameters from file",
+                    self.log_message("parameters_config", f"{filename_parameters} doesn't exists!", "WARNING")
+                    messageBox(self, "Error getting parameters from file",
                                     f"{filename_parameters} doesn't exists!", "warning")
     # end REPORTS functions
     # ---------------------
@@ -2225,8 +2227,7 @@ class MainWindow(QMainWindow):
 
         instruments = "config." + username + ".instruments"
         importlib.import_module(instruments)
-        print("instruments loaded...")
-        # from config.default.instruments import *
+        self.log_message("loading_drivers", "Instruments loaded", "SUCCESS")
 
     # BUTTONS CLICK
     # Post here your functions for clicked buttons
@@ -2343,6 +2344,38 @@ class MainWindow(QMainWindow):
             self.log.setLevel(logging.INFO)
         self.config["defaults"]["debugmode"] = status
         return status
+
+    def log_message(self, function_name, text, log_type="INFO"):
+        from datetime import datetime
+        import sys
+
+        COLOR_CODES = {
+            "INFO": "\033[94m",      # Azul
+            "SUCCESS": "\033[92m",   # Verde
+            "ERROR": "\033[91m",     # Rojo
+            "WARNING": "\033[93m",   # Naranja
+            "RESET": "\033[0m"
+        }
+
+        timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        log_entry = f"{timestamp} [{log_type}] >> [{function_name}] {text}"
+
+        if log_type not in COLOR_CODES:
+            log_type = "INFO"
+
+        if self.IsDebugMode():
+            color = COLOR_CODES[log_type]
+            reset = COLOR_CODES["RESET"]
+            print(f"{color}{log_entry}{reset}")
+        
+        if log_type == "ERROR":
+            self.log.error(log_entry)
+        elif log_type == "WARNING":
+            self.log.warning(log_entry)
+        elif log_type == "SUCCESS":
+            self.log.info(f"[SUCCESS] {text}")
+        else:
+            self.log.info(log_entry)
 
     def IsCartographyMeasurement(self):
         return widgets.chkCartoMeas.isChecked()
@@ -2647,13 +2680,13 @@ class MainWindow(QMainWindow):
     def execute_measurement(self):
         global dieActual, moduleActual, wafer_parameters, file_measurement, connDeep
         global init_chip, end_chip
-        # print(">> [execute_measurement] START")
+        self.log_message("execute_measurement", "START", "INFO")
         if self.script_running:
-            # print(">> [execute_measurement] Script already running, abort.")
+            self.log_message("execute_measurement", "Script already running, abort.", "WARNING")
             return  # Evita doble ejecución
 
         self.script_running = True  # Marca como "en ejecución"
-        # print(">> [execute_measurement] Marked script_running = True")
+        self.log_message("execute_measurement", "Marked script_running = True", "INFO")
 
         self.toggle_widgets(False)
         QApplication.processEvents()
@@ -2672,9 +2705,9 @@ class MainWindow(QMainWindow):
         if hasattr(self, "script_thread") and self.script_thread is not None:
             try:
                 self.script_thread.finished.disconnect(self.on_script_finished)
-                # print(">> [execute_measurement] Disconnected previous finished")
+                self.log_message("execute_measurement", "Disconnected previous finished", "INFO")
             except (TypeError, RuntimeError):
-                print(">> [execute_measurement] No previous finished to disconnect or already disconnected")
+                self.log_message("execute_measurement", "No previous finished to disconnect or already disconnected", "INFO")
             try:
                 self.script_thread.error.disconnect(self.on_script_error)
             except Exception:
@@ -2689,16 +2722,16 @@ class MainWindow(QMainWindow):
                 pass
 
         self.script_thread = ScriptRunner(runfile, main_context=self)
-        # print(f">> [execute_measurement] Created ScriptRunner ID: {id(self.script_thread)}")
+        self.log_message("execute_measurement", f"Created ScriptRunner ID: {id(self.script_thread)}", "INFO")
 
         self.script_thread.finished.connect(self.on_script_finished)
         self.script_thread.error.connect(self.on_script_error)
         self.script_thread.plot_ready.connect(self.show_graph)
         self.script_thread.request_message_box.connect(self.show_message_box)
-        # print(">> [execute_measurement] Connected signals")
+        self.log_message("execute_measurement", "Connected signals", "INFO")
 
         self.script_thread.start()
-        # print(">> [execute_measurement] Script started")
+        self.log_message("execute_measurement", "Script started", "SUCCESS")
 
     def show_message_box(self, title, message, buttons_type):
         if buttons_type == "yes_cancel":
@@ -2775,51 +2808,13 @@ class MainWindow(QMainWindow):
                     file_measurement.MeasurementSectionFile(section="MODTEST", tag="END", modtest=count)
 
         measurement_status.status = "FINISH"
-        # print(">> [on_script_finished] Reset script_running = False")
 
     def on_script_error(self, error_message):
-        print(error_message)
+        self.log_message("on_script_error", error_message, "ERROR")
         messageBox(self, "Error ejecutando script", error_message, "critical")
         self.change_state_process("STOP")
         self.toggle_widgets(True)
         self.script_running = False
-
-    def execute_measurement_old(self):
-        # without threads
-        global dieActual, moduleActual, wafer_parameters, file_measurement, connDeep
-
-
-        # load test and run
-        self.toggle_widgets(False)
-        QApplication.processEvents()
-        self.run(self.get_filename_test(), "tests" + "/" + self.get_instrument_selected())
-
-        if not self.IsCartographyMeasurement():
-            self.toggle_widgets(True)
-        else:
-            # update dieActual status (moduleActual?)
-            # transfor wafer_parameters["wafer_positions"] coord to real name button
-            # waferwindow_btn = self.waferwindow.centralWidget().findChild(QPushButton, "btn_0_0")
-            # waferwindow_btn.btnType = meas_result["meas_status"]
-            # waferwindow_btn.message = meas_result["meas_message"]
-
-            # save file measurement
-            # check for multi-test
-            die = int(dieActual) - 1
-            module = int(moduleActual) - 1
-            variables = self.waferwindow.meas_result[die][module]["variables"]
-            list_check = isinstance(variables, list)
-            if not list_check:
-                file_measurement.MeasurementSectionFile(section="MODTEST", tag="BEG")
-                file_measurement.MeasurementVariablesFile(variables)
-                file_measurement.MeasurementSectionFile(section="MODTEST", tag="END")
-            else:
-                count = 1
-                for var in variables:
-                    file_measurement.MeasurementSectionFile(section="MODTEST", tag="BEG", modtest=count)
-                    file_measurement.MeasurementVariablesFile(var)
-                    file_measurement.MeasurementSectionFile(section="MODTEST", tag="END", modtest=count)
-                    count += 1
 
     def init_prober(self):
 
@@ -2979,7 +2974,7 @@ class MainWindow(QMainWindow):
         if "driver" in instruments[instrument_name]:
             instrument_name_worker = instruments[instrument_name]["driver"]
 
-        print(f"Instrument_name_worker: {instrument_name_worker}")
+        self.log_message("query_instrument_idn", f"Worker: {instrument_name_worker}", "DEBUG")
 
         # Crear hilo para ejecutar el IDN
         self.idn_thread = IDNWorker(instrument_name_worker, instruments[instrument_name], False)
@@ -3509,7 +3504,7 @@ class MainWindow(QMainWindow):
         probers = load_toml_config("probers.toml")
         self.load_probers()
         self.prober = None
-        print("Probers reloaded.")
+        self.log_message("reload_probers", "Probers reloaded", "SUCCESS")
 
     def load_tests(self):
         global widgets

@@ -29,7 +29,7 @@ class StatisticsEstepa():
             self.error = True
             self.error_message = "List 1 & List 2 do not have the same length!"
         if "method" in config_estepa_file and "lna" in config_estepa_file and "limmin" in config_estepa_file and "limmax" in config_estepa_file:
-            self.config = config_estepa_file  # {"method": "None", lna" : False, "limmin" : 0, "limmax" : 100}
+            self.config = config_estepa_file
         else:
             self.error = True
             self.error_message = "Configuration estepa file not valid!"
@@ -37,15 +37,13 @@ class StatisticsEstepa():
         if isinstance(self.data_list, list):
             if len(self.data_list) > 0:
                 self.points_ini = len(self.data_list)
-                # delete outliers controlando tiempo espera
-                outliers_thread = threading.Thread(target=self.outliers)
-                # self.outliers()
-                outliers_thread.start()
-                outliers_thread.join(timeout=15)  # Espera como mucho 15 segundos y sino finaliza
-                if outliers_thread.is_alive():
-                    print(f"El hilo de outliers salió por timeout en el parámetro {param}")
+                if not self.error:
+                    outliers_thread = threading.Thread(target=self.outliers)
+                    outliers_thread.start()
+                    outliers_thread.join(timeout=15)
+                    if outliers_thread.is_alive():
+                        print(f"El hilo de outliers salió por timeout en el parámetro {param}")
 
-                # load statistics
                 self.load_statistics()
                 self.points_end = len(self.data_list)
             else:

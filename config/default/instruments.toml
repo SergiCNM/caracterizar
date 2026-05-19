@@ -24,6 +24,7 @@ timeout = 30000
 address = "TCPIP0::169.254.81.78::5025::SOCKET"
 read_termination = "\n"
 write_termination = "\n"
+timeout = 50000
 
 [Keithley_4200]
 address = "GPIB0::17::INSTR"

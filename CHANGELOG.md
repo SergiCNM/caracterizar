@@ -2,6 +2,10 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [2.3.0] - 2026-05-19
+### Added
+- **Testing Framework**: Suite completa de tests unitarios en `tests/` para validar el módulo de estadísticas y gestión de archivos.
+- **Test B1500**: Implementado test para el instrumento B1500. Modificación función dataready driver LAN. Test_test.py preparado para leer datos del B1500, guardar ficheros.
 
 ## [2.2.2] - 2026-02-13
 ### Changed
