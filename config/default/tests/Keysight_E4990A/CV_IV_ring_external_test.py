@@ -26,13 +26,14 @@ from config.default.instruments import Keysight_E4990A
 from config.default.instruments import Keithley_2470
 from config.default.instruments import Keithley_2410
 from config.default.devices import *
+from config.default.tests.common import save_results_to_file, build_results_folder
 from config.functions import *
 import toml
 
 global test_status, measurement_status
 global dieActual, moduleActual
 global CV_IV_ring_external_parameters
-global base_dir, tests_dir, cartographic_measurement
+global base_dir, tests_dir, results_dir, username, cartographic_measurement
 
 
 def load_CV_IV_ring_external_parameters():
@@ -76,6 +77,8 @@ def load_CV_IV_ring_external_parameters():
     if file_exists:
         toml_info = toml.load(filename_config)
         CV_IV_ring_external_parameters = toml_info["parameters"]
+        if "output" in toml_info:
+            CV_IV_ring_external_parameters["output"] = toml_info["output"]
 
 
 def config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_ring_external_parameters):
@@ -482,15 +485,22 @@ try:
                     ]["plot_parameters"]
                     emit_plot(plot_parameters)
 
-                    namefile = (
-                        main.getDirs("results")
-                        + f"/CV_IV_ring_external_E4990A_{freq}kHz_{main.ui.txtProcess.text()}_{dieActual}_{moduleActual}.txt"
-                    )
-                    main.save_lists_to_txt(
-                        namefile=namefile,
-                        var_list=[voltage, current_pad, current_ring, capacitance, conductance],
-                        headers=["V", "I_pad", "I_ring", "C", "G"],
-                        separation=",",
+                    results_data = list(zip(voltage, current_pad, current_ring, capacitance, conductance))
+                    variables_list = ["V", "I_pad", "I_ring", "C", "G"]
+                    output_params = CV_IV_ring_external_parameters.get("output", {"separator": "comma", "prefix": f"CV_IV_ring_external_E4990A_{freq}kHz", "suffix": ""})
+                    
+                    save_results_to_file(
+                        results_data=results_data,
+                        variables_list=variables_list,
+                        test_parameters=output_params,
+                        die=dieActual,
+                        module=moduleActual,
+                        folder_func=lambda: build_results_folder(
+                            username=username,
+                            process=main.ui.txtProcess.text(),
+                            lot=main.ui.txtLot.text(),
+                            wafer=main.ui.txtWafer.text()
+                        )
                     )
                 else:
                     meas_status = "meas_error"
@@ -540,15 +550,23 @@ try:
 
                     dieActual = 1
                     moduleActual = 1
-                    namefile = (
-                        main.getDirs("results")
-                        + f"/CV_IV_ring_external_E4990A_{freq}kHz_{main.ui.txtProcess.text()}_single.txt"
-                    )
-                    main.save_lists_to_txt(
-                        namefile=namefile,
-                        var_list=[voltage, current_pad, current_ring, capacitance, conductance],
-                        headers=["V", "I_pad", "I_ring", "C", "G"],
-                        separation=",",
+                    
+                    results_data = list(zip(voltage, current_pad, current_ring, capacitance, conductance))
+                    variables_list = ["V", "I_pad", "I_ring", "C", "G"]
+                    output_params = CV_IV_ring_external_parameters.get("output", {"separator": "comma", "prefix": f"CV_IV_ring_external_E4990A_{freq}kHz", "suffix": "single"})
+                    
+                    save_results_to_file(
+                        results_data=results_data,
+                        variables_list=variables_list,
+                        test_parameters=output_params,
+                        die=dieActual,
+                        module=moduleActual,
+                        folder_func=lambda: build_results_folder(
+                            username=username,
+                            process=main.ui.txtProcess.text(),
+                            lot=main.ui.txtLot.text(),
+                            wafer=main.ui.txtWafer.text()
+                        )
                     )
 
     # Stop and close

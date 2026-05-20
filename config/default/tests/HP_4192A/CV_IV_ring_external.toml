@@ -81,3 +81,7 @@ GRAPH2 = "Parameter 2 to measure (NONE or G)"
 SOURCE_DELAY = "Source delay"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"
 SOURCE_INSTRUMENT = "Instrument(s) to use as voltage source (pad and ring will use the same type)"
+
+[output]
+separator = "comma"
+variables = ["V", "I_pad", "I_ring", "C", "G"]

@@ -2,6 +2,7 @@
 import os.path
 from config.default.instruments import Keithley_2470
 from config.default.devices import *
+from config.default.tests.common import save_results_to_file, build_results_folder
 from config.functions import *
 from PySide6.QtWidgets import QMessageBox
 import toml, time
@@ -46,32 +47,32 @@ def load_IV_ring_parameters():
     if file_exists:
         toml_info = toml.load(filename_config)
         IV_ring_parameters = toml_info["parameters"]
+        if "output" in toml_info:
+            IV_ring_parameters["output"] = toml_info["output"]
 
 def save_file(main, voltage, current_pad, current_ring, resistance_pad, resistance_ring, namefile):
     """
-    Save file
-    :param main: main program
-    :param voltage: voltage list
-    :param current_pad: current pad list
-    :param current_ring: current ring list
-    :param resistance_pad: resistance pad list
-    :param resistance_ring: resistance ring list
-    :param namefile:
-    :return: None
+    Save file using common.save_results_to_file
     """
-    global dieActual, moduleActual
-    separation_char = ","
-    lines = ["V" + separation_char + "I_pad" + separation_char + "I_ring" + separation_char + "R_pad" + separation_char + "R_ring"]
-    for i in range(0,len(voltage)):
-        lines.append(str(voltage[i]) + separation_char + str(current_pad[i]) + separation_char + str(current_ring[i]) + separation_char + str(resistance_pad[i]) + separation_char + str(resistance_ring[i]))
-    # create folder
-    folder = os.path.join(os.getcwd(), results_dir, username, main.ui.txtProcess.text())
-    os.makedirs(folder, exist_ok=True)
-    namefile = os.path.join(folder, namefile + ".txt").replace("\\", "/")
-    f = open(namefile, "w+")
-    s1 = '\n'.join(lines)
-    f.write(s1)
-    f.close()
+    global dieActual, moduleActual, username
+    
+    results_data = list(zip(voltage, current_pad, current_ring, resistance_pad, resistance_ring))
+    variables_list = ["V", "I_pad", "I_ring", "R_pad", "R_ring"]
+    output_params = IV_ring_parameters.get("output", {"separator": "comma", "prefix": "IV_ring", "suffix": ""})
+    
+    save_results_to_file(
+        results_data=results_data,
+        variables_list=variables_list,
+        test_parameters=output_params,
+        die=dieActual,
+        module=moduleActual,
+        folder_func=lambda: build_results_folder(
+            username=username,
+            process=main.ui.txtProcess.text(),
+            lot=main.ui.txtLot.text(),
+            wafer=main.ui.txtWafer.text()
+        )
+    )
 
 def measure_IV_ring(k2470_pad, k2470_ring, IV_ring_parameters, main):
     voltage_list = []

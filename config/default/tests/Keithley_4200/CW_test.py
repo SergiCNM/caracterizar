@@ -5,12 +5,13 @@ import sys
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import Keithley_4200
+from config.default.tests.common import save_results_to_file, build_results_folder
 from config.functions import *
 import toml
 global test_status, measurement_status
 global dieActual, moduleActual
 global CW_parameters
-global base_dir, tests_dir, cartographic_measurement
+global base_dir, tests_dir, results_dir, username, cartographic_measurement
 
 
 def load_CW_parameters():
@@ -33,6 +34,8 @@ def load_CW_parameters():
     if os.path.exists(filename_config):
         toml_info = toml.load(filename_config)
         CW_parameters = toml_info["parameters"]
+        if "output" in toml_info:
+            CW_parameters["output"] = toml_info["output"]
     else:
         print(f"File toml {filename_config} doesn't exist!")
 
@@ -104,10 +107,24 @@ try:
                 }
 
                 emit_plot(main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"])
-
-                namefile = main.getDirs("results") + f"/CW_{main.ui.txtProcess.text()}_{dieActual}_{moduleActual}.txt"
-                main.save_lists_to_txt(namefile=namefile, var_list=[freq, capacitance, conductance],
-                                       headers=["f", "C", "G"], separation=",")
+                
+                results_data = list(zip(freq, capacitance, conductance))
+                variables_list = ["f", "C", "G"]
+                output_params = CW_parameters.get("output", {"separator": "comma", "prefix": "CW", "suffix": ""})
+                
+                save_results_to_file(
+                    results_data=results_data,
+                    variables_list=variables_list,
+                    test_parameters=output_params,
+                    die=dieActual,
+                    module=moduleActual,
+                    folder_func=lambda: build_results_folder(
+                        username=username,
+                        process=main.ui.txtProcess.text(),
+                        lot=main.ui.txtLot.text(),
+                        wafer=main.ui.txtWafer.text()
+                    )
+                )
 
     else:
         if k4200.config_CW(CW_parameters):
@@ -144,9 +161,23 @@ try:
 
             emit_plot(plot_parameters)
 
-            namefile = main.getDirs("results") + "/CW_" + main.ui.txtProcess.text() + "_1_1.txt"
-            main.save_lists_to_txt(namefile=namefile, var_list=[freq, capacitance, conductance],
-                                   headers=["f", "C", "G"], separation=",")
+            results_data = list(zip(freq, capacitance, conductance))
+            variables_list = ["f", "C", "G"]
+            output_params = CW_parameters.get("output", {"separator": "comma", "prefix": "CW", "suffix": "single"})
+            
+            save_results_to_file(
+                results_data=results_data,
+                variables_list=variables_list,
+                test_parameters=output_params,
+                die=1,
+                module=1,
+                folder_func=lambda: build_results_folder(
+                    username=username,
+                    process=main.ui.txtProcess.text(),
+                    lot=main.ui.txtLot.text(),
+                    wafer=main.ui.txtWafer.text()
+                )
+            )
 
 except:
     message = "ERROR: Oops! " + str(sys.exc_info()[0]).replace("<", "").replace(">", "") + " occurred. " + str(sys.exc_info()[1])

@@ -81,3 +81,9 @@ GRAPH2 = "Parameter 2 to measure (NONE or G)"
 SOURCE_INSTRUMENT = "Instrument to use as voltage source (Keithley_2470 or Keithley_2410)"
 SOURCE_DELAY = "Source delay"
 SENSE_COUNT = "Number of measurements to make when a measurement is requested"
+
+[output]
+separator = "comma"
+prefix = "CV_IV_external"
+suffix = ""
+variables = ["V", "C", "G"]

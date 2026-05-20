@@ -64,3 +64,9 @@ CALCULATE_PARAMS = "Calculate parameters"
 COMPENSATION_OPEN = "Open compensation"
 COMPENSATION_SHORT = "Short compensation"
 COMPENSATION_DONE = "Compensation done"
+
+[output]
+separator = "comma"
+prefix = "CV"
+suffix = ""
+variables = "V,C,G"

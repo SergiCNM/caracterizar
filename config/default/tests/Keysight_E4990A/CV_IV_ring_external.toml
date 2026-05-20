@@ -76,3 +76,9 @@ COMPENSATION_DONE = "Compensation status"
 SOURCE_INSTRUMENT = "Instrument to use as voltage source"
 GRAPH1 = "Parameter 1 (CS/CP)"
 GRAPH2 = "Parameter 2 (NONE/G)"
+
+[output]
+separator = "comma"
+prefix = "CV_IV_ring_external_E4990A"
+suffix = ""
+variables = ["V", "I_pad", "I_ring", "C", "G"]

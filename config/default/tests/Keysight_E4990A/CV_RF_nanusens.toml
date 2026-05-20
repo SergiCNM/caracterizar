@@ -42,3 +42,9 @@ SMU_VOLTAGE = "Voltage applied to the sample by the SMU"
 ACTIVE_POINTS = "Number of points to apply voltage to the sample"
 INACTIVE_POINTS = "Number of points to not apply voltage to the sample"
 TIME_TOTAL = "Total time of the measurement in seconds"
+
+[output]
+separator = "comma"
+prefix = "CV_RF"
+suffix = ""
+variables = ["V", "C", "G"]

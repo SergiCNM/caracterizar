@@ -3,6 +3,7 @@ import os.path
 import sys
 from config.default.instruments import Keithley_2470
 from config.default.devices import *
+from config.default.tests.common import save_results_to_file, build_results_folder
 from config.functions import *
 from PySide6.QtWidgets import QMessageBox
 import toml, time
@@ -47,30 +48,40 @@ def load_IV_parameters():
     if file_exists:
         toml_info = toml.load(filename_config)
         IV_parameters = toml_info["parameters"]
+        # Load [output] section if exists
+        if "output" in toml_info:
+            IV_parameters["output"] = toml_info["output"]
 
 def save_file(main, voltage, current, resistance, namefile):
     """
-    Save file
+    Save file using common.save_results_to_file
     :param main: main program
     :param voltage: voltage list
     :param current: current list
     :param resistance: resistance list
-    :param namefile:
+    :param namefile: (legacy parameter, not used - naming handled by common function)
     :return: None
     """
     global dieActual, moduleActual
-    separation_char = ","
-    lines = ["V" + separation_char + "I" + separation_char + "R"]
-    for i in range(0,len(voltage)):
-        lines.append(str(voltage[i]) + separation_char + str(current[i]) + separation_char + str(resistance[i]))
-    # create folder
-    folder = os.path.join(os.getcwd(), results_dir, username, main.ui.txtProcess.text())
-    os.makedirs(folder, exist_ok=True)
-    namefile = os.path.join(folder, namefile + ".txt").replace("\\", "/")
-    f = open(namefile, "w+")
-    s1 = '\n'.join(lines)
-    f.write(s1)
-    f.close()
+    
+    # Prepare data for common function
+    results_data = list(zip(voltage, current, resistance))
+    variables_list = ["V", "I", "R"]
+    output_params = IV_parameters.get("output", {"separator": "comma", "prefix": "IV", "suffix": ""})
+    
+    save_results_to_file(
+        results_data=results_data,
+        variables_list=variables_list,
+        test_parameters=output_params,
+        die=dieActual,
+        module=moduleActual,
+        folder_func=lambda: build_results_folder(
+            username=username,
+            process=main.ui.txtProcess.text(),
+            lot=main.ui.txtLot.text(),
+            wafer=main.ui.txtWafer.text()
+        )
+    )
 
 def measure_IV(IV_parameters, k2470):
     # create empty list if not exists

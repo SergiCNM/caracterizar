@@ -33,3 +33,9 @@ AVERAGE = "Calculate average"
 COMPENSATION_OPEN = "Open compensation"
 COMPENSATION_SHORT = "Short compensation"
 COMPENSATION_DONE = "Compensation done"
+
+[output]
+separator = "comma"
+prefix = "CW"
+suffix = ""
+variables = "Freq,C,G"

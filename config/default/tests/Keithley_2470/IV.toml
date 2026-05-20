@@ -55,3 +55,9 @@ SENSE_COUNT = "Number of measurements to make when a measurement is requested"
 RES_MIN = "Minimum resistance for resistance measurement"
 RES_MAX = "Maximum resistance for resistance measurement"
 DISPLAY_GRAPH = "Display graph after measurement"
+
+[output]
+separator = "comma"
+prefix = "IV"
+suffix = ""
+variables = "V,I,R"

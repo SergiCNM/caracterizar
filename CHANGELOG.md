@@ -2,6 +2,12 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [2.4.0] - 2026-05-20
+### Added
+- **common.py**: Se ha añadido la función save_results_to_file() para guardar los resultados de los tests. Se ha añadido la función build_results_folder() para construir la carpeta de resultados.
+- **Añadir nuevos tests**: Añadidos tests unitarios para validar la gestión de resultados y funcionamiento de common.py.
+- **Generación de documentación**: Se ha añadido documentación en formato Markdown dentro de la carpeta docs para uso futuro. Fichero SaveResultsDoc.md para explicar la gestión de resultados (sustituimos rutina de main.py save_lists_to_txt() que se mantiene de momento). Fichero Testing.md para explicar la suite de tests unitarios.
+
 ## [2.3.0] - 2026-05-19
 ### Added
 - **Testing Framework**: Suite completa de tests unitarios en `tests/` para validar el módulo de estadísticas y gestión de archivos.

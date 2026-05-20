@@ -48,3 +48,9 @@ WAIT_TIME = "Wait time at beginning of sweep in seconds"
 COMPENSATION_OPEN = "Open compensation"
 COMPENSATION_SHORT = "Short compensation"
 COMPENSATION_DONE = "Compensation done"
+
+[output]
+separator = "comma"
+prefix = "CW"
+suffix = ""
+variables = ["F", "C", "G"]

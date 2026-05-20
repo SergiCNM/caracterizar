@@ -55,3 +55,9 @@ SENSE_COUNT = "Number of measurements to make when a measurement is requested"
 RES_MIN = "Minimum resistance for resistance measurement (applies to both pad and ring)"
 RES_MAX = "Maximum resistance for resistance measurement (applies to both pad and ring)"
 DISPLAY_GRAPH = "Display graph after measurement"
+
+[output]
+separator = "comma"
+prefix = "IV_ring"
+suffix = ""
+variables = "V,I_pad,I_ring,R_pad,R_ring"

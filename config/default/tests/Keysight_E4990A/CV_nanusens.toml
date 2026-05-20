@@ -50,3 +50,9 @@ NUM_POINTS = "Number of points from 2 to 1601"
 AVERAGE_POINTS = "Number of points to average from 1 to 999"
 AVERAGE_SWEEPS = "Number of sweeps to average from 1 to 999"
 APERTURE = "Measurement speed. 1 is the fastest setting."
+
+[output]
+separator = "comma"
+prefix = "CV"
+suffix = ""
+variables = ["V", "C", "G"]

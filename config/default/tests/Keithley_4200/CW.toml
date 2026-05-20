@@ -63,3 +63,9 @@ AREA = "Area"
 FIMS = "FIMS"
 PERMITTIVITY = "Permittivity"
 SERIAL_RES = "Calculate Serial resistance"
+
+[output]
+separator = "comma"
+prefix = "CW"
+suffix = ""
+variables = "f,C,G"

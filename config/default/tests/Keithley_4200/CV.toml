@@ -70,3 +70,9 @@ FIMS = "FIMS"
 PERMITTIVITY = "Permittivity"
 SERIAL_RES = "Calculate Serial resistance"
 CALCULATE_PARAMS = "Calculate parameters"
+
+[output]
+separator = "comma"
+prefix = "CV"
+suffix = ""
+variables = "V,C,G"

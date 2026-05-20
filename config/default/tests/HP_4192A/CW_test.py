@@ -21,12 +21,13 @@ import os.path
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
+from config.default.tests.common import save_results_to_file, build_results_folder
 from config.functions import *
 import toml
 global test_status, measurement_status
 global dieActual, moduleActual
 global CW_parameters
-global base_dir, tests_dir, cartographic_measurement
+global base_dir, tests_dir, results_dir, username, cartographic_measurement
 
 
 def measure_CW(hp4192A, CW_parameters):
@@ -115,6 +116,8 @@ def load_CW_parameters():
     if file_exists:
         toml_info = toml.load(filename_config)
         CW_parameters = toml_info["parameters"]
+        if "output" in toml_info:
+            CW_parameters["output"] = toml_info["output"]
     else:
         print(f"File toml {filename_config} doesn't exists!")
 
@@ -196,11 +199,23 @@ try:
                 plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
 
                 emit_plot(plot_parameters)
-                namefile = main.getDirs("results") + "/CW"+ str(CW_parameters["SPOT"]) + "V" + main.ui.txtProcess.text() + "_" + str(
-                    dieActual) + "_" + str(
-                    moduleActual) + ".txt"
-                main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
-                                       headers=["F", "C", "G"], separation=",")
+                results_data = list(zip(frequency, capacitance, conductance))
+                variables_list = ["Freq", "C", "G"]
+                output_params = CW_parameters.get("output", {"separator": "comma", "prefix": "CW", "suffix": ""})
+                
+                save_results_to_file(
+                    results_data=results_data,
+                    variables_list=variables_list,
+                    test_parameters=output_params,
+                    die=dieActual,
+                    module=moduleActual,
+                    folder_func=lambda: build_results_folder(
+                        username=username,
+                        process=main.ui.txtProcess.text(),
+                        lot=main.ui.txtLot.text(),
+                        wafer=main.ui.txtWafer.text()
+                    )
+                )
 
     else:
         # reset instrument
@@ -243,12 +258,23 @@ try:
                 moduleActual = 1
 
                 emit_plot(plot_parameters)
-                namefile = main.getDirs("results") + "/CW" + str(
-                    CW_parameters["SPOT"]) + "V" + main.ui.txtProcess.text() + "_" + str(
-                    dieActual) + "_" + str(
-                    moduleActual) + ".txt"
-                main.save_lists_to_txt(namefile=namefile, var_list=[frequency, capacitance, conductance],
-                                       headers=["F", "C", "G"], separation=",")
+                results_data = list(zip(frequency, capacitance, conductance))
+                variables_list = ["Freq", "C", "G"]
+                output_params = CW_parameters.get("output", {"separator": "comma", "prefix": "CW", "suffix": ""})
+                
+                save_results_to_file(
+                    results_data=results_data,
+                    variables_list=variables_list,
+                    test_parameters=output_params,
+                    die=dieActual,
+                    module=moduleActual,
+                    folder_func=lambda: build_results_folder(
+                        username=username,
+                        process=main.ui.txtProcess.text(),
+                        lot=main.ui.txtLot.text(),
+                        wafer=main.ui.txtWafer.text()
+                    )
+                )
 
     # stop process
     hp4192A.stop()

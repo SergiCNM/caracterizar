@@ -70,3 +70,9 @@ SERIAL_RES = "Calculate Serial resistance"
 COMPENSATION_OPEN = "Compensate for open circuit"
 COMPENSATION_SHORT = "Compensate for short circuit"
 COMPENSATION_DONE = "Compensations done"
+
+[output]
+separator = "comma"
+prefix = "CV"
+suffix = ""
+variables = ["V", "C", "G"]

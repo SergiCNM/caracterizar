@@ -20,12 +20,13 @@ import os.path
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
+from config.default.tests.common import save_results_to_file, build_results_folder
 from config.functions import *
 import toml
 global test_status, measurement_status
 global dieActual, moduleActual
 global CV_parameters
-global base_dir, tests_dir, cartographic_measurement
+global base_dir, tests_dir, results_dir, username, cartographic_measurement
 
 
 def measure_CV(hp4192A,CV_parameters):
@@ -182,6 +183,8 @@ def load_CV_parameters():
     if file_exists:
         toml_info = toml.load(filename_config)
         CV_parameters = toml_info["parameters"]
+        if "output" in toml_info:
+            CV_parameters["output"] = toml_info["output"]
     else:
         print(f"File toml {filename_config} doesn't exists!")
 
@@ -265,11 +268,23 @@ try:
                 plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
 
                 emit_plot(plot_parameters)
-                namefile = main.getDirs("results") + "/CV" + str(CV_parameters["FREQ"]) + "kHz_" + main.ui.txtProcess.text() + "_" + str(
-                    dieActual) + "_" + str(
-                    moduleActual) + ".txt"
-                main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                       headers=["V", "C", "G"], separation=",")
+                results_data = list(zip(voltage, capacitance, conductance))
+                variables_list = ["V", "C", "G"]
+                output_params = CV_parameters.get("output", {"separator": "comma", "prefix": "CV", "suffix": ""})
+                
+                save_results_to_file(
+                    results_data=results_data,
+                    variables_list=variables_list,
+                    test_parameters=output_params,
+                    die=dieActual,
+                    module=moduleActual,
+                    folder_func=lambda: build_results_folder(
+                        username=username,
+                        process=main.ui.txtProcess.text(),
+                        lot=main.ui.txtLot.text(),
+                        wafer=main.ui.txtWafer.text()
+                    )
+                )
 
     else:
         # make compensation
@@ -317,10 +332,23 @@ try:
                 # stop process
                 hp4192A.stop()
                 emit_plot(plot_parameters)
-                namefile = main.getDirs("results") + "/CV" + str(CV_parameters["FREQ"]) + "kHz_" + main.ui.txtProcess.text() + "_" + str(dieActual) + "_" + str(
-                    moduleActual) + ".txt"
-                main.save_lists_to_txt(namefile=namefile, var_list=[voltage, capacitance, conductance],
-                                       headers=["V", "C", "G"], separation=",")
+                results_data = list(zip(voltage, capacitance, conductance))
+                variables_list = ["V", "C", "G"]
+                output_params = CV_parameters.get("output", {"separator": "comma", "prefix": "CV", "suffix": ""})
+                
+                save_results_to_file(
+                    results_data=results_data,
+                    variables_list=variables_list,
+                    test_parameters=output_params,
+                    die=dieActual,
+                    module=moduleActual,
+                    folder_func=lambda: build_results_folder(
+                        username=username,
+                        process=main.ui.txtProcess.text(),
+                        lot=main.ui.txtLot.text(),
+                        wafer=main.ui.txtWafer.text()
+                    )
+                )
 
 
     hp4192A.local()

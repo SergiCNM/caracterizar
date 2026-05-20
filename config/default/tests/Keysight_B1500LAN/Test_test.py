@@ -7,6 +7,7 @@ import time
 import toml
 import numpy as np
 from config.default.instruments import Keysight_B1500LAN
+from config.default.tests.common import get_output_separator, save_results_to_file, build_results_folder
 from PySide6.QtWidgets import QMessageBox
 
 global test_status, measurement_status
@@ -57,15 +58,6 @@ def configure_test(B1500, workspace_name, group, test_preset_group_name):
     return B1500
 
 
-def get_output_separator(separator_str):
-    if separator_str == "space":
-        return " "
-    elif separator_str == "tab":
-        return "\t"
-    else:
-        return ","
-
-
 def check_existing_files():
     folder = os.getcwd() + "/" + results_dir + "/" + username + "/" + main.ui.txtProcess.text() + "/" + main.ui.txtLot.text() + "_W" + f"{int(main.ui.txtWafer.text()):02d}" + "/"
 
@@ -94,42 +86,6 @@ def check_existing_files():
             return True, folder
 
     return False, folder
-
-
-def save_results_to_file(results_data, variables_list):
-    separator = get_output_separator(TEST_parameters.get("separator", "comma"))
-    prefix = TEST_parameters.get("prefix", "")
-    suffix = TEST_parameters.get("suffix", "")
-    die = int(dieActual)
-    module = int(moduleActual)
-
-    folder = os.getcwd() + "/" + results_dir + "/" + username + "/" + main.ui.txtProcess.text() + "/" + main.ui.txtLot.text() + "_W" + f"{int(main.ui.txtWafer.text()):02d}" + "/"
-
-    os.makedirs(folder, exist_ok=True)
-
-    if prefix and suffix:
-        filename = f"{prefix}_{die}_{module}_{suffix}.txt"
-    elif prefix:
-        filename = f"{prefix}_{die}_{module}.txt"
-    elif suffix:
-        filename = f"{die}_{module}_{suffix}.txt"
-    else:
-        filename = f"{die}_{module}.txt"
-
-    filepath = os.path.join(folder, filename)
-
-    with open(filepath, 'w') as f:
-        header_line = separator.join(variables_list)
-        f.write(header_line + "\n")
-
-        if hasattr(results_data, '__len__') and len(results_data) > 0:
-            if hasattr(results_data[0], '__len__'):
-                for row in results_data:
-                    row_str = separator.join([str(v) for v in row])
-                    f.write(row_str + "\n")
-            else:
-                row_str = separator.join([str(v) for v in results_data])
-                f.write(row_str + "\n")
 
 
 def get_plot_parameters(results_data, variables_list):
@@ -209,17 +165,11 @@ def test_B1500(B1500):
     message = ""
     results = ""
     try:
-        print("single measure...")
         B1500.single()
-        print("measuring & wait opc..")
         opc = B1500.dataready()
-        print("data ready, getting data...")
         data = B1500.get_data()
-        print("data: ", data)
         variables = B1500.get_vars(data)
-        print("variables: ", variables)
         results = B1500.get_data_numpy(data, variables)
-        print("results: ", results)
 
     except Exception as ex:
         status = "meas_error"
@@ -267,9 +217,7 @@ def load_TEST_parameters():
         if "plot" in toml_info:
             TEST_parameters["plot"] = toml_info["plot"]
 
-print("loading test parameters...")
 load_TEST_parameters()
-print(TEST_parameters)
 
 B1500 = Keysight_B1500LAN(instruments["Keysight_B1500LAN"])
 B1500.instrument.timeout = 20000 # bigger than test
@@ -281,10 +229,6 @@ try:
     variables_config = TEST_parameters.get("variables", "V1,I1,V2,I2").split(",")
 
     exists, folder = check_existing_files()
-
-    print("Exists: ", exists)
-
-    print(folder)
 
     if exists:
         if cartographic_measurement:
@@ -306,7 +250,6 @@ try:
 
         if str(dieActual) == str(init_chip) and str(moduleActual) == "1":
             retval = message_user(main, "Init Keysight B1500 for measurement!", "Please, configure instrument for initialization", "yes_cancel")
-            print("retval", retval)
             if retval == QMessageBox.Yes:
                 configure_test(B1500, workspace_name, group, test_preset_group_name)
                 test_status.status = "STARTED"
@@ -321,7 +264,19 @@ try:
 
             plot_parameters = {}
             if status == "meas_success" and results_data is not None:
-                save_results_to_file(results_data, variables_config)
+                save_results_to_file(
+                    results_data=results_data,
+                    variables_list=variables_config,
+                    test_parameters=TEST_parameters,
+                    die=dieActual,
+                    module=moduleActual,
+                    folder_func=lambda: build_results_folder(
+                        username=username,
+                        process=main.ui.txtProcess.text(),
+                        lot=main.ui.txtLot.text(),
+                        wafer=main.ui.txtWafer.text()
+                    )
+                )
                 plot_parameters = get_plot_parameters(results_data, variables_config)
 
             main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
@@ -343,19 +298,27 @@ try:
     else:
         dieActual = "1"
         moduleActual = "1"
-        print("Configure test...")
         configure_test(B1500, workspace_name, group, test_preset_group_name)
-        print("Test configured...")
-
         test_result = test_B1500(B1500)
-        print("Result: ", test_result)
         status = test_result[0]
         message = test_result[1]
         results_data = test_result[2]
 
         plot_parameters = {}
         if status == "meas_success" and results_data is not None:
-            save_results_to_file(results_data, variables_config)
+            save_results_to_file(
+                results_data=results_data,
+                variables_list=variables_config,
+                test_parameters=TEST_parameters,
+                die=dieActual,
+                module=moduleActual,
+                folder_func=lambda: build_results_folder(
+                    username=username,
+                    process=main.ui.txtProcess.text(),
+                    lot=main.ui.txtLot.text(),
+                    wafer=main.ui.txtWafer.text()
+                )
+            )
             plot_parameters = get_plot_parameters(results_data, variables_config)
 
         
