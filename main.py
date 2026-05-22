@@ -3658,7 +3658,8 @@ class MainWindow(QMainWindow):
         filename_wafermap = self.get_filename_wafermap()
         if filename_wafermap != "":
             self.run(self.get_filename_wafermap(), "wafermaps")
-            wafer = Wafer(wafer_parameters)
+            max_buttons = self.config.get("wafermap", {}).get("max_visible_buttons", 10000)
+            wafer = Wafer(wafer_parameters, max_visible_buttons=max_buttons)
             if not wafer.wafer_error:
                 self.waferwindow = wafer.create_wafer_window(enable)
                 if widgets.chkViewPosition.isChecked():

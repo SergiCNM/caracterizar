@@ -2,6 +2,19 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [2.5.0] - 2026-05-22
+### Added
+- **Rendimiento en navegación por secciones**: Implementado sistema de contenedores (`_section_container_cache`) que cachea cada sección en un `QWidget`. Al navegar, se intercambia el contenedor completo (`addWidget`/`removeWidget`) en lugar de reconstruir los 5625 botones individualmente. La primera navegación a una sección tarda ~1.4s, las siguientes ~0.06s.
+- **Lectura de `max_visible_buttons` desde configuración en `DrawWafer`**: El método `DrawWafer` ahora lee `max_visible_buttons` del archivo `config.toml` (como ya hacía `view_wafermap`), garantizando que la división en secciones sea idéntica al crear y al recargar un mapa de oblea.
+
+### Fixed
+- **Highlight de init/end chip entre secciones**: `total_meas()` ahora sincroniza los estados `meas`/`meas_selected` en `all_buttons_states` para **todas** las coordenadas (no solo las visibles). Al navegar a otra sección, los botones restaurados desde caché mantienen el color correcto del rango init/end chip.
+- **MarkAll ahora marca todas las secciones**: `MarkAll` actualiza `all_buttons_states` completo cambiando `in` → `meas` en todas las coordenadas, refleja los cambios visualmente en la sección actual, y establece init_chip=1 y end_chip=total_meas.
+- **UnmarkAll ahora desmarca todas las secciones**: `UnmarkAll` actualiza `all_buttons_states` completo poniendo todo lo no-`out` como `in`, refleja cambios visualmente, y establece init_chip=1 y end_chip=0.
+
+### Removed
+- Eliminados prints de perfilado `[PERF]` de `add_die_buttons` y `_refresh_display`.
+
 ## [2.4.0] - 2026-05-20
 ### Added
 - **common.py**: Se ha añadido la función save_results_to_file() para guardar los resultados de los tests. Se ha añadido la función build_results_folder() para construir la carpeta de resultados.

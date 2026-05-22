@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wafertfXXEW.ui'
+## Form generated from reading UI file 'waferDhRaEF.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -28,8 +28,8 @@ class Ui_WaferWindow(object):
         if not WaferWindow.objectName():
             WaferWindow.setObjectName(u"WaferWindow")
         WaferWindow.setEnabled(True)
-        WaferWindow.resize(1200, 862)
-        WaferWindow.setMinimumSize(QSize(1200, 800))
+        WaferWindow.resize(1200, 840)
+        WaferWindow.setMinimumSize(QSize(1200, 840))
         WaferWindow.setMaximumSize(QSize(1200, 862))
         self.action4 = QAction(WaferWindow)
         self.action4.setObjectName(u"action4")
@@ -44,7 +44,7 @@ class Ui_WaferWindow(object):
         self.centralwidget = QWidget(WaferWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setMinimumSize(QSize(1200, 800))
-        self.centralwidget.setMaximumSize(QSize(1200, 800))
+        self.centralwidget.setMaximumSize(QSize(1200, 900))
         self.verticalLayoutWidget = QWidget(self.centralwidget)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
         self.verticalLayoutWidget.setGeometry(QRect(10, 0, 1181, 791))
@@ -52,11 +52,12 @@ class Ui_WaferWindow(object):
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setSizeConstraint(QLayout.SetDefaultConstraint)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 5)
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setSizeConstraint(QLayout.SetMinimumSize)
         self.gridLayout.setVerticalSpacing(0)
+        self.gridLayout.setContentsMargins(-1, -1, -1, 0)
 
         self.verticalLayout.addLayout(self.gridLayout)
 
@@ -64,6 +65,7 @@ class Ui_WaferWindow(object):
         self.horizontalLayout_3.setSpacing(6)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_3.setSizeConstraint(QLayout.SetMinimumSize)
+        self.horizontalLayout_3.setContentsMargins(-1, 50, -1, -1)
         self.label = QLabel(self.verticalLayoutWidget)
         self.label.setObjectName(u"label")
         self.label.setMinimumSize(QSize(80, 0))
@@ -168,6 +170,7 @@ class Ui_WaferWindow(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setSizeConstraint(QLayout.SetMinimumSize)
+        self.horizontalLayout.setContentsMargins(-1, -1, -1, 0)
         self.cmbWaferSize = QComboBox(self.verticalLayoutWidget)
         self.cmbWaferSize.setObjectName(u"cmbWaferSize")
         self.cmbWaferSize.setEnabled(False)
@@ -302,6 +305,7 @@ class Ui_WaferWindow(object):
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setSizeConstraint(QLayout.SetMinimumSize)
+        self.horizontalLayout_2.setContentsMargins(-1, 5, -1, 5)
         self.txtOriginChip = QLineEdit(self.verticalLayoutWidget)
         self.txtOriginChip.setObjectName(u"txtOriginChip")
         self.txtOriginChip.setEnabled(False)
@@ -513,6 +517,95 @@ class Ui_WaferWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(-1, 5, 5, 5)
+        self.btnNavUpLeft = QPushButton(self.verticalLayoutWidget)
+        self.btnNavUpLeft.setObjectName(u"btnNavUpLeft")
+        self.btnNavUpLeft.setEnabled(False)
+        self.btnNavUpLeft.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavUpLeft)
+
+        self.btnNavUp = QPushButton(self.verticalLayoutWidget)
+        self.btnNavUp.setObjectName(u"btnNavUp")
+        self.btnNavUp.setEnabled(False)
+        self.btnNavUp.setMaximumSize(QSize(32, 32))
+        font4 = QFont()
+        font4.setPointSize(9)
+        font4.setBold(True)
+        self.btnNavUp.setFont(font4)
+
+        self.horizontalLayout_4.addWidget(self.btnNavUp)
+
+        self.btnNavUpRight = QPushButton(self.verticalLayoutWidget)
+        self.btnNavUpRight.setObjectName(u"btnNavUpRight")
+        self.btnNavUpRight.setEnabled(False)
+        self.btnNavUpRight.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavUpRight)
+
+        self.btnNavLeft = QPushButton(self.verticalLayoutWidget)
+        self.btnNavLeft.setObjectName(u"btnNavLeft")
+        self.btnNavLeft.setEnabled(False)
+        self.btnNavLeft.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavLeft)
+
+        self.btnNavCenter = QPushButton(self.verticalLayoutWidget)
+        self.btnNavCenter.setObjectName(u"btnNavCenter")
+        self.btnNavCenter.setEnabled(False)
+        self.btnNavCenter.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavCenter)
+
+        self.btnNavRight = QPushButton(self.verticalLayoutWidget)
+        self.btnNavRight.setObjectName(u"btnNavRight")
+        self.btnNavRight.setEnabled(False)
+        self.btnNavRight.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavRight)
+
+        self.btnNavDownLeft = QPushButton(self.verticalLayoutWidget)
+        self.btnNavDownLeft.setObjectName(u"btnNavDownLeft")
+        self.btnNavDownLeft.setEnabled(False)
+        self.btnNavDownLeft.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavDownLeft)
+
+        self.btnNavDown = QPushButton(self.verticalLayoutWidget)
+        self.btnNavDown.setObjectName(u"btnNavDown")
+        self.btnNavDown.setEnabled(False)
+        self.btnNavDown.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavDown)
+
+        self.btnNavDownRight = QPushButton(self.verticalLayoutWidget)
+        self.btnNavDownRight.setObjectName(u"btnNavDownRight")
+        self.btnNavDownRight.setEnabled(False)
+        self.btnNavDownRight.setMaximumSize(QSize(32, 32))
+
+        self.horizontalLayout_4.addWidget(self.btnNavDownRight)
+
+        self.horizontalSpacer_7 = QSpacerItem(50, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_7)
+
+        self.txtSectionInfo = QLineEdit(self.verticalLayoutWidget)
+        self.txtSectionInfo.setObjectName(u"txtSectionInfo")
+        self.txtSectionInfo.setEnabled(False)
+        self.txtSectionInfo.setMaximumSize(QSize(16777215, 16777215))
+
+        self.horizontalLayout_4.addWidget(self.txtSectionInfo)
+
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_8)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+
+        self.verticalLayout.setStretch(0, 5)
         WaferWindow.setCentralWidget(self.centralwidget)
         self.statusBar = QStatusBar(WaferWindow)
         self.statusBar.setObjectName(u"statusBar")
@@ -538,9 +631,9 @@ class Ui_WaferWindow(object):
         self.action8.setText(QCoreApplication.translate("WaferWindow", u"8\"", None))
         self.actionXSize.setText(QCoreApplication.translate("WaferWindow", u"XSize", None))
         self.actionView_Module_1.setText(QCoreApplication.translate("WaferWindow", u"View Module 1", None))
-        self.label.setText(QCoreApplication.translate("WaferWindow", u"Wafer size", None))
+        self.label.setText(QCoreApplication.translate("WaferWindow", u"Wafer Size", None))
         self.label_10.setText(QCoreApplication.translate("WaferWindow", u"Wafer Flat", None))
-        self.label_2.setText(QCoreApplication.translate("WaferWindow", u"Wafer name", None))
+        self.label_2.setText(QCoreApplication.translate("WaferWindow", u"Wafer Name", None))
         self.label_4.setText(QCoreApplication.translate("WaferWindow", u"XSize (um)", None))
         self.label_3.setText(QCoreApplication.translate("WaferWindow", u"YSize (um)", None))
         self.label_12.setText("")
@@ -635,5 +728,41 @@ class Ui_WaferWindow(object):
         self.btnSave.setToolTip(QCoreApplication.translate("WaferWindow", u"Save as", None))
 #endif // QT_CONFIG(tooltip)
         self.btnSave.setText("")
+#if QT_CONFIG(tooltip)
+        self.btnNavUpLeft.setToolTip(QCoreApplication.translate("WaferWindow", u"Section upper left", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavUpLeft.setText(QCoreApplication.translate("WaferWindow", u"\u2196", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavUp.setToolTip(QCoreApplication.translate("WaferWindow", u"Section upper", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavUp.setText(QCoreApplication.translate("WaferWindow", u"\u2191", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavUpRight.setToolTip(QCoreApplication.translate("WaferWindow", u"Section upper right", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavUpRight.setText(QCoreApplication.translate("WaferWindow", u"\u2197", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavLeft.setToolTip(QCoreApplication.translate("WaferWindow", u"Section left", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavLeft.setText(QCoreApplication.translate("WaferWindow", u"\u2190", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavCenter.setToolTip(QCoreApplication.translate("WaferWindow", u"Section center", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavCenter.setText(QCoreApplication.translate("WaferWindow", u"C", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavRight.setToolTip(QCoreApplication.translate("WaferWindow", u"Section right", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavRight.setText(QCoreApplication.translate("WaferWindow", u"\u2192", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavDownLeft.setToolTip(QCoreApplication.translate("WaferWindow", u"Section down left", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavDownLeft.setText(QCoreApplication.translate("WaferWindow", u"\u2199", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavDown.setToolTip(QCoreApplication.translate("WaferWindow", u"Section down", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavDown.setText(QCoreApplication.translate("WaferWindow", u"\u2193", None))
+#if QT_CONFIG(tooltip)
+        self.btnNavDownRight.setToolTip(QCoreApplication.translate("WaferWindow", u"Section down right", None))
+#endif // QT_CONFIG(tooltip)
+        self.btnNavDownRight.setText(QCoreApplication.translate("WaferWindow", u"\u2198", None))
     # retranslateUi
 

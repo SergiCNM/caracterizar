@@ -35,4 +35,4 @@ Thumbs.db
 log/*.log
 
 # Tests (solo desarrollo local)
-tests/
+/tests/

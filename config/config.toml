@@ -1,5 +1,5 @@
 title = "Caracterizar"
-version = "2.4.0"
+version = "2.5.0"
 author = "Sergi Sànchez"
 
 [defaults]
@@ -55,3 +55,6 @@ title = "CMOS REPORT"
 subtitle = "19298"
 date = "APR 2026"
 author = "Sergi Sànchez"
+
+[wafermap]
+max_visible_buttons = 10000

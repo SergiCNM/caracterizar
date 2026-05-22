@@ -1,4 +1,7 @@
 import os
+import math
+import time
+import toml
 import numpy as np
 from datetime import datetime
 
@@ -19,12 +22,14 @@ from config.defs import *
 
 
 class Wafer(QMainWindow):
-    def __init__(self, wafer_parameters):
+    def __init__(self, wafer_parameters, max_visible_buttons=10000):
         QMainWindow.__init__(self)
-        # wafer parameters, array with 15 parameters
         self.wafer_error = False
+        self.max_visible_buttons = max_visible_buttons
         self.waferwindow = ""
         self.wafer_parameters = wafer_parameters
+        # Ensure max_visible_buttons is available in parameters dict for WaferWindow
+        self.wafer_parameters["max_visible_buttons"] = max_visible_buttons
         try:
             if len(wafer_parameters)>=13:
                 self.wafer_name = wafer_parameters["wafer_name"]
@@ -303,54 +308,51 @@ class Wafer(QMainWindow):
         self.waferwindow = WaferWindow(self.wafer_parameters,enable)
         return self.waferwindow
 
-    def is_home(self,x,y):
-        # pass x,y position
-        if self.real_origin_chip!="" and self.home_chip!="":
-            real_origin_chipX , real_origin_chipY = self.real_origin_chip.split()
-            home_chipX , home_chipY = self.home_chip.split()
-            if int(x)*-1 - int(float(real_origin_chipX)) == int(float(home_chipX)) and int(y)*-1 - int(float(real_origin_chipY)) == int(float(home_chipY)):
+    def is_home_by_index(self, idx_x, idx_y):
+        # Versión que usa índices de grid directamente
+        if self.real_origin_chip != "" and self.home_chip != "":
+            real_origin_chipX, real_origin_chipY = self.real_origin_chip.split()
+            home_chipX, home_chipY = self.home_chip.split()
+            if idx_x - int(float(real_origin_chipX)) == int(float(home_chipX)) and idx_y - int(float(real_origin_chipY)) == int(float(home_chipY)):
                 return True
         return False
 
-    def is_origin(self,x,y):
-        # pass x,y position
-        if self.real_origin_chip!="":
-            real_origin_chipX , real_origin_chipY = self.real_origin_chip.split()
-            origin_chipX , origin_chipY = self.origin_chip.split()
-            if int(x)*-1 - int(float(real_origin_chipX)) == int(float(origin_chipX)) and int(y)*-1 - int(float(real_origin_chipY)) == int(float(origin_chipY)):
+    def is_origin_by_index(self, idx_x, idx_y):
+        # Versión que usa índices de grid directamente
+        if self.real_origin_chip != "":
+            real_origin_chipX, real_origin_chipY = self.real_origin_chip.split()
+            origin_chipX, origin_chipY = self.origin_chip.split()
+            if idx_x - int(float(real_origin_chipX)) == int(float(origin_chipX)) and idx_y - int(float(real_origin_chipY)) == int(float(origin_chipY)):
                 return True
         return False
 
-    def is_in(self,x,y):
-        # (x-a)² + (y-b)² = R²
-        # miramos si los 4 puntos estan dentro 
-        is_in = True
-        R = float(self.wafer_size_mm)/2
-        xstep = float(self.xsize)/1000
-        ystep = float(self.ysize)/1000
-        a1 = int(abs(x))*xstep
-        b1 = int(abs(y))*ystep
-        a = { 1:a1, 2:a1+xstep, 3:a1, 4:a1+xstep}
-        b = { 1:b1, 2:b1, 3:b1+ystep, 4:b1+ystep}
-        for i in range(1,5):
-            if pow(R-a[i],2)+pow(R-b[i],2)>pow(R,2):
-                # is out
-                is_in = False
-                break
+    def is_in_by_index(self, idx_x, idx_y):
+        # Verifica si el die está dentro del wafer usando índices de grid
+        # Cada die ocupa xsize x ysize μm
+        pos_x = idx_x * self.xsize
+        pos_y = idx_y * self.ysize
+        R = float(self.wafer_size_mm) * 1000 / 2  # Radio en μm
+        # Verificar las 4 esquinas del die
+        corners = [
+            (pos_x, pos_y),
+            (pos_x + self.xsize, pos_y),
+            (pos_x, pos_y + self.ysize),
+            (pos_x + self.xsize, pos_y + self.ysize)
+        ]
+        for cx, cy in corners:
+            if pow(R - cx, 2) + pow(R - cy, 2) > pow(R, 2):
+                return False
+        return True
 
-        return is_in
-
-    def is_to_measure(self,x,y):
-        is_to_measure = False
-        if len(self.wafer_positions)>0:
-            if self.real_origin_chip!="":
-                real_origin_chipX , real_origin_chipY = self.real_origin_chip.split()
-                realX = -int(x) - int(real_origin_chipX)
-                realY = -int(y) - int(real_origin_chipY)
-                realpos = str(realX) + " " + str(realY)
-                if realpos in self.wafer_positions:
-                    is_to_measure = True
-        return is_to_measure
+    def is_to_measure_by_index(self, idx_x, idx_y):
+        # Versión que usa índices de grid directamente
+        if len(self.wafer_positions) > 0 and self.real_origin_chip != "":
+            real_origin_chipX, real_origin_chipY = self.real_origin_chip.split()
+            realX = -idx_x - int(real_origin_chipX)
+            realY = -idx_y - int(real_origin_chipY)
+            realpos = str(realX) + " " + str(realY)
+            return realpos in self.wafer_positions
+        return False
 
     def save_wafermap(self):
 
@@ -509,7 +511,8 @@ class WaferWindow(QMainWindow):
         self.widgets = widgets
         self.moduleswindow = ""
 
-        wafer = Wafer(wafer_parameters)
+        max_buttons = wafer_parameters.get("max_visible_buttons", 10000)
+        wafer = Wafer(wafer_parameters, max_visible_buttons=max_buttons)
         self.wafer = wafer
         self.wafer_parameters = wafer_parameters
         self.wafer_modules = wafer.wafer_modules
@@ -522,12 +525,50 @@ class WaferWindow(QMainWindow):
         self.max_size = 860 # MAX_SIZE w/h BUTTONS
         self.max_window_size = 1100 # MAX WINDOW SIZE w/h
 
+        # Navegación por secciones (cuadrantes)
+        self.current_section = (0, 0)
+        self.section_count = (1, 1)
+        self.is_quadrant_mode = False
+
+        # Bandera para evitar recursión en total_meas durante operaciones masivas
+        self._skip_total_meas = False
+
+        # Diccionario persistente para guardar estados de TODOS los botones (todas las secciones)
+        self.all_buttons_states = {}
+
+        # Diccionario para acceso rápido a botones por coordenadas
+        self.buttons_by_coord = {}
+
         # create empty meas_result
         # array [die][module] with dict content status, message, contact_height, variables & plot_parameters
         self.meas_result = self.create_meas_result(self.wafer.nchips, self.wafer.nmodules)
 
         # add buttons to gridLayout and get numx buttons & numy buttons
         self.numx, self.numy = self.add_die_buttons(wafer, enable)
+
+        # Cache de contenedores por sección para navegación rápida (modo cuadrante)
+        self._section_container_cache = {}
+        self._current_container = None
+
+        # Si es modo cuadrante, envolver la sección actual en un contenedor
+        if self.is_quadrant_mode:
+            self._wrap_current_section_in_container()
+
+        # Registrar botones visibles en all_buttons_states
+        for btn in self.centralWidget().findChildren(QWaferButton):
+            coord = (btn.x, btn.y)
+            self.all_buttons_states[coord] = {
+                'btnType': btn._btnType, 'home': btn._home,
+                'origin': btn._origin, 'message': ''
+            }
+
+        # Pre-calcular estados de todas las secciones para contadores iniciales correctos
+        wafer_size_um = wafer.wafer_size_mm * 1000
+        est_x_count = max(1, int(wafer_size_um / wafer.xsize))
+        est_y_count = max(1, int(wafer_size_um / wafer.ysize))
+        if est_x_count * est_y_count < 500000:
+            self._init_all_buttons_states()
+        self._update_totals_from_states()
 
         # set values into textBoxes
         widgets.txtWaferName.setText(wafer.wafer_name)
@@ -617,6 +658,18 @@ class WaferWindow(QMainWindow):
 
         widgets.btnMarkAll.clicked.connect(self.MarkAll)
         widgets.btnUnmarkAll.clicked.connect(self.UnmarkAll)
+
+        # Navegación por secciones
+        widgets.btnNavUpLeft.clicked.connect(lambda: self.go_to_section(0, 0))
+        widgets.btnNavUp.clicked.connect(lambda: self.go_to_section(self.current_section[0], 0))
+        widgets.btnNavUpRight.clicked.connect(lambda: self.go_to_section(self.section_count[0]-1, 0))
+        widgets.btnNavLeft.clicked.connect(lambda: self.go_to_section(0, self.current_section[1]))
+        widgets.btnNavCenter.clicked.connect(self.show_full_wafer)
+        widgets.btnNavRight.clicked.connect(lambda: self.go_to_section(self.section_count[0]-1, self.current_section[1]))
+        widgets.btnNavDownLeft.clicked.connect(lambda: self.go_to_section(0, self.section_count[1]-1))
+        widgets.btnNavDown.clicked.connect(lambda: self.go_to_section(self.current_section[0], self.section_count[1]-1))
+        widgets.btnNavDownRight.clicked.connect(lambda: self.go_to_section(self.section_count[0]-1, self.section_count[1]-1))
+
         windowTitle = "Wafer window"
         if wafer.wafer_name!="":
             windowTitle = windowTitle + " - " + wafer.wafer_name
@@ -631,6 +684,35 @@ class WaferWindow(QMainWindow):
         self.setMaximumHeight(960)
         self.setMaximumWidth(self.max_window_size)
         self.enabled_widgets(enable)
+
+    def _init_all_buttons_states(self):
+        """Pre-calcula estados de TODOS los dies del wafer completo (todas las secciones)"""
+        wafer_size_um = self.wafer.wafer_size_mm * 1000
+        est_x = max(1, int(wafer_size_um / self.wafer.xsize))
+        est_y = max(1, int(wafer_size_um / self.wafer.ysize))
+        
+        for y_idx in range(est_y):
+            for x_idx in range(est_x):
+                coord = (-x_idx, -y_idx)  # Convención negativa de QWaferButton
+                if coord in self.all_buttons_states:
+                    continue  # Ya existe (botón visible en sección actual)
+                
+                btnType = "out"
+                is_home = self.wafer.is_home_by_index(x_idx, y_idx)
+                is_origin = self.wafer.is_origin_by_index(x_idx, y_idx)
+                if is_origin:
+                    btnType = "meas"
+                if self.wafer.is_in_by_index(x_idx, y_idx):
+                    btnType = "in"
+                if self.wafer.is_to_measure_by_index(x_idx, y_idx):
+                    btnType = "meas"
+                
+                self.all_buttons_states[coord] = {
+                    'btnType': btnType,
+                    'home': is_home,
+                    'origin': is_origin,
+                    'message': ''
+                }
 
     @property
     def status(self):
@@ -682,23 +764,28 @@ class WaferWindow(QMainWindow):
 
     def viewModulesChange(self,nmodule):
         # unchecked all
-
-        for actionModule in range (0,self.wafer.nmodules):
-            self.actions[actionModule].setChecked(False)
-        # check the selected module view
-        self.actions[nmodule-1].setChecked(True)
-        self.view_modules = nmodule
-        # print module view in buttons to measure
-        for i in range (0,self.wafer_parameters["nchips"]):
-            x , y = self.wafer_parameters["wafer_positions"][i].split()
-            x2, y2 = change_coord_to_origin(-int(x),-int(y),self.wafer_parameters["real_origin_chip"]).split()
-            btn = self.centralWidget().findChild(QPushButton,get_btnName(x2,y2))
-            meas_array = ["meas_success","meas_warning","meas_error"]
-            if self.meas_result[i][nmodule-1]["status"] in meas_array:
-                btn.btnType = self.meas_result[i][nmodule-1]["status"]
-                btn.message = self.meas_result[i][nmodule-1]["message"]
-            else:
-                btn.btnType = "meas"
+        self.centralWidget().setUpdatesEnabled(False)
+        try:
+            for actionModule in range (0,self.wafer.nmodules):
+                self.actions[actionModule].setChecked(False)
+            # check the selected module view
+            self.actions[nmodule-1].setChecked(True)
+            self.view_modules = nmodule
+            # print module view in buttons to measure
+            for i in range (0,self.wafer_parameters["nchips"]):
+                x , y = self.wafer_parameters["wafer_positions"][i].split()
+                x2, y2 = change_coord_to_origin(-int(x),-int(y),self.wafer_parameters["real_origin_chip"]).split()
+                btn = self.centralWidget().findChild(QPushButton,get_btnName(x2,y2))
+                meas_array = ["meas_success","meas_warning","meas_error"]
+                if btn:
+                    if self.meas_result[i][nmodule-1]["status"] in meas_array:
+                        btn.btnType = self.meas_result[i][nmodule-1]["status"]
+                        btn.message = self.meas_result[i][nmodule-1]["message"]
+                    else:
+                        btn.btnType = "meas"
+        finally:
+            self.centralWidget().setUpdatesEnabled(True)
+            self.centralWidget().update()
             QApplication.processEvents()
 
 
@@ -707,204 +794,354 @@ class WaferWindow(QMainWindow):
         if self.moduleswindow!="":
             self.moduleswindow.close()
 
-
     def MarkAll(self):
-        for i in self.centralWidget().findChildren(QWaferButton):
-            if i._btnType == "in":
-                i.btnType = "meas"
+        self.centralWidget().setUpdatesEnabled(False)
+        self._skip_total_meas = True
+        try:
+            # 1. Sincronizar botones visibles → all_buttons_states
+            for btn in self.centralWidget().findChildren(QWaferButton):
+                coord = (btn.x, btn.y)
+                self.all_buttons_states[coord] = {
+                    'btnType': btn._btnType, 'home': btn._home,
+                    'origin': btn._origin, 'message': btn._message
+                }
+
+            # 2. Marcar TODOS los IN como MEAS en all_buttons_states
+            for state in self.all_buttons_states.values():
+                if state['btnType'] == "in":
+                    state['btnType'] = "meas"
+
+            # 3. Reflejar cambios en botones visibles
+            for btn in self.centralWidget().findChildren(QWaferButton):
+                coord = (btn.x, btn.y)
+                new_type = self.all_buttons_states[coord]['btnType']
+                if btn._btnType != new_type:
+                    btn._btnType = new_type
+                    self._apply_button_style(btn, new_type)
+                    name = ""
+                    if btn._home: name = "H"
+                    if btn._origin: name = "O"
+                    btn.setText(name)
+
+            # 4. Actualizar init/end chip
+            total_meas_count = sum(1 for s in self.all_buttons_states.values()
+                                   if s['btnType'] in ("meas", "meas_selected"))
+            self.widgets.txtInitChip.setText("1")
+            self.widgets.txtEndChip.setText(str(total_meas_count))
+            self.wafer.init_chip = "1"
+            self.wafer.end_chip = str(total_meas_count)
+
+            # 5. Contadores globales
+            self._update_totals_from_states()
+        finally:
+            self.centralWidget().setUpdatesEnabled(True)
+            self.centralWidget().update()
+            self._skip_total_meas = False
+        # 6. Aplicar highlight TOTAL
         self.total_meas()
 
     def UnmarkAll(self):
-        for i in self.centralWidget().findChildren(QWaferButton):
-            if i._btnType == "meas":
-                x = i.x * -1
-                y = i.y * -1
-                if not i.origin:
-                    if i.waferwindow.wafer.is_in(x,y):
-                        i.btnType = "in"
-                    else:
-                        i.btnType = "out"
+        self.centralWidget().setUpdatesEnabled(False)
+        self._skip_total_meas = True
+        try:
+            # 1. Sincronizar botones visibles → all_buttons_states
+            for btn in self.centralWidget().findChildren(QWaferButton):
+                coord = (btn.x, btn.y)
+                self.all_buttons_states[coord] = {
+                    'btnType': btn._btnType, 'home': btn._home,
+                    'origin': btn._origin, 'message': btn._message
+                }
 
+            # 2. Poner todo lo que no es OUT como IN en all_buttons_states
+            for state in self.all_buttons_states.values():
+                if state['btnType'] != "out":
+                    state['btnType'] = "in"
+
+            # 3. Reflejar cambios en botones visibles
+            for btn in self.centralWidget().findChildren(QWaferButton):
+                coord = (btn.x, btn.y)
+                new_type = self.all_buttons_states[coord]['btnType']
+                if btn._btnType != new_type:
+                    btn._btnType = new_type
+                    self._apply_button_style(btn, new_type)
+                    name = ""
+                    if btn._home: name = "H"
+                    if btn._origin: name = "O"
+                    btn.setText(name)
+
+            # 4. Actualizar init/end chip
+            self.widgets.txtInitChip.setText("1")
+            self.widgets.txtEndChip.setText("0")
+            self.wafer.init_chip = "1"
+            self.wafer.end_chip = "0"
+
+            # 5. Contadores globales
+            self._update_totals_from_states()
+        finally:
+            self.centralWidget().setUpdatesEnabled(True)
+            self.centralWidget().update()
+            self._skip_total_meas = False
+        # 6. Aplicar highlight TOTAL (rango vacío → sin highlight, TOTAL = 0)
         self.total_meas()
 
-    def get_sorted_measured_buttons(self):
-        """Returns a list of measured buttons sorted according to navigation options."""
-        wafer_positions = []
-        real_origin_chip = self.widgets.txtOriginChip.text()
+    def _calculate_original_button_type(self, x_coord, y_coord):
+        """Calcula el tipo original basado en geometría. Acepta coords de botón (negativas)."""
+        x_idx = abs(x_coord)  # Convertir a índice positivo para funciones geométricas
+        y_idx = abs(y_coord)
+        
+        btnType = "out"
+        if self.wafer.is_origin_by_index(x_idx, y_idx):
+            btnType = "meas"
+        if self.wafer.is_in_by_index(x_idx, y_idx):
+            btnType = "in"
+        if self.wafer.is_to_measure_by_index(x_idx, y_idx):
+            btnType = "meas"
+        return btnType
 
+    def _apply_button_style(self, button, btn_type):
+        button.setStyleSheet(QWaferButton.BUTTON_STYLES[btn_type])
+
+    def get_sorted_measured_buttons(self):
+        """Devuelve los botones visibles y medibles de la sección actual, ordenados."""
+        wafer_positions = []
+        
         navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
         starting_location = navigation_options[0].split("-")
         stepx = 1
         stepy = 1
         xini = 0
-        xfin = 0
+        xfin = self.numx-1
         yini = 0
-        yfin = 0
-        
-        if starting_location[0]=="UPPER":
+        yfin = self.numy-1
+
+        if starting_location[0] == "UPPER":
             yini = 0
             yfin = self.numy-1
+            stepy = 1
         else:
             yini = self.numy-1
             yfin = 0
             stepy = -1
-        if starting_location[1]=="LEFT":
+        if starting_location[1] == "LEFT":
             xini = 0
             xfin = self.numx-1
+            stepx = 1
         else:
             xini = self.numx-1
             xfin = 0
             stepx = -1
-        
+
         change_direction = False
-        if navigation_options[1]=="BI-DIRECTIONAL":
+        if navigation_options[1] == "BI-DIRECTIONAL":
             change_direction = True
 
         try:
-            if navigation_options[2]=="ROW":
-                for y in range (yini,yfin+stepy,stepy):
+            if navigation_options[2] == "ROW":
+                curr_xini, curr_xfin, curr_stepx = xini, xfin, stepx
+                for y in range(yini, yfin + stepy, stepy):
                     count_found = 0
-                    for x in range(xini,xfin+stepx,stepx):
-                        btn = self.centralWidget().findChild(QPushButton,get_btnName(x,y))
+                    row_buttons = []
+                    for x in range(curr_xini, curr_xfin + curr_stepx, curr_stepx):
+                        if self.is_quadrant_mode:
+                            wafer_size_um = self.wafer.wafer_size_mm * 1000
+                            est_x_count = max(1, int(wafer_size_um / self.wafer.xsize))
+                            est_y_count = max(1, int(wafer_size_um / self.wafer.ysize))
+                            cols, rows = self.section_count
+                            section_cols = int(math.ceil(est_x_count / cols))
+                            section_rows = int(math.ceil(est_y_count / rows))
+                            x_start_idx = self.current_section[0] * section_cols
+                            y_start_idx = self.current_section[1] * section_rows
+                            coord_key = (x_start_idx + x, y_start_idx + y)
+                        else:
+                            coord_key = (x, y)
+                            
+                        btn = self.buttons_by_coord.get(coord_key)
                         if btn and btn.btnType in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]:
-                            wafer_positions.append(btn)
-                            count_found+=1
-
-                    if change_direction and count_found>0: 
-                        xini, xfin = xfin, xini
-                        stepx = stepx * -1
-
+                            row_buttons.append(btn)
+                            count_found += 1
+                    wafer_positions.extend(row_buttons)
+                    if change_direction and count_found > 0:
+                        curr_xini, curr_xfin = curr_xfin, curr_xini
+                        curr_stepx = curr_stepx * -1
             else:
                 # COLUMN
-                for x in range (xini,xfin+stepx,stepx):
+                curr_yini, curr_yfin, curr_stepy = yini, yfin, stepy
+                for x in range(xini, xfin + stepx, stepx):
                     count_found = 0
-                    for y in range(yini,yfin+stepy,stepy):
-                        btn = self.centralWidget().findChild(QPushButton,get_btnName(x,y))
+                    col_buttons = []
+                    for y in range(curr_yini, curr_yfin + curr_stepy, curr_stepy):
+                        if self.is_quadrant_mode:
+                            wafer_size_um = self.wafer.wafer_size_mm * 1000
+                            est_x_count = max(1, int(wafer_size_um / self.wafer.xsize))
+                            est_y_count = max(1, int(wafer_size_um / self.wafer.ysize))
+                            cols, rows = self.section_count
+                            section_cols = int(math.ceil(est_x_count / cols))
+                            section_rows = int(math.ceil(est_y_count / rows))
+                            x_start_idx = self.current_section[0] * section_cols
+                            y_start_idx = self.current_section[1] * section_rows
+                            coord_key = (x_start_idx + x, y_start_idx + y)
+                        else:
+                            coord_key = (x, y)
+                            
+                        btn = self.buttons_by_coord.get(coord_key)
                         if btn and btn.btnType in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]:
-                            wafer_positions.append(btn)
-                            count_found+=1
-
-                    if change_direction and count_found>0: 
-                        yini, yfin = yfin, yini
-                        stepy = stepy * -1
-                        
+                            col_buttons.append(btn)
+                            count_found += 1
+                    wafer_positions.extend(col_buttons)
+                    if change_direction and count_found > 0:
+                        curr_yini, curr_yfin = curr_yfin, curr_yini
+                        curr_stepy = curr_stepy * -1
         except Exception as e:
             print(f"Error getting sorted buttons: {e}")
             return []
 
         return wafer_positions
 
+    def get_all_measured_positions_sorted(self):
+        """Devuelve todas las coordenadas de botones MEAS del wafer completo, ordenadas según navigation_options."""
+        wafer_size_um = self.wafer.wafer_size_mm * 1000
+        est_x = max(1, int(wafer_size_um / self.wafer.xsize))
+        est_y = max(1, int(wafer_size_um / self.wafer.ysize))
+
+        navigation_options = [self.widgets.cmbStartingLocation.currentText(),self.widgets.cmbDirectionalMovement.currentText(),self.widgets.cmbMoveBy.currentText()]
+        starting_location = navigation_options[0].split("-")
+        
+        stepx = 1
+        stepy = 1
+        xini = 0
+        xfin = est_x - 1
+        yini = 0
+        yfin = est_y - 1
+
+        if starting_location[0] == "UPPER":
+            yini = 0
+            yfin = est_y - 1
+            stepy = 1
+        else:
+            yini = est_y - 1
+            yfin = 0
+            stepy = -1
+            
+        if starting_location[1] == "LEFT":
+            xini = 0
+            xfin = est_x - 1
+            stepx = 1
+        else:
+            xini = est_x - 1
+            xfin = 0
+            stepx = -1
+
+        change_direction = False
+        if navigation_options[1] == "BI-DIRECTIONAL":
+            change_direction = True
+
+        measured_coords = []
+        try:
+            if navigation_options[2] == "ROW":
+                curr_xini, curr_xfin, curr_stepx = xini, xfin, stepx
+                for y in range(yini, yfin + stepy, stepy):
+                    count_found = 0
+                    row_coords = []
+                    for x in range(curr_xini, curr_xfin + curr_stepx, curr_stepx):
+                        coord_key = (-x, -y)
+                        state = self.all_buttons_states.get(coord_key)
+                        if state and state.get('btnType') in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]:
+                            row_coords.append(coord_key)
+                            count_found += 1
+                    measured_coords.extend(row_coords)
+                    if change_direction and count_found > 0:
+                        curr_xini, curr_xfin = curr_xfin, curr_xini
+                        curr_stepx = curr_stepx * -1
+            else:
+                # COLUMN
+                curr_yini, curr_yfin, curr_stepy = yini, yfin, stepy
+                for x in range(xini, xfin + stepx, stepx):
+                    count_found = 0
+                    col_coords = []
+                    for y in range(curr_yini, curr_yfin + curr_stepy, curr_stepy):
+                        coord_key = (-x, -y)
+                        state = self.all_buttons_states.get(coord_key)
+                        if state and state.get('btnType') in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]:
+                            col_coords.append(coord_key)
+                            count_found += 1
+                    measured_coords.extend(col_coords)
+                    if change_direction and count_found > 0:
+                        curr_yini, curr_yfin = curr_yfin, curr_yini
+                        curr_stepy = curr_stepy * -1
+        except Exception as e:
+            print(f"Error sorting global measured positions: {e}")
+            return []
+            
+        return measured_coords
+
     def total_meas(self):
-        # get measured chips
-        total_meas = 0
-        total_in = 0
-        total_out = 0
-        total_meas_success = 0
-        total_meas_warning = 0
-        total_meas_error = 0
-        
-        # Validation for init_chip and end_chip calculation
+        if self._skip_total_meas:
+            return
+        self._skip_total_meas = True
+        self.centralWidget().setUpdatesEnabled(False)
         try:
-            init_chip_val = int(self.wafer.init_chip) if str(self.wafer.init_chip).isdigit() else 1
-            if init_chip_val < 1: init_chip_val = 1
-        except:
-            init_chip_val = 1
-            
-        # We need to count total selected first to handle end_chip validation logic if needed,
-        # but typically end_chip is user input. 
-        # The user requested: "Init_chip debe ser 1 o superior a 1 mientras end_chip debe ser superior a init_chip e igual o inferior al numero total de chips seleccionados."
-        
-        # We will count totals first
-        sorted_buttons = self.get_sorted_measured_buttons()
-        total_selected = len(sorted_buttons)
-        
-        try:
-            end_chip_val = int(self.wafer.end_chip) if str(self.wafer.end_chip).isdigit() else total_selected
-        except:
-            end_chip_val = total_selected
+            # 1. Sincronizar botones visibles → all_buttons_states
+            for btn in self.centralWidget().findChildren(QWaferButton):
+                coord = (btn.x, btn.y)
+                if coord in self.all_buttons_states:
+                    self.all_buttons_states[coord]['btnType'] = btn._btnType
 
-        # Enforce validation rules for display/logic (soft enforcement or visual feedback)
-        # We update the class variables so other parts use the corrected values, 
-        # BUT updating text widgets here might disrupt typing, so we just use values for calculation/visuals.
-        
-        # Recalculate plan count based on validated range intersecting with available chips
-        # Actually the user said: end_chip <= numero total de chips seleccionados.
-        
-        # Let's just clamp the values for the "Selected Range" logic
-        
-        start_idx = init_chip_val - 1
-        end_idx = end_chip_val
-        
-        # Visual Highlighting Logic
-        # Reset all "meas_selected" back to "meas" first? 
-        # We iterate all buttons or just sorted ones?
-        # Better to iterate all buttons to count types accurately.
-        
-        # But wait, we need to know WHICH ones are in the range to color them.
-        # The sorted_buttons list gives us the order.
-        
-        targets_for_highlight = set()
-        if total_selected > 0:
-            # slice is safe even if out of bounds
-            for btn in sorted_buttons[start_idx:end_idx]:
-                targets_for_highlight.add(btn)
+            # 2. Contar desde all_buttons_states (wafer completo)
+            self._update_totals_from_states()
 
-        for i in self.centralWidget().findChildren(QWaferButton):
-            # Restore visual state if it was highlighted but shouldn't be, or highlight if it should be
-            # We preserve existing status like success/warning/error
-            
-            # Check basic types
-            if i._btnType == "in":
-                total_in += 1
-            elif i._btnType == "out":
-                total_out += 1
-            
-            # Check meas types
-            is_meas_type = i._btnType in ["meas", "meas_selected", "meas_success", "meas_warning", "meas_error"]
-            
-            if is_meas_type:
-                # Logic for counting specific states
-                if i._btnType == "meas_success":
-                    total_meas_success += 1
-                elif i._btnType == "meas_warning":
-                    total_meas_warning += 1
-                elif i._btnType == "meas_error":
-                    total_meas_error += 1
-                
-                # It counts as measured regardless of sub-status
-                total_meas += 1
-                
-                # Visual update: only affect "meas" and "meas_selected"
-                # If it has a specific result (success/warn/error), we usually keep that color.
-                # The request: "identificarlos con un color algo más oscuro ... al asignado a los botones de meas".
-                # Implies we only change the "meas" ones, or maybe we overlay?
-                # Usually standard "meas" (blue) vs "meas_selected" (darker blue).
-                # Start by defaulting to "meas" if it was "meas_selected"
-                if i._btnType == "meas_selected":
-                     i.btnType = "meas"
-                
-                # Now apply highlight if it is a target and clearly just "meas"
-                if i in targets_for_highlight and i._btnType == "meas":
-                    i.btnType = "meas_selected"
-                elif i not in targets_for_highlight and i._btnType == "meas_selected":
-                    i.btnType = "meas"
+            # 3. Aplicar highlight init_chip/end_chip solo a botones visibles
+            all_measured_coords = self.get_all_measured_positions_sorted()
+            total_selected = len(all_measured_coords)
 
-        total_plan = 0
-        if total_selected > 0:
-             # Logic as requested: end_chip - init_chip + 1
-             # We should use the clamped values for the display if we want it to be accurate to what is highlighted
-             total_plan = max(0, end_chip_val - init_chip_val + 1)
-             
-        self.widgets.txtNumberDies.setValue(total_meas)
-        self.widgets.btnIN.setText("IN\n" + str(total_in))
-        self.widgets.btnOUT.setText("OUT\n" + str(total_out))
-        self.widgets.btnMEAS.setText("MEAS\n" + str(total_meas))
-        self.widgets.btnMEAS_PLAN.setText("TOTAL\n" + str(total_plan))
-        self.widgets.btnMEAS_SUCCESS.setText("SUCCESS\n" + str(total_meas_success))
-        self.widgets.btnMEAS_WARNING.setText("WARNING\n" + str(total_meas_warning))
-        self.widgets.btnMEAS_ERROR.setText("ERROR\n" + str(total_meas_error))
+            try:
+                init_chip_val = int(self.wafer.init_chip) if str(self.wafer.init_chip).isdigit() else 1
+                if init_chip_val < 1: init_chip_val = 1
+            except:
+                init_chip_val = 1
 
-        return {"meas" : total_meas, "in" : total_in, "out" : total_out, "meas_success" : total_meas_success, "meas_warning" : total_meas_warning, "meas_error" : total_meas_error}
+            try:
+                end_chip_val = int(self.wafer.end_chip) if str(self.wafer.end_chip).isdigit() else total_selected
+            except:
+                end_chip_val = total_selected
+
+            start_idx = init_chip_val - 1
+            end_idx = end_chip_val
+
+            targets_for_highlight = set()
+            if total_selected > 0:
+                targets_for_highlight = set(all_measured_coords[start_idx:end_idx])
+
+            for i in self.centralWidget().findChildren(QWaferButton):
+                coord = (i.x, i.y)
+                if i._btnType in ["meas", "meas_selected"]:
+                    if coord in targets_for_highlight:
+                        i.btnType = "meas_selected"
+                    else:
+                        i.btnType = "meas"
+
+            # Sincronizar all_buttons_states para TODAS las secciones (no solo visibles)
+            for coord, state in self.all_buttons_states.items():
+                if state.get('btnType') in ["meas", "meas_selected"]:
+                    state['btnType'] = "meas_selected" if coord in targets_for_highlight else "meas"
+
+            total_plan = 0
+            if total_selected > 0:
+                total_plan = max(0, end_chip_val - init_chip_val + 1)
+
+            self.widgets.btnMEAS_PLAN.setText("TOTAL\n" + str(total_plan))
+
+            total_in = int(self.widgets.btnIN.text().split("\n")[1])
+            total_out = int(self.widgets.btnOUT.text().split("\n")[1])
+            total_meas = int(self.widgets.btnMEAS.text().split("\n")[1])
+            total_meas_success = int(self.widgets.btnMEAS_SUCCESS.text().split("\n")[1])
+            total_meas_warning = int(self.widgets.btnMEAS_WARNING.text().split("\n")[1])
+            total_meas_error = int(self.widgets.btnMEAS_ERROR.text().split("\n")[1])
+
+            return {"meas" : total_meas, "in" : total_in, "out" : total_out, "meas_success" : total_meas_success, "meas_warning" : total_meas_warning, "meas_error" : total_meas_error}
+        finally:
+            self.centralWidget().setUpdatesEnabled(True)
+            self.centralWidget().update()
+            self._skip_total_meas = False
 
     def actionsButtons(self):
         global set_origin, set_home
@@ -922,14 +1159,11 @@ class WaferWindow(QMainWindow):
                 # first reset previous home
                 if previous_origin!="":
                     previous_origin_x, previous_origin_y = previous_origin.split()
-                    for i in range(self.ui.gridLayout.count()):
-                        name_button = "btn_" + previous_origin_x + "_" + previous_origin_y
-                        if self.ui.gridLayout.itemAt(i).widget().btnName == name_button:
-                            coord_text = "(" + previous_origin_x + "," + previous_origin_y + ")"
-                            #self.ui.gridLayout.itemAt(i).widget().setText(coord_text)
-                            self.ui.gridLayout.itemAt(i).widget().origin = False
-                            QApplication.processEvents()
-                            break
+                    coord_key = (abs(int(previous_origin_x)), abs(int(previous_origin_y)))
+                    btn = self.buttons_by_coord.get(coord_key)
+                    if btn:
+                        btn.origin = False
+                        QApplication.processEvents()
                 self.widgets.txtOriginChip.setText("")
                 retval = messageBox(self,"Set Origin Position","Click in new Origin chip","info")
                 set_origin = True
@@ -946,12 +1180,11 @@ class WaferWindow(QMainWindow):
                         origin_x, origin_y = origin.split()
                         real_home_x = int(origin_x) + int(previous_home_x)
                         real_home_y = int(origin_y) + int(previous_home_y)
-                        name_button = "btn_" + str(real_home_x) + "_" + str(real_home_y)
-                        for i in range(self.ui.gridLayout.count()):
-                            if self.ui.gridLayout.itemAt(i).widget().btnName == name_button:
-                                self.ui.gridLayout.itemAt(i).widget().home = False
-                                QApplication.processEvents()
-                                break
+                        coord_key = (abs(real_home_x), abs(real_home_y))
+                        btn = self.buttons_by_coord.get(coord_key)
+                        if btn:
+                            btn.home = False
+                            QApplication.processEvents()
                 else:
                     retval = messageBox(self,"Setting home problem","Please, select first the Origin chip!","warning")
 
@@ -1058,7 +1291,14 @@ class WaferWindow(QMainWindow):
 
                                 }
                             self.close()
-                            wafer = Wafer(wafer_parameters)
+                            wafer_max_buttons = 10000
+                            try:
+                                with open(os.path.join(os.getcwd(), 'config', 'config.toml')) as f:
+                                    _cfg = toml.load(f)
+                                wafer_max_buttons = _cfg.get("wafermap", {}).get("max_visible_buttons", 10000)
+                            except:
+                                pass
+                            wafer = Wafer(wafer_parameters, max_visible_buttons=wafer_max_buttons)
                             self.waferwindow = wafer.create_wafer_window(True)
                             self.waferwindow.show()
                             self.waferwindow.total_meas()
@@ -1086,7 +1326,7 @@ class WaferWindow(QMainWindow):
         init_chip = self.widgets.txtInitChip.text()
         end_chip = self.widgets.txtEndChip.text()
         # init & end chip check
-        sorted_buttons = self.get_sorted_measured_buttons()
+        sorted_positions = self.get_all_measured_positions_sorted()
         
         # Validation for Init/End Chip
         if init_chip == "" or end_chip == "":
@@ -1096,7 +1336,7 @@ class WaferWindow(QMainWindow):
         try:
             init_val = int(init_chip)
             end_val = int(end_chip)
-            total_selected = len(sorted_buttons)
+            total_selected = len(sorted_positions)
             
             # Init_chip debe ser 1 o superior a 1
             # end_chip debe ser superior a init_chip e igual o inferior al numero total de chips seleccionados
@@ -1117,15 +1357,15 @@ class WaferWindow(QMainWindow):
              retval = messageBox(self,"Problem with Init/End chip","Values must integers","warning")
              return
 
-        # Build wafer_positions using sorted buttons
+        # Build wafer_positions using sorted positions
         origin_chip = "0 0"
         real_origin_chip = self.widgets.txtOriginChip.text()
         home_chip = self.widgets.txtHomeChip.text()
         wafer_positions = []
         try:
-            for btn in sorted_buttons:
-                x = btn.x 
-                y = btn.y
+            for coord in sorted_positions:
+                x = coord[0]
+                y = coord[1]
                 # Checking origin consistency (copied from logic)
                 if len(wafer_positions)==0:
                      if real_origin_chip != str(x)+" "+str(y):
@@ -1186,59 +1426,360 @@ class WaferWindow(QMainWindow):
         self.wafer.flat_orientation = waferorientation_selected
 
 
-    def add_die_buttons(self, wafer, enable):
-        # die out wafer => color white
-        # die in wafer => color yellow
-        # die in wafer (to measure) => color blue light
-        # die in wafer (measure ok) => color green
-        # die in wafer (measure with problems) => color orange
-        # die in wafer (measure ko) => color red
+    def add_die_buttons(self, wafer, enable, saved_states=None, parent_layout=None):
+        layout = parent_layout if parent_layout is not None else self.ui.gridLayout
+        # Calcular estimación de botones
+        wafer_size_um = wafer.wafer_size_mm * 1000
+        est_x_count = max(1, int(wafer_size_um / wafer.xsize))
+        est_y_count = max(1, int(wafer_size_um / wafer.ysize))
+        button_estimate = est_x_count * est_y_count
 
-        x = y = xmax = ymax = 0
+        # Determinar si necesita modo cuadrante
+        self.is_quadrant_mode = button_estimate > wafer.max_visible_buttons
+
+        if self.is_quadrant_mode:
+            # Calcular número de secciones basado en el límite
+            target_per_section = wafer.max_visible_buttons * 0.8
+            section_area_um = target_per_section * wafer.xsize * wafer.ysize
+            section_size_um = math.sqrt(section_area_um)
+
+            cols = max(1, int(math.ceil(wafer_size_um / section_size_um)))
+            rows = max(1, int(math.ceil(wafer_size_um / section_size_um)))
+
+            # Asegurar al menos 2x2 si se activa el modo
+            if cols == 1 and rows == 1:
+                cols = 2
+                rows = 2
+
+            self.section_count = (cols, rows)
+
+            # Calcular rangos para la sección actual en índices de grid
+            section_cols = int(math.ceil(est_x_count / cols))
+            section_rows = int(math.ceil(est_y_count / rows))
+            x_start_idx = self.current_section[0] * section_cols
+            x_end_idx = min(x_start_idx + section_cols, est_x_count)
+            y_start_idx = self.current_section[1] * section_rows
+            y_end_idx = min(y_start_idx + section_rows, est_y_count)
+
+            # Escalado para la sección visible
+            display_width = (x_end_idx - x_start_idx) * wafer.xsize
+            display_height = (y_end_idx - y_start_idx) * wafer.ysize
+            display_size = max(display_width, display_height)
+            ratio = float(display_size / self.max_size)
+        else:
+            self.section_count = (1, 1)
+            self.current_section = (0, 0)
+            x_start_idx = y_start_idx = 0
+            x_end_idx = est_x_count
+            y_end_idx = est_y_count
+
+            # Escalado normal
+            ratio = float(wafer_size_um / self.max_size)
+
+            # Actualizar UI de navegación
+            self._update_navigation_ui()
+
+        xstep = wafer.xsize / ratio
+        ystep = wafer.ysize / ratio
+
+        num_xsteps = int(self.max_size / xstep)
+        num_ysteps = int(self.max_size / ystep)
+
+        # Generar botones
+        x = y = 0
         name = ""
-        ratio = float(wafer.wafer_size_mm*1000 / self.max_size)
+        numx = numy = 0
 
-        xstep = wafer.xsize/(ratio)
-        ystep = wafer.ysize/(ratio)
-
-        #num_xsteps = self.max_size/xstep
-        #num_ysteps = self.max_size/ystep
-
-
-        while ymax<self.max_size+ystep:
-            while xmax<self.max_size+xstep:
-
-                name = ""
-                btnType = "out"
-                if wafer.is_home(x,y):
-                    name = "H"
-                if wafer.is_origin(x,y):
-                    name = "O"
-                    btnType = "meas"
-                if wafer.is_in(x,y):
-                    btnType = "in"
-                if wafer.is_to_measure(x,y): # not only in in, set in wafer_position
-                    btnType = "meas"
-
-                b = QWaferButton(self, name, btnType, xstep, ystep, -x, -y, enable)
-                b.clicked.connect(CallButton(self,btnType,-x,-y,name,b))
-
-                if name=="H":
-                    b.home = True
-                if name=="O":
-                    b.origin = True
-
-                self.ui.gridLayout.addWidget(b,y,x)
-                xmax = xmax + xstep
-                x = x + 1
-            numx = x
-            ymax = ymax + ystep
-            y = y + 1
-            xmax = 0
+        while y < num_ysteps:
             x = 0
-        numy = y
+            numx = 0
+            while x < num_xsteps:
+                # Índice real en el grid del wafer
+                x_idx = x_start_idx + x
+                y_idx = y_start_idx + y
 
-        return [numx,numy]
+                # Verificar si está dentro de la sección actual
+                if self.is_quadrant_mode:
+                    if not (x_start_idx <= x_idx < x_end_idx and y_start_idx <= y_idx < y_end_idx):
+                        x += 1
+                        numx += 1
+                        continue
+
+                btnType = "out"
+                name = ""
+
+                # Verificar si hay estado guardado para este botón
+                coord_key = (-x_idx, -y_idx)
+                saved_state = saved_states.get(coord_key) if saved_states else None
+
+                if saved_state:
+                    btnType = saved_state['btnType']
+                    if saved_state['home']:
+                        name = "H"
+                    if saved_state['origin']:
+                        name = "O"
+                else:
+                    if wafer.is_home_by_index(x_idx, y_idx):
+                        name = "H"
+                    if wafer.is_origin_by_index(x_idx, y_idx):
+                        name = "O"
+                        btnType = "meas"
+                    if wafer.is_in_by_index(x_idx, y_idx):
+                        btnType = "in"
+                    if wafer.is_to_measure_by_index(x_idx, y_idx):
+                        btnType = "meas"
+
+                b = QWaferButton(self, name, btnType, xstep, ystep, -x_idx, -y_idx, enable)
+
+                # Aplicar propiedades directamente sin pasar por setters para evitar callbacks
+                b._btnType = btnType
+                b._home = True if name == "H" else False
+                b._origin = True if name == "O" else False
+                if saved_state:
+                    b._home = saved_state.get('home', b._home)
+                    b._origin = saved_state.get('origin', b._origin)
+                    b._message = saved_state.get('message', '')
+                    if saved_state.get('message'):
+                        b.setToolTip("Warning: " + saved_state['message'])
+
+                # Conectar click
+                b.clicked.connect(CallButton(self, btnType, -x_idx, -y_idx, name, b))
+
+                layout.addWidget(b, numy, numx)
+
+                # Guardar en diccionario para acceso rápido
+                grid_key = (x_idx, y_idx)
+                self.buttons_by_coord[grid_key] = b
+
+                x += 1
+                numx += 1
+
+            y += 1
+            numy += 1
+
+
+        # Añadir widget spacer al final para centrar
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(spacer, numy, 0, 1, numx + 1)
+
+        # Actualizar UI de navegación si hay modo cuadrante
+        if self.is_quadrant_mode:
+            self._update_navigation_ui()
+
+        return [numx, numy]
+
+    def _wrap_current_section_in_container(self):
+        """Envuelve los botones de la sección actual en un QWidget contenedor"""
+        container = QWidget()
+        container_layout = QGridLayout()
+        container_layout.setVerticalSpacing(0)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container.setLayout(container_layout)
+
+        # Capturar todos los items del gridLayout
+        items = []
+        for i in range(self.ui.gridLayout.count()):
+            item = self.ui.gridLayout.itemAt(i)
+            if item and item.widget():
+                pos = self.ui.gridLayout.getItemPosition(i)
+                items.append((item.widget(), pos))
+
+        # Remover items del gridLayout
+        for _ in range(len(items)):
+            self.ui.gridLayout.takeAt(0)
+
+        # Añadir items al contenedor
+        for w, (row, col, rowspan, colspan) in items:
+            container_layout.addWidget(w, row, col, rowspan, colspan)
+
+        # Poner contenedor en el gridLayout
+        self.ui.gridLayout.addWidget(container, 0, 0)
+        self._current_container = container
+        self._section_container_cache[(0, 0)] = {
+            'container': container,
+            'numx': self.numx,
+            'numy': self.numy
+        }
+
+    def _update_navigation_ui(self):
+        """Actualiza la visibilidad y estado de los controles de navegación"""
+        widgets = self.widgets
+
+        if not self.is_quadrant_mode:
+            # Ocultar todos los controles
+            widgets.btnNavUpLeft.setVisible(False)
+            widgets.btnNavUp.setVisible(False)
+            widgets.btnNavUpRight.setVisible(False)
+            widgets.btnNavLeft.setVisible(False)
+            widgets.btnNavCenter.setVisible(False)
+            widgets.btnNavRight.setVisible(False)
+            widgets.btnNavDownLeft.setVisible(False)
+            widgets.btnNavDown.setVisible(False)
+            widgets.btnNavDownRight.setVisible(False)
+            widgets.txtSectionInfo.setVisible(False)
+            widgets.btnNavCenter.setText("C")
+            widgets.txtSectionInfo.setText("1,1 de 1x1")
+            return
+
+        # Mostrar controles
+        widgets.btnNavUpLeft.setVisible(True)
+        widgets.btnNavUp.setVisible(True)
+        widgets.btnNavUpRight.setVisible(True)
+        widgets.btnNavLeft.setVisible(True)
+        widgets.btnNavCenter.setVisible(True)
+        widgets.btnNavRight.setVisible(True)
+        widgets.btnNavDownLeft.setVisible(True)
+        widgets.btnNavDown.setVisible(True)
+        widgets.btnNavDownRight.setVisible(True)
+        widgets.txtSectionInfo.setVisible(True)
+
+        # Cambiar texto del botón centro
+        widgets.btnNavCenter.setText("Todo")
+
+        # Actualizar info de sección
+        current = f"{self.current_section[0]+1},{self.current_section[1]+1}"
+        total = f"{self.section_count[0]}x{self.section_count[1]}"
+        widgets.txtSectionInfo.setText(f"{current} de {total}")
+
+        # Deshabilitar botones según posición
+        widgets.btnNavUpLeft.setEnabled(self.current_section[1] > 0 or self.current_section[0] > 0)
+        widgets.btnNavUp.setEnabled(self.current_section[1] > 0)
+        widgets.btnNavUpRight.setEnabled(self.current_section[1] > 0 or self.current_section[0] < self.section_count[0]-1)
+        widgets.btnNavLeft.setEnabled(self.current_section[0] > 0)
+        widgets.btnNavRight.setEnabled(self.current_section[0] < self.section_count[0]-1)
+        widgets.btnNavDownLeft.setEnabled(self.current_section[1] < self.section_count[1]-1 or self.current_section[0] > 0)
+        widgets.btnNavDown.setEnabled(self.current_section[1] < self.section_count[1]-1)
+        widgets.btnNavDownRight.setEnabled(self.current_section[1] < self.section_count[1]-1 or self.current_section[0] < self.section_count[0]-1)
+
+    def go_to_section(self, col, row):
+        """Navega a una sección específica"""
+        if not self.is_quadrant_mode:
+            return
+
+        if 0 <= col < self.section_count[0] and 0 <= row < self.section_count[1]:
+            self._refresh_display(new_section=(col, row))
+            self._update_navigation_ui()
+
+    def show_full_wafer(self):
+        """Muestra la vista completa (vuelve a sección 0,0)"""
+        self._refresh_display(new_section=(0, 0))
+        self._update_navigation_ui()
+
+    def _refresh_display(self, new_section=None):
+        """Regenera los botones para la sección actual"""
+        old_section = self.current_section
+        target_section = new_section if new_section is not None else old_section
+
+        self._skip_total_meas = True
+        self.centralWidget().setUpdatesEnabled(False)
+
+        # Guardar estados de botones VISIBLES en el diccionario persistente
+        for btn in self.centralWidget().findChildren(QWaferButton):
+            coord = (btn.x, btn.y)
+            self.all_buttons_states[coord] = {
+                'btnType': btn._btnType,
+                'home': btn._home,
+                'origin': btn._origin,
+                'message': btn._message
+            }
+
+        try:
+            if self.is_quadrant_mode:
+                # Cachear contenedor actual si existe
+                if self._current_container is not None:
+                    self._section_container_cache[old_section] = {
+                        'container': self._current_container,
+                        'numx': self.numx,
+                        'numy': self.numy
+                    }
+                    self.ui.gridLayout.removeWidget(self._current_container)
+                    self._current_container.setParent(None)
+                    self._current_container.hide()
+                    self.buttons_by_coord.clear()
+
+                # Actualizar sección actual
+                self.current_section = target_section
+
+                # Obtener contenedor de la sección destino (caché o crear nuevo)
+                cached = self._section_container_cache.pop(target_section, None)
+                if cached:
+                    container = cached['container']
+                    self.numx = cached['numx']
+                    self.numy = cached['numy']
+                    # Reconstruir buttons_by_coord desde el contenedor
+                    for btn in container.findChildren(QWaferButton):
+                        coord_key = (abs(btn.x), abs(btn.y))
+                        self.buttons_by_coord[coord_key] = btn
+                else:
+                    # Crear nuevo contenedor para la sección
+                    container = QWidget()
+                    container_layout = QGridLayout()
+                    container_layout.setVerticalSpacing(0)
+                    container_layout.setContentsMargins(0, 0, 0, 0)
+                    container.setLayout(container_layout)
+                    self.numx, self.numy = self.add_die_buttons(
+                        self.wafer, True, self.all_buttons_states,
+                        parent_layout=container_layout
+                    )
+
+                # Mostrar contenedor destino en gridLayout
+                self._current_container = container
+                self.ui.gridLayout.addWidget(container, 0, 0)
+                container.show()
+            else:
+                # Modo normal: destruir y recrear
+                while self.ui.gridLayout.count():
+                    item = self.ui.gridLayout.takeAt(0)
+                    widget = item.widget()
+                    if widget:
+                        widget.setParent(None)
+                        widget.deleteLater()
+                self.numx, self.numy = self.add_die_buttons(self.wafer, True, self.all_buttons_states)
+
+            # Actualizar totales desde el diccionario persistente
+            self._update_totals_from_states()
+
+        finally:
+            self.centralWidget().setUpdatesEnabled(True)
+            self.centralWidget().update()
+            self._skip_total_meas = False
+
+    def _update_totals_from_states(self):
+        """Actualiza los contadores de totales desde el diccionario de estados"""
+        total_meas = 0
+        total_in = 0
+        total_out = 0
+        total_meas_success = 0
+        total_meas_warning = 0
+        total_meas_error = 0
+
+        for state in self.all_buttons_states.values():
+            btn_type = state.get('btnType', 'out')
+            if btn_type == "in":
+                total_in += 1
+            elif btn_type == "out":
+                total_out += 1
+            elif btn_type == "meas" or btn_type == "meas_selected":
+                total_meas += 1
+            elif btn_type == "meas_success":
+                total_meas += 1
+                total_meas_success += 1
+            elif btn_type == "meas_warning":
+                total_meas += 1
+                total_meas_warning += 1
+            elif btn_type == "meas_error":
+                total_meas += 1
+                total_meas_error += 1
+
+        self.widgets.txtNumberDies.setValue(total_meas)
+        self.widgets.btnIN.setText("IN\n" + str(total_in))
+        self.widgets.btnOUT.setText("OUT\n" + str(total_out))
+        self.widgets.btnMEAS.setText("MEAS\n" + str(total_meas))
+        self.widgets.btnMEAS_PLAN.setText("TOTAL\n" + str(total_meas))
+        self.widgets.btnMEAS_SUCCESS.setText("SUCCESS\n" + str(total_meas_success))
+        self.widgets.btnMEAS_WARNING.setText("WARNING\n" + str(total_meas_warning))
+        self.widgets.btnMEAS_ERROR.setText("ERROR\n" + str(total_meas_error))
 
 class CallButton:
     def __init__(self, waferwindow, btnType, x, y,name, b):
@@ -1318,6 +1859,7 @@ class CallButton:
                     # case "IN, "OUT, "MEAS", "MEAS_SUCCESS", "MEAS_WARNING" & "MEAS_ERROR"
                     if status=="IN" or status =="OUT" or status == "MEAS" or (previous_btnType =="meas" and (status in meas_array)):
                         self.b.btnType = status.lower()
+                        self.waferwindow.total_meas()
                     else:
                         print("Please, make meas chip first previous to apply status (Success, Warning or Error)!")
         else:
@@ -1355,19 +1897,23 @@ class CallButton:
 
 
 class QWaferButton(QPushButton):
+    COLORS_DIES = {
+        "out" : "#FFFFFF",
+        "in" : "#FFFF99",
+        "meas" : "#33CCFF",
+        "meas_selected" : "#2299FF",
+        "meas_success" : "#66CC99",
+        "meas_error" : "#FF3300",
+        "meas_warning" : "#FFCC33"
+    }
+    BUTTON_STYLES = {
+        t: f"font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: {c};"
+        for t, c in COLORS_DIES.items()
+    }
 
     def __init__(self, waferwindow, name, btnType, xstep,ystep,x,y, enable):
         super().__init__()
 
-        self.COLORS_DIES = {
-            "out" : "#FFFFFF",
-            "in" : "#FFFF99",
-            "meas" : "#33CCFF",
-            "meas_selected" : "#2299FF",
-            "meas_success" : "#66CC99",
-            "meas_error" : "#FF3300",
-            "meas_warning" : "#FFCC33"
-        }
         self.setFixedSize(QSize(xstep,ystep))
         self.waferwindow = waferwindow
         self.xstep = xstep
@@ -1391,7 +1937,7 @@ class QWaferButton(QPushButton):
         if name!="":
             self.setText(name)
 
-        self.setStyleSheet("font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: %s;" % self.COLORS_DIES[self.btnType])
+        self.setStyleSheet(QWaferButton.BUTTON_STYLES[self.btnType])
         self.btnName = btnName
         self.setObjectName(self.btnName)
         self.setToolTip(self.coord_text)
@@ -1437,7 +1983,7 @@ class QWaferButton(QPushButton):
             self._origin = value
             self.setText("O")
             # origin always to measure
-            self.setStyleSheet("font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: %s;" % self.COLORS_DIES["meas"])
+            self.setStyleSheet(QWaferButton.BUTTON_STYLES["meas"])
         else:
             self.setText("")
 
@@ -1452,29 +1998,31 @@ class QWaferButton(QPushButton):
     @btnType.setter
     def btnType(self,value):
         states =["in","out","meas","meas_selected","meas_success","meas_warning","meas_error"]
-        
+
         # Avoid recursion and unnecessary updates
         if self._btnType == value:
             return
 
         old_value = self._btnType
         self._btnType = value
-        
+
         if value in states:
-            #self.setStyleSheet("font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: qlineargradient(x1:0, x2:1, stop: 0.24 red, stop: 0.49 blue, stop: 0.74 red, stop: 0.98 blue)")
-            self.setStyleSheet("font-size: 8pt; text-align: center; border: 1px solid #DDDDDD; background-color: %s;" % self.COLORS_DIES[value])
-            
+            self.setStyleSheet(QWaferButton.BUTTON_STYLES[value])
+
+            # Actualizar estado persistente
+            coord = (self.x, self.y)
+            if coord in self.waferwindow.all_buttons_states:
+                self.waferwindow.all_buttons_states[coord]['btnType'] = value
+
             # Recalculate only if the change affects the total measurement count
-            # meas and meas_selected both count as 'measured', so switching between them shouldn't trigger total_meas
-            # Also, if we are in a visual update loop (managed by logic), we should avoid re-triggering.
-            
             should_recalculate = True
             meas_types = ["meas", "meas_selected"]
             if old_value in meas_types and value in meas_types:
                 should_recalculate = False
-            
-            if should_recalculate:
-                self.waferwindow.total_meas()
+
+            if should_recalculate and not self.waferwindow._skip_total_meas:
+                self.waferwindow._update_totals_from_states()
+
         if value!="meas_warning" or value!="meas_error":
             self.setToolTip(self.coord_text)
         if "meas" in value:
