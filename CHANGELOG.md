@@ -2,6 +2,10 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [2.5.1] - 2026-05-25
+### Added
+- **Mejoras en gráfica**: Añadimos un segundo eje para las gráficas que fallaba en CV (Keysight E4990A). Problemas eje y2 solucionado.
+
 ## [2.5.0] - 2026-05-22
 ### Added
 - **Rendimiento en navegación por secciones**: Implementado sistema de contenedores (`_section_container_cache`) que cachea cada sección en un `QWidget`. Al navegar, se intercambia el contenedor completo (`addWidget`/`removeWidget`) en lugar de reconstruir los 5625 botones individualmente. La primera navegación a una sección tarda ~1.4s, las siguientes ~0.06s.

@@ -666,7 +666,7 @@ class MainWindow(QMainWindow):
                         bottom_title += r" (" + plot_parameters["units"]["bottom"] + ")"
                     _static_ax.set_xlabel(bottom_title)
 
-                if plot_parameters.get("y2") and "right" in plot_parameters["titles"]:
+                if plot_parameters.get("y2") is not None and "right" in plot_parameters["titles"]:
                     right_title = plot_parameters["titles"]["right"]
                     if "units" in plot_parameters and "right" in plot_parameters["units"]:
                         right_title += r" (" + plot_parameters["units"]["right"] + ")"
@@ -680,9 +680,9 @@ class MainWindow(QMainWindow):
                 if plot_parameters.get("legend", True):
                     _static_ax.legend()
             else:
-                if plot_parameters.get("y2"):
+                if plot_parameters.get("y2") is not None:
                     _static_ax2.plot(plot_parameters["x"], plot_parameters["y2"], color='blue', label=right_title)
-                if plot_parameters.get("y1"):
+                if plot_parameters.get("y1") is not None:
                     _static_ax.plot(plot_parameters["x"], plot_parameters["y1"], color='green', label=left_title)
                 if "legend" in plot_parameters and plot_parameters["legend"]:
                     static_canvas.figure.legend(loc="upper right", bbox_to_anchor=(1,1), bbox_transform=_static_ax.transAxes)
