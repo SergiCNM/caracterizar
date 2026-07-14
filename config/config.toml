@@ -1,17 +1,17 @@
 title = "Caracterizar"
-version = "2.5.1"
+version = "2.6.0"
 author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
 darkmode = true
 estepa = true
-txtprocess = "18606"
-txtlot = "18606"
-txtwafer = "1"
-txtmask = "CNM1178"
+txtprocess = "19998"
+txtlot = "19998"
+txtwafer = "7"
+txtmask = "CNM004"
 txttemperature = "25.0"
-txthumidity = "46"
+txthumidity = "50"
 
 [dirs]
 base = "config"

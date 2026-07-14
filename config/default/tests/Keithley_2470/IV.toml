@@ -17,7 +17,6 @@ SOURCE_DELAY = 1.0
 SENSE_COUNT = 3
 RES_MIN = 100.0
 RES_MAX = 120.0
-DISPLAY_GRAPH = true
 
 [options]
 RANGE = "AUTO,0.2,2,20,200,1000"
@@ -57,7 +56,23 @@ RES_MAX = "Maximum resistance for resistance measurement"
 DISPLAY_GRAPH = "Display graph after measurement"
 
 [output]
-separator = "comma"
-prefix = "IV"
-suffix = ""
-variables = "V,I,R"
+SEPARATOR = "comma"
+PREFIX = "IV"
+SUFFIX = ""
+VARIABLES = "V,I,R"
+
+[plot]
+SHOW_PLOT = true
+NAME = "IV Measurement"
+TITLE = "IV Plot"
+X_VARIABLE = "V"
+Y1_VARIABLE = "I"
+Y2_VARIABLE = "R"
+LEFT_LABEL = "Current"
+BOTTOM_LABEL = "Voltage"
+RIGHT_LABEL = "Resistance"
+LEFT_UNITS = "A"
+BOTTOM_UNITS = "V"
+RIGHT_UNITS = "Ohm"
+SHOW_GRID = false
+LEGEND = true

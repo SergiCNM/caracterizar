@@ -20,7 +20,7 @@ import os.path
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 global test_status, measurement_status
@@ -185,6 +185,8 @@ def load_CV_parameters():
         CV_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CV_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CV_parameters["plot"] = toml_info["plot"]
     else:
         print(f"File toml {filename_config} doesn't exists!")
 
@@ -212,7 +214,6 @@ try:
         if test_status.status=="STARTED":
             # single measure
             for freq in freqs:
-                load_CV_parameters()  # reload parameters to avoid modifications during the test
                 CV_parameters["FREQ"] = freq
                 if hp4192A.config_CV(CV_parameters):
                     voltage, capacitance, conductance, results = measure_CV_full(main, hp4192A, CV_parameters)
@@ -233,7 +234,17 @@ try:
                     voltage, capacitance, conductance = [], [], []
                     meas_status = "meas_error"
                     meas_message = "Error configuring instrument"
-                # save results
+                
+                hp4192A.stop()
+
+                plot_config = CV_parameters.get("plot", {}).copy()
+                base_title = plot_config.get("TITLE", "Plot CV")
+                plot_config["NAME"] = f"Plot CV Die {dieActual} Module {moduleActual}"
+                plot_config["TITLE"] = f"{base_title} {CV_parameters['FREQ']}kHz (Die {dieActual} Module {moduleActual})"
+
+                results_data_dict = {"V": voltage, "C": capacitance, "G": conductance}
+                plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
+
                 main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
                     "status" : meas_status,
                     "message" : meas_message,
@@ -242,32 +253,12 @@ try:
                         "params" : params,
                         "data" : [{"name" : "V", "values" : voltage, "units" : "V"},{"name": "C", "values" : capacitance, "units": "F"},{"name": "G", "values" : conductance, "units": "S"}]
                     },
-                    "plot_parameters" : {
-                        "name" : f"Plot CV Die {dieActual} Module {moduleActual}",
-                        "x" : voltage,
-                        "y1" : capacitance,
-                        "y2" : conductance,
-
-                        "titles" : {
-                            "title" : "Plot CV " + str(CV_parameters["FREQ"]) + "kHz (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
-                            "left" : "Capacitance",
-                            "bottom" : "Voltage",
-                            "right" : "Conductance"
-                        },
-                        "units" : {
-                            "left" : "F",
-                            "bottom" : "V",
-                            "right" : "S"
-                        },
-                        "showgrid" : {"x" : False, "y" : False},
-                        "legend" : True
-
-                    }
-
+                    "plot_parameters" : plot_parameters
                 }
-                plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
 
-                emit_plot(plot_parameters)
+                if plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
+
                 results_data = list(zip(voltage, capacitance, conductance))
                 variables_list = ["V", "C", "G"]
                 output_params = CV_parameters.get("output", {"separator": "comma", "prefix": "CV", "suffix": ""})
@@ -291,7 +282,6 @@ try:
         make_full_compensation(main, hp4192A, CV_parameters)
         # single measure
         for freq in freqs:
-            load_CV_parameters()  # reload parameters to avoid modifications during the test
             CV_parameters["FREQ"] = freq
             if hp4192A.config_CV(CV_parameters):
                 voltage, capacitance, conductance, results = measure_CV_full(main, hp4192A, CV_parameters)
@@ -304,34 +294,21 @@ try:
                         params.append({"name" : clave, "value" : str(results[clave])})
                     main.updateTextDescription(txt_result)
 
-                plot_parameters = {
-                    "name" : "Plot CV",
-                    "x" : voltage,
-                    "y1" : capacitance,
-                    "y2" : conductance,
+                plot_config = CV_parameters.get("plot", {}).copy()
+                base_title = plot_config.get("TITLE", "CV Measurement")
+                plot_config["TITLE"] = f"{base_title} {CV_parameters['FREQ']}kHz"
 
-                    "titles" : {
-                        "title" : "CV Measurement at " + str(CV_parameters["FREQ"]) + "kHz",
-                        "left" : "Capacitance",
-                        "bottom" : "Voltage",
-                        "right" : "Conductance"
-                    },
-                    "units" : {
-                        "left" : "F",
-                        "bottom" : "V",
-                        "right" : "s"
-                    },
-                    "showgrid" : {"x" : False, "y" : False},
-                    "legend" : True
-                    #"foreground" : "#CCCCCC"
-
-                }
+                results_data_dict = {"V": voltage, "C": capacitance, "G": conductance}
+                plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
 
                 dieActual = 1
                 moduleActual = 1
                 # stop process
                 hp4192A.stop()
-                emit_plot(plot_parameters)
+
+                if plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
+
                 results_data = list(zip(voltage, capacitance, conductance))
                 variables_list = ["V", "C", "G"]
                 output_params = CV_parameters.get("output", {"separator": "comma", "prefix": "CV", "suffix": ""})

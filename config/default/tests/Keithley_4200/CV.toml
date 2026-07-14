@@ -72,7 +72,23 @@ SERIAL_RES = "Calculate Serial resistance"
 CALCULATE_PARAMS = "Calculate parameters"
 
 [output]
-separator = "comma"
-prefix = "CV"
-suffix = ""
-variables = "V,C,G"
+SEPARATOR = "comma"
+PREFIX = "CV"
+SUFFIX = ""
+VARIABLES = "V,C,G"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Measurement"
+TITLE = "Plot"
+X_VARIABLE = "Freq"
+Y1_VARIABLE = "Cp"
+Y2_VARIABLE = "Gp"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Frequency"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "F"
+BOTTOM_UNITS = "Hz"
+RIGHT_UNITS = "S"
+SHOW_GRID = false
+LEGEND = true

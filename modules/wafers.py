@@ -1868,12 +1868,13 @@ class CallButton:
                 real_coord = str(self.x - int(origin_coord_text_x)) + " " + str(self.y - int(origin_coord_text_y))
                 die = int(self.waferwindow.wafer_parameters["wafer_positions"].index(real_coord))
                 module = int(self.waferwindow.view_modules)-1
-                variables = self.waferwindow.meas_result[die][module]["variables"]["params"]
-                if variables!="":
+                variables = self.waferwindow.meas_result[die][module]["variables"]
+                if variables!="" and isinstance(variables, dict) and "params" in variables and variables["params"]!="" and len(variables["params"])>0:
                     print("=> Variables for die: " + str(die+1) + " & module " + str(module+1) + ":")
                     returnText = ""
-                    for i in range (0,len(variables)):
-                        for nombre , valor in variables[i].items():
+                    params = variables["params"]
+                    for i in range (0,len(params)):
+                        for nombre , valor in params[i].items():
                             if nombre=="name":
                                 if returnText=="":
                                     returnText = valor + " = "
@@ -1886,7 +1887,7 @@ class CallButton:
                 # view graph
                 plot_parameters = self.waferwindow.meas_result[die][module]["plot_parameters"]
 
-                if plot_parameters!="":
+                if plot_parameters!="" and isinstance(plot_parameters, dict):
                     self.plotwindow = PlotWindow(plot_parameters,True)
                     self.plotwindow.show()
 

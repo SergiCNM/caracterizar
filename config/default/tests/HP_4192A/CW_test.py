@@ -21,7 +21,7 @@ import os.path
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import HP_4192A
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 global test_status, measurement_status
@@ -118,6 +118,8 @@ def load_CW_parameters():
         CW_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CW_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CW_parameters["plot"] = toml_info["plot"]
     else:
         print(f"File toml {filename_config} doesn't exists!")
 
@@ -162,43 +164,33 @@ try:
                 else:
                     frequency, capacitance, conductance = [],[],[]
                     meas_status = "meas_error"
+                
+                # stop instrument
+                hp4192A.stop()
+
                 # save results
+                plot_config = CW_parameters.get("plot", {}).copy()
+                base_title = plot_config.get("TITLE", "Plot CW")
+                plot_config["NAME"] = f"Plot CW {CW_parameters['SPOT']}V Die {dieActual} Module {moduleActual}"
+                plot_config["TITLE"] = f"{base_title} {CW_parameters['SPOT']}V (Die {dieActual} Module {moduleActual})"
+
+                results_data_dict = {"Freq": frequency, "C": capacitance, "G": conductance}
+                plot_parameters = get_plot_parameters(results_data_dict, ["Freq", "C", "G"], plot_config)
+
                 main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
                     "status" : meas_status,
                     "message" : "",
                     "contact_height" : "",
                     "variables" : {
                         "params" : [],
-                        "data" : [{"name" : "V", "values" : frequency, "units" : "V"},{"name": "C", "values" : capacitance, "units": "pF"},{"name": "G", "values" : conductance, "units": "nS"}]
+                        "data" : [{"name" : "Freq", "values" : frequency, "units" : "V"},{"name": "C", "values" : capacitance, "units": "pF"},{"name": "G", "values" : conductance, "units": "nS"}]
                     },
-                    #"variables" : [{"name" : "cmax(pF)", "value" : 420.056},{"name" : "cmin(pF)", "value" : 210.057}],
-                    "plot_parameters" : {
-                        "name" : "Plot CW " + str(CW_parameters["SPOT"]) + "V (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
-                        "x" : frequency,
-                        "y1" : capacitance,
-                        "y2" : conductance,
-
-                        "titles" : {
-                            "title" : "Plot CW " + str(CW_parameters["SPOT"]) + "V (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
-                            "left" : "Capacitance",
-                            "bottom" : "Frequency",
-                            "right" : "Conductance"
-                        },
-                        "units" : {
-                            "left" : "F",
-                            "bottom" : "kHz",
-                            "right" : "S"
-                        },
-                        "showgrid" : {"x" : False, "y" : False},
-                        "legend" : True,
-                        "logarithmic": {"x": True, "y": False},
-
-                    }
-
+                    "plot_parameters" : plot_parameters
                 }
-                plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
 
-                emit_plot(plot_parameters)
+                if plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
+
                 results_data = list(zip(frequency, capacitance, conductance))
                 variables_list = ["Freq", "C", "G"]
                 output_params = CW_parameters.get("output", {"separator": "comma", "prefix": "CW", "suffix": ""})
@@ -230,34 +222,23 @@ try:
                 CW_parameters["frequency"] = frequency
                 CW_parameters["capacitance"] = capacitance
                 CW_parameters["conductance"] = conductance
-                plot_parameters = {
-                    "name" : f"Plot CW Single Measure",
-                    "x" : frequency,
-                    "y1" : capacitance,
-                    "y2" : conductance,
+                plot_config = CW_parameters.get("plot", {}).copy()
+                base_title = plot_config.get("TITLE", "Plot CW Single Measure")
+                plot_config["NAME"] = f"Plot CW Single Measure"
+                plot_config["TITLE"] = f"{base_title} {CW_parameters['SPOT']}V"
 
-                    "titles" : {
-                        "title" : "Plot CW Single Measure",
-                        "left" : "Capacitance",
-                        "bottom" : "Frequency",
-                        "right" : "Conductance"
-                    },
-                    "units" : {
-                        "left" : "F",
-                        "bottom" : "kHz",
-                        "right" : "s"
-                    },
-                    "showgrid" : {"x" : False, "y" : False},
-                    "legend" : True,
-                    "logarithmic" : {"x" : True, "y" : False},
-                    #"foreground" : "#CCCCCC"
-
-                }
+                results_data_dict = {"Freq": frequency, "C": capacitance, "G": conductance}
+                plot_parameters = get_plot_parameters(results_data_dict, ["Freq", "C", "G"], plot_config)
 
                 dieActual = 1
                 moduleActual = 1
 
-                emit_plot(plot_parameters)
+                # stop process
+                hp4192A.stop()
+
+                if plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
+
                 results_data = list(zip(frequency, capacitance, conductance))
                 variables_list = ["Freq", "C", "G"]
                 output_params = CW_parameters.get("output", {"separator": "comma", "prefix": "CW", "suffix": ""})
@@ -276,10 +257,7 @@ try:
                     )
                 )
 
-    # stop process
-    hp4192A.stop()
     hp4192A.local()
-
     hp4192A.close()
 
 

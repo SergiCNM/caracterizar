@@ -44,7 +44,23 @@ INACTIVE_POINTS = "Number of points to not apply voltage to the sample"
 TIME_TOTAL = "Total time of the measurement in seconds"
 
 [output]
-separator = "comma"
-prefix = "CV_RF"
-suffix = ""
-variables = ["V", "C", "G"]
+SEPARATOR = "comma"
+PREFIX = "CV_RF"
+SUFFIX = ""
+VARIABLES = "V,C,G"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Plot CV_RF"
+TITLE = "C-V RF Measurement"
+X_VARIABLE = "V"
+Y1_VARIABLE = "C"
+Y2_VARIABLE = "G"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Points"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "fF"
+BOTTOM_UNITS = ""
+RIGHT_UNITS = "nS"
+SHOW_GRID = true
+LEGEND = true

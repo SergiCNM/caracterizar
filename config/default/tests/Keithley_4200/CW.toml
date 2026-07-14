@@ -65,7 +65,23 @@ PERMITTIVITY = "Permittivity"
 SERIAL_RES = "Calculate Serial resistance"
 
 [output]
-separator = "comma"
-prefix = "CW"
-suffix = ""
-variables = "f,C,G"
+SEPARATOR = "comma"
+PREFIX = "CW"
+SUFFIX = ""
+VARIABLES = "f,C,G"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Plot CW"
+TITLE = "C-W Measurement"
+X_VARIABLE = "f"
+Y1_VARIABLE = "C"
+Y2_VARIABLE = "G"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Frequency"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "F"
+BOTTOM_UNITS = "Hz"
+RIGHT_UNITS = "S"
+SHOW_GRID = false
+LEGEND = false

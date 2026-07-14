@@ -5,7 +5,7 @@ import sys
 import numpy as np
 
 from config.default.instruments import Keysight_E4990A, Keithley_2470
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 
@@ -53,6 +53,8 @@ def load_CV_parameters():
         CV_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CV_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CV_parameters["plot"] = toml_info["plot"]
 
 
 try:
@@ -265,30 +267,14 @@ try:
     # print(f"Capacitance points: {capacitance}")
     # print(f"Conductance points: {conductance}")
     # Plot parameters
-    plot_parameters = {
-        "name": "Plot CV_RF",
-        "x": voltage,
-        "y1": capacitance * 1e15,
-        "y2": conductance * 1e9,
+    plot_config = CV_parameters.get("plot", {}).copy()
+    plot_config["TITLE"] = f"CV {CV_parameters['PADS_POSITION']} Measurement"
 
-        "titles": {
-            "title": f"CV {CV_parameters['PADS_POSITION']} Measurement",
-            "left": "Capacitance",
-            "bottom": "Points",
-            "right": "Conductance"
-        },
-        "units": {
-            "left": "fF",
-            "bottom": "",
-            "right": "nS"
-        },
-        "showgrid": {"x": True, "y": True},
-        "legend": True
-        # "foreground" : "#CCCCCC"
+    results_data_dict = {"V": voltage, "C": capacitance * 1e15, "G": conductance * 1e9}
+    plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
 
-    }
-
-    emit_plot(plot_parameters)
+    if plot_config.get("SHOW_PLOT", True):
+        emit_plot(plot_parameters)
     
     results_data = list(zip(voltage, capacitance, conductance))
     variables_list = ["V", "C", "G"]

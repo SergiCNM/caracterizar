@@ -31,7 +31,7 @@ measure_always = true
 enable = true
 max_temperature = 300.0
 min_temperature = -40.0
-temperature_list = "25.0,30.0,35.0"
+temperature_list = 25.0
 temperature_timeout = 300
 
 [MPI_TS2000SE.progressive_contact]

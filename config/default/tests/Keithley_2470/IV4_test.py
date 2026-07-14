@@ -3,7 +3,7 @@ import os.path
 import sys
 from config.default.instruments import Keithley_2470
 from config.default.devices import *
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 from PySide6.QtWidgets import QMessageBox
 import toml, time
@@ -39,8 +39,7 @@ def load_IV_parameters():
         "SOURCE_DELAY": 1.0,
         "COUNTS": 3,
         "RES_MIN": 100.0,
-        "RES_MAX": 120.0,
-        "DISPLAY_GRAPH": False
+        "RES_MAX": 120.0
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2470/IV4.toml'
@@ -50,6 +49,8 @@ def load_IV_parameters():
         IV_parameters = toml_info["parameters"]
         if "output" in toml_info:
             IV_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            IV_parameters["plot"] = toml_info["plot"]
 
 def save_file(main, voltage, current, resistance, namefile):
     """
@@ -106,43 +107,7 @@ def measure_IV(IV_parameters, k2470):
     return [voltage, current_float, resistance]
 
 
-def get_plot_parameters(voltage, current, resistance):
-    """
-    Get dict for plot parameters
-    :param voltage: voltage list
-    :param current: current list
-    :return: plot_parameters dict
-    """
-    plot_parameters = {
-        "name": "Plot IV",
-        "x": voltage,
-        "y1": current,
-        "y2": resistance,
-        "contact_height": "",
-        "variables": [{
-            "params": [],
-            "data": [{"name": "V", "values": voltage, "units": "V"},
-                     {"name": "I", "values": current, "units": "A"},
-                     {"name": "R", "values": resistance, "units": "Ohm"}
-                     ]
-        }],
-        "titles": {
-            "title": "IV 4 Wire Measurement",
-            "left": "Current",
-            "bottom": "Voltage",
-            "right": "Resistance"
-        },
-        "units": {
-            "left": "A",
-            "bottom": "V",
-            "right": "Ohm"
-        },
-        "showgrid": {"x": False, "y": False},
-        "legend": True
-        # "foreground" : "#CCCCCC"
-
-    }
-    return plot_parameters
+# Removed local get_plot_parameters
 
 
 if __name__ == "__main__":
@@ -190,7 +155,8 @@ if __name__ == "__main__":
                 # show results resistance average in description
                 main.updateTextDescription(f"R_avg: {resistance_avg:.4e} Ohm", "RESULT")
                 # get plot parameters
-                plot_parameters = get_plot_parameters(voltage, current, resistance)
+                results_data_dict = {"V": voltage, "I": current, "R": resistance}
+                plot_parameters = get_plot_parameters(results_data_dict, ["V", "I", "R"], IV_parameters.get("plot", {}))
                 # save results
                 main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
                     "status": meas_status,
@@ -223,15 +189,15 @@ if __name__ == "__main__":
                 # show results resistance average in description
                 main.updateTextDescription(f"R_avg: {resistance_avg:.4e} Ohm", "RESULT")
                 # self.updateTextDescription(txt_result)
-                plot_parameters = get_plot_parameters(voltage, current, resistance)
+                results_data_dict = {"V": voltage, "I": current, "R": resistance}
+                plot_parameters = get_plot_parameters(results_data_dict, ["V", "I", "R"], IV_parameters.get("plot", {}))
                 # Single measurement, view plot
-                emit_plot(plot_parameters)
+                if IV_parameters.get("plot", {}).get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
                 # Save file in results
                 namefile = f"IV4_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
                 save_file(main, voltage, current, resistance, namefile)
 
-        if "DISPLAY_GRAPH" in IV_parameters and IV_parameters["DISPLAY_GRAPH"]:
-            k2470.display_graph()
         # stop process, put instrument in local mode
         k2470.stop()
         k2470.close()

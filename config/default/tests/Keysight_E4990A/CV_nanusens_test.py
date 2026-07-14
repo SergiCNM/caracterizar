@@ -3,7 +3,7 @@
 import os.path
 import sys
 import numpy as np
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 
@@ -46,6 +46,8 @@ def load_CV_parameters():
         CV_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CV_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CV_parameters["plot"] = toml_info["plot"]
 
 
 try:
@@ -127,8 +129,13 @@ try:
             params = []
             data = []
 
-            meas_status = "meas_success"
-            # save results
+            plot_config = CV_parameters.get("plot", {}).copy()
+            plot_config["NAME"] = f"Plot CV Die {dieActual} Module {moduleActual}"
+            plot_config["TITLE"] = f"C-V Measurement Die {dieActual} Module {moduleActual}"
+
+            results_data_dict = {"V": voltage, "C": capacitance * 1e15, "G": conductance * 1e9}
+            plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
+
             main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
                 "status": meas_status,
                 "message": "",
@@ -139,31 +146,11 @@ try:
                              {"name": "C", "values": capacitance * 1e15, "units": "fF"},
                              {"name": "G", "values": conductance * 1E9, "units": "nS"}]
                 },
-                "plot_parameters": {
-                    "name": "Plot CV Die " + str(dieActual) + " Module " + str(moduleActual),
-                    "x": voltage,
-                    "y1": capacitance * 1e15,
-                    "y2": conductance * 1e9,
-
-                    "titles": {
-                        "title": "C-V Measurement" + str(dieActual) + " Module " + str(moduleActual),
-                        "left": "Capacitance",
-                        "bottom": "Voltage",
-                        "right": "Conductance"
-                    },
-                    "units": {
-                        "left": "fF",
-                        "bottom": "V",
-                        "right": "nS"
-                    },
-                    "showgrid": {"x": True, "y": True},
-                    "legend": False
-
-                }
-
+                "plot_parameters": plot_parameters
             }
-            plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
-            emit_plot(plot_parameters)
+
+            if plot_config.get("SHOW_PLOT", True):
+                emit_plot(plot_parameters)
             
             results_data = list(zip(voltage, capacitance, conductance))
             variables_list = ["V", "C", "G"]
@@ -231,30 +218,14 @@ try:
             # Turn off bias
             keysightE4990A.turn_off_bias()
             # Plot parameters
-            plot_parameters = {
-                "name": "Plot CV",
-                "x": voltage,
-                "y1": capacitance * 1e15,
-                "y2": conductance * 1e9,
+            plot_config = CV_parameters.get("plot", {}).copy()
+            plot_config["TITLE"] = "C-V Measurement"
 
-                "titles": {
-                    "title": "C-V Measurement",
-                    "left": "Capacitance",
-                    "bottom": "Voltage",
-                    "right": "Conductance"
-                },
-                "units": {
-                    "left": "fF",
-                    "bottom": "V",
-                    "right": "nS"
-                },
-                "showgrid": {"x": True, "y": True},
-                "legend": True
-                # "foreground" : "#CCCCCC"
+            results_data_dict = {"V": voltage, "C": capacitance * 1e15, "G": conductance * 1e9}
+            plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
 
-            }
-
-            emit_plot(plot_parameters)
+            if plot_config.get("SHOW_PLOT", True):
+                emit_plot(plot_parameters)
             
             results_data = list(zip(voltage, capacitance, conductance))
             variables_list = ["V", "C", "G"]

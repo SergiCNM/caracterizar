@@ -5,7 +5,7 @@ import sys
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import Keithley_4200
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 global test_status, measurement_status
@@ -47,6 +47,8 @@ def load_CV_parameters():
         CV_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CV_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CV_parameters["plot"] = toml_info["plot"]
     else:
         print(f"File toml {filename_config} doesn't exists!")
 
@@ -140,6 +142,14 @@ try:
                     params.append({"name" : clave, "value" : str(results[clave])})
                 main.updateTextDescription(txt_result)
             meas_status = "meas_success"
+            plot_config = CV_parameters.get("plot", {})
+            plot_config["LEFT_LABEL"] = x_text
+            plot_config["RIGHT_LABEL"] = y_text
+            plot_config["RIGHT_UNITS"] = "S" if CV_parameters.get("CIRCUIT_MODE", "").lower() == "parallel" else "Ohm"
+            
+            results_data_dict = {"V": voltage, "C": capacitance, "G": conductance}
+            plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
+            
             # save results
             main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
                 "status" : meas_status,
@@ -149,32 +159,11 @@ try:
                     "params" : params,
                     "data" : [{"name" : "V", "values" : voltage, "units" : "V"},{"name": "C", "values" : capacitance, "units": "F"},{"name": "G", "values" : conductance, "units": "S"}]
                 },
-                "plot_parameters" : {
-                    "name" : "Plot CV",
-                    "x" : voltage,
-                    "y1" : capacitance,
-                    "y2" : conductance,
-
-                    "titles" : {
-                        "title" : "C-V Measurement Die " + str(dieActual) + " Module " + str(moduleActual),
-                        "left" : x_text,
-                        "bottom" : "Voltage",
-                        "right" : y_text
-                    },
-                    "units" : {
-                        "left" : "F",
-                        "bottom" : "V",
-                        "right" : "S" if CV_parameters["CIRCUIT_MODE"].lower() == "parallel" else "Ohm"
-                    },
-                    "showgrid" : {"x" : False, "y" : False},
-                    "legend" : False
-
-                }
-
+                "plot_parameters" : plot_parameters
             }
-            plot_parameters = main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"]
-            # self.show_graph(plot_parameters)
-            emit_plot(plot_parameters)
+
+            if plot_config.get("SHOW_PLOT", True):
+                emit_plot(plot_parameters)
             
             results_data = list(zip(voltage, capacitance, conductance))
             variables_list = ["V", "C", "G"]
@@ -254,31 +243,16 @@ try:
                     params.append({"name" : clave, "value" : str(results[clave])})
                 main.updateTextDescription(txt_result)
 
-            plot_parameters = {
-                "name" : "Plot CV",
-                "x" : voltage,
-                "y1" : capacitance,
-                "y2" : conductance,
+            plot_config = CV_parameters.get("plot", {})
+            plot_config["LEFT_LABEL"] = x_text
+            plot_config["RIGHT_LABEL"] = y_text
+            plot_config["RIGHT_UNITS"] = "S" if CV_parameters.get("CIRCUIT_MODE", "").lower() == "parallel" else "Ohm"
+            
+            results_data_dict = {"V": voltage, "C": capacitance, "G": conductance}
+            plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
 
-                "titles" : {
-                    "title" : "C-V Measurement",
-                    "left" : x_text,
-                    "bottom" : "Voltage",
-                    "right" : y_text
-                },
-                "units" : {
-                    "left" : "F",
-                    "bottom" : "V",
-                    "right" : "S" if CV_parameters["CIRCUIT_MODE"].lower() == "parallel" else "Ohm"
-                },
-                "showgrid" : {"x" : False, "y" : False},
-                "legend" : False
-                #"foreground" : "#CCCCCC"
-
-            }
-
-            # self.show_graph(plot_parameters)
-            emit_plot(plot_parameters)
+            if plot_config.get("SHOW_PLOT", True):
+                emit_plot(plot_parameters)
             
             results_data = list(zip(voltage, capacitance, conductance))
             variables_list = ["V", "C", "G"]

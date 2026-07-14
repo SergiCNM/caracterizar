@@ -2,7 +2,7 @@
 import os.path
 from config.default.instruments import Keithley_2410
 from config.default.devices import *
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 from PySide6.QtWidgets import QMessageBox
 import toml, time
@@ -38,8 +38,7 @@ def load_IV_ring_parameters():
         "SOURCE_DELAY": 1.0,
         "COUNTS": 3,
         "RES_MIN": 100.0,
-        "RES_MAX": 120.0,
-        "DISPLAY_GRAPH": False
+        "RES_MAX": 120.0
     }
     # load from external toml file in tests_dir (if exists, if not default values)
     filename_config = os.getcwd() + base_dir + tests_dir + '/Keithley_2410/IV_ring.toml'
@@ -49,6 +48,8 @@ def load_IV_ring_parameters():
         IV_ring_parameters = toml_info["parameters"]
         if "output" in toml_info:
             IV_ring_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            IV_ring_parameters["plot"] = toml_info["plot"]
 
 def save_file(main, voltage, current_pad, current_ring, resistance_pad, resistance_ring, namefile):
     """
@@ -148,44 +149,7 @@ def measure_IV_ring(k2410_pad, k2410_ring, IV_ring_parameters, main):
         resistance_ring,
     )
 
-def get_plot_parameters(voltage, current_pad, current_ring):
-    """
-    Get dict for plot parameters
-    Plot only currents (I_pad and I_ring), not resistance
-    :param voltage: voltage list
-    :param current_pad: current pad list
-    :param current_ring: current ring list
-    :return: plot_parameters dict
-    """
-    plot_parameters = {
-        "name": "Plot IV_ring",
-        "x": voltage,
-        "y1": current_pad,
-        "y2": current_ring,
-        "contact_height": "",
-        "variables": [{
-            "params": [],
-            "data": [{"name": "V", "values": voltage, "units": "V"},
-                     {"name": "I_pad", "values": current_pad, "units": "A"},
-                     {"name": "I_ring", "values": current_ring, "units": "A"}]
-        }],
-        "titles": {
-            "title": "IV_ring Measurement",
-            "left": "Current Pad",
-            "bottom": "Voltage",
-            "right": "Current Ring"
-        },
-        "units": {
-            "left": "A",
-            "bottom": "V",
-            "right": "A"
-        },
-        "showgrid": {"x": False, "y": False},
-        "legend": True
-        # "foreground" : "#CCCCCC"
-
-    }
-    return plot_parameters
+# Removed local get_plot_parameters
 
 
 if __name__ == "__main__":
@@ -262,7 +226,8 @@ if __name__ == "__main__":
                 # show results resistance average in description
                 main.updateTextDescription(f"R_pad_avg: {resistance_pad_avg:.4e} Ohm, R_ring_avg: {resistance_ring_avg:.4e} Ohm", "RESULT")
                 # get plot parameters (only currents, no resistance)
-                plot_parameters = get_plot_parameters(voltage, current_pad, current_ring)
+                results_data_dict = {"V": voltage, "I_pad": current_pad, "I_ring": current_ring}
+                plot_parameters = get_plot_parameters(results_data_dict, ["V", "I_pad", "I_ring"], IV_ring_parameters.get("plot", {}))
                 # save results
                 main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
                     "status": meas_status,
@@ -305,16 +270,15 @@ if __name__ == "__main__":
             # show results resistance average in description
             main.updateTextDescription(f"R_pad_avg: {resistance_pad_avg:.4e} Ohm, R_ring_avg: {resistance_ring_avg:.4e} Ohm", "RESULT")
             # main.updateTextDescription(txt_result)
-            plot_parameters = get_plot_parameters(voltage, current_pad, current_ring)
+            results_data_dict = {"V": voltage, "I_pad": current_pad, "I_ring": current_ring}
+            plot_parameters = get_plot_parameters(results_data_dict, ["V", "I_pad", "I_ring"], IV_ring_parameters.get("plot", {}))
             # Single measurement, view plot
-            emit_plot(plot_parameters)
+            if IV_ring_parameters.get("plot", {}).get("SHOW_PLOT", True):
+                emit_plot(plot_parameters)
             # Save file in results
             namefile = f"IV_ring_{main.ui.txtLot.text()}_W{int(main.ui.txtWafer.text()):02d}_single"
             save_file(main, voltage, current_pad, current_ring, resistance_pad, resistance_ring, namefile)
 
-        if "DISPLAY_GRAPH" in IV_ring_parameters and IV_ring_parameters["DISPLAY_GRAPH"]:
-            k2410_pad.display_graph()
-            k2410_ring.display_graph()
         # stop process, close instruments
         k2410_pad.stop()
         k2410_pad.close()

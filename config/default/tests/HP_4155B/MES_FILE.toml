@@ -24,3 +24,19 @@ MOVE_FILES = "Move files from fitxers to another folder"
 DISK_FOLDER = "Folder to move data"
 FITXERS_FOLDER = "Folder to save data (NET1)"
 TEST_NAME = "Test names (MES FILEs) separated by comma"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Measurement"
+TITLE = "Plot"
+X_VARIABLE = "Freq"
+Y1_VARIABLE = "Cp"
+Y2_VARIABLE = "Gp"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Frequency"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "F"
+BOTTOM_UNITS = "Hz"
+RIGHT_UNITS = "S"
+SHOW_GRID = false
+LEGEND = true

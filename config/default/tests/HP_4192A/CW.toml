@@ -4,7 +4,7 @@ title = "CW parameters"
 START = 1
 STOP = 1000
 STEP = 1
-SPOT = "-5"
+SPOT = "-20"
 OSC = 30
 CIRCUIT_MODE = "Parallel"
 AVERAGE = true
@@ -35,7 +35,23 @@ COMPENSATION_SHORT = "Short compensation"
 COMPENSATION_DONE = "Compensation done"
 
 [output]
-separator = "comma"
-prefix = "CW"
-suffix = ""
-variables = "Freq,C,G"
+SEPARATOR = "comma"
+PREFIX = "CW"
+SUFFIX = ""
+VARIABLES = "Freq,C,G"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Plot CW"
+TITLE = "C-W Measurement"
+X_VARIABLE = "Freq"
+Y1_VARIABLE = "C"
+Y2_VARIABLE = "G"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Frequency"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "F"
+BOTTOM_UNITS = "kHz"
+RIGHT_UNITS = "S"
+SHOW_GRID = false
+LEGEND = true

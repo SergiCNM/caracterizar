@@ -78,7 +78,23 @@ GRAPH1 = "Parameter 1 (CS/CP)"
 GRAPH2 = "Parameter 2 (NONE/G)"
 
 [output]
-separator = "comma"
-prefix = "CV_IV_ring_external_E4990A"
-suffix = ""
-variables = ["V", "I_pad", "I_ring", "C", "G"]
+SEPARATOR = "comma"
+PREFIX = "CV_IV_ring_external_E4990A"
+SUFFIX = ""
+VARIABLES = "V,I_pad,I_ring,C,G"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Plot CV"
+TITLE = "C-V Measurement"
+X_VARIABLE = "V"
+Y1_VARIABLE = "C"
+Y2_VARIABLE = "G"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Voltage"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "pF"
+BOTTOM_UNITS = "V"
+RIGHT_UNITS = "nS"
+SHOW_GRID = true
+LEGEND = false

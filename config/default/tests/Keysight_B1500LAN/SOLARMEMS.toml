@@ -17,3 +17,19 @@ GROUP = "Group name"
 TEST_PRESET_GROUP_NAME = "Test preset group name"
 FOLDER_IMAGES = "Folder to save images (MPI)"
 ONLY_PHOTOS = "Only take photos, no electrical measurements"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Measurement"
+TITLE = "Plot"
+X_VARIABLE = "Freq"
+Y1_VARIABLE = "Cp"
+Y2_VARIABLE = "Gp"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Frequency"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "F"
+BOTTOM_UNITS = "Hz"
+RIGHT_UNITS = "S"
+SHOW_GRID = false
+LEGEND = true

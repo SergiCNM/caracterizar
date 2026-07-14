@@ -2,6 +2,26 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [2.6.0] - 2026-07-13
+### Added
+- **`get_plot_parameters()` en `common.py`**: Nueva función que construye el diccionario `plot_parameters` a partir de datos de medición y configuración TOML. Soporta gráficas con series múltiples (step variable).
+- **Sección `[plot]` en TOML de tests**: Todos los ficheros de configuración de tests ahora incluyen parámetros de visualización (`X_VARIABLE`, `Y1_VARIABLE`, `Y2_VARIABLE`, etiquetas, unidades, `SHOW_GRID`, `LEGEND`, etc.).
+- **Tests automatizados en `release.py`**: El script de release ejecuta `pytest` automáticamente antes de proceder con el commit y push.
+
+### Changed
+- **Claves de output en mayúsculas**: Los TOML de tests ahora usan `SEPARATOR`, `PREFIX`, `VARIABLES` (con fallback a minúsculas para compatibilidad).
+- **Refactorización de grid en gráficas**: Lógica más clara para activar/desactivar grid en ejes X, Y e Y2 en `main.py`.
+- **Validación mejorada en `parameters_config()`**: Verifica selección de instrumento y test antes de abrir parámetros; mensajes de error más descriptivos.
+- **Parámetros de sesión actualizados** en `config.toml` (proceso 19998, wafer 7, máscara CNM004).
+
+### Fixed
+- **Símbolos en `plots.py`**: Corregido acceso a `symbols_default` usando índices individuales en lugar del array completo.
+- **Acceso a variables en `wafers.py`**: Añadida validación robusta antes de acceder a `variables["params"]` y `plot_parameters`.
+- **Movimiento de prober**: Añadido `move_chuck_xy` después de `calculate_init_prober_movement()` para asegurar el movimiento real al chuck.
+
+### Removed
+- Eliminados ficheros obsoletos: `Keithley_2470/IV_temp.toml`, `Keithley_2470/IV_temp_test.py`, `Keithley_4200/CVKeithley_test.py`, y tests de `Keysight_B1500` (`IV_2_SMUS`, `IV_4_SMUS`, `SOLARMEMS`, `SOLARMEMS_graph`).
+
 ## [2.5.1] - 2026-05-25
 ### Added
 - **Mejoras en gráfica**: Añadimos un segundo eje para las gráficas que fallaba en CV (Keysight E4990A). Problemas eje y2 solucionado.

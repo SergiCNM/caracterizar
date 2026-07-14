@@ -182,7 +182,7 @@ class PlotWindow(QMainWindow):
             widths_y = []
             widths_y.append(width_default)
             symbols_y = []
-            symbols_y.append(symbols_default)
+            symbols_y.append(symbols_default[0])
             names_y = []
             
             if not plot_parameters["multiaxis"]:
@@ -200,7 +200,7 @@ class PlotWindow(QMainWindow):
                     colors_y.append(colors_default[i])
                     styles_y.append(style_default)
                     widths_y.append(width_default)
-                    symbols_y.append(symbols_default)
+                    symbols_y.append(symbols_default[1] if len(symbols_default) > 1 else symbols_default[0])
                     antialias_y.append(antialias_default)
                     if plot_parameters["multiaxis"]:
                         name_y = "plot" + str(i+1)

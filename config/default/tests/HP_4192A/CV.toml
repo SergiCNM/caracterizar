@@ -1,24 +1,24 @@
 title = "CV parameters"
 
 [parameters]
-START = 5.0
-STOP = -5.0
-STEP = -0.2
+START = -5.0
+STOP = -20.0
+STEP = -0.25
 FREQ = "100"
 OSC = 30
 PN = 1.0
 CIRCUIT_MODE = "Parallel"
 NOT_CHANGE = false
 AVERAGE = false
-HYSTERESIS = false
+HYSTERESIS = true
 HYSTERESIS_TIME = 1
 WAIT_TIME = 0.0
 LIGHT = true
 LIGHT_TIME = 3
-TEMPERATURE = 22.0
+TEMPERATURE = 23.0
 AREA = 960400
 FIMS = 4.1
-PERMITTIVITY = 3.9
+PERMITTIVITY = 7.5
 SERIAL_RES = false
 CALCULATE_PARAMS = true
 COMPENSATION_OPEN = false
@@ -66,7 +66,23 @@ COMPENSATION_SHORT = "Short compensation"
 COMPENSATION_DONE = "Compensation done"
 
 [output]
-separator = "comma"
-prefix = "CV"
-suffix = ""
-variables = "V,C,G"
+SEPARATOR = "comma"
+PREFIX = "CV"
+SUFFIX = ""
+VARIABLES = "V,C,G"
+
+[plot]
+SHOW_PLOT = true
+NAME = "Plot CV"
+TITLE = "C-V Measurement"
+X_VARIABLE = "V"
+Y1_VARIABLE = "C"
+Y2_VARIABLE = "G"
+LEFT_LABEL = "Capacitance"
+BOTTOM_LABEL = "Voltage"
+RIGHT_LABEL = "Conductance"
+LEFT_UNITS = "F"
+BOTTOM_UNITS = "V"
+RIGHT_UNITS = "S"
+SHOW_GRID = true
+LEGEND = true

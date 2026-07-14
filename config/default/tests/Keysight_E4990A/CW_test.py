@@ -23,7 +23,7 @@ from PySide6.QtWidgets import QMessageBox
 import numpy as np
 
 from config.default.instruments import Keysight_E4990A
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 
@@ -63,6 +63,8 @@ def load_CW_parameters():
         CW_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CW_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CW_parameters["plot"] = toml_info["plot"]
     else:
         print(f"File toml {filename_config} doesn't exists!")
 
@@ -222,44 +224,29 @@ try:
                 data = []
 
                 # save results
+                plot_config = CW_parameters.get("plot", {}).copy()
+                plot_config["NAME"] = f"Plot CW {CW_parameters['SPOT']}V (Die {dieActual} Module {moduleActual})"
+                plot_config["TITLE"] = f"Plot CW {CW_parameters['SPOT']}V (Die {dieActual} Module {moduleActual})"
+                plot_config["LOGARITHMIC"] = {"x" : True, "y" : False} if CW_parameters["LOGFREQ"] else {"x" : False, "y" : False}
+
+                results_data_dict = {"F": frequency/1e3, "C": capacitance * 1e12, "G": conductance * 1e6}
+                plot_parameters = get_plot_parameters(results_data_dict, ["F", "C", "G"], plot_config)
+                
                 main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
                     "status": meas_status,
                     "message": "",
                     "contact_height": "",
                     "variables": {
                         "params": params,
-                        "data": [{"name": "W", "values": frequency, "units": "Hz"},
-                                 {"name": "C", "values": capacitance * 1e12, "units": "pF"},
-                                 {"name": "G", "values": conductance * 1E6, "units": "uS"}]
+                        "data": [{"name": "F", "values": frequency, "units": "Hz"},
+                                    {"name": "C", "values": capacitance * 1e12, "units": "pF"},
+                                    {"name": "G", "values": conductance * 1E6, "units": "uS"}]
                     },
-                    "plot_parameters": {
-                        "name": "Plot CW " + str(CW_parameters["SPOT"]) + "V (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
-                        "x": frequency/1e3,
-                        "y1": capacitance * 1e12,
-                        "y2": conductance * 1e6,
-
-                        "titles": {
-                            "title": "Plot CW " + str(CW_parameters["SPOT"]) + "V (Die " + str(dieActual) + " Module " + str(moduleActual) + ")",
-                            "left": "Capacitance",
-                            "bottom": "Frequency",
-                            "right": "Conductance"
-                        },
-                        "units": {
-                            "left": "pF",
-                            "bottom": "kHz",
-                            "right": "uS"
-                        },
-                        "showgrid": {"x": True, "y": True},
-
-                        "legend": True,
-                        "logarithmic" : {"x" : True, "y" : False} if CW_parameters["LOGFREQ"] else {"x" : False, "y" : False},
-
-                    }
-
+                    "plot_parameters": plot_parameters
                 }
-                plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1]["plot_parameters"]
 
-                emit_plot(plot_parameters)
+                if plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
                 
                 results_data = list(zip(frequency, capacitance, conductance))
                 variables_list = ["F", "C", "G"]
@@ -296,32 +283,18 @@ try:
                 # Turn off bias
                 keysightE4990A.turn_off_bias()
                 # Plot parameters
-                plot_parameters = {
-                    "name": "Plot CW",
-                    "x": frequency/1e3,
-                    "y1": capacitance * 1e12,
-                    "y2": conductance * 1e6,
+                plot_config = CW_parameters.get("plot", {}).copy()
+                plot_config["TITLE"] = f"Plot CW at {spot} V"
+                plot_config["LOGARITHMIC"] = {"x" : True, "y" : False} if CW_parameters["LOGFREQ"] else {"x" : False, "y" : False}
 
-                    "titles": {
-                        "title": f"Plot CW at {str(spot)} V",
-                        "left": "Capacitance",
-                        "bottom": "Frequency",
-                        "right": "Conductance"
-                    },
-                    "units": {
-                        "left": "pF",
-                        "bottom": "kHz",
-                        "right": "uS"
-                    },
-                    "showgrid": {"x": True, "y": True},
-                    "legend": True,
-                    "logarithmic" : {"x" : True, "y" : False} if CW_parameters["LOGFREQ"] else {"x" : False, "y" : False},
+                results_data_dict = {"F": frequency/1e3, "C": capacitance * 1e12, "G": conductance * 1e6}
+                plot_parameters = get_plot_parameters(results_data_dict, ["F", "C", "G"], plot_config)
 
-                }
                 dieActual = 1
                 moduleActual = 1
 
-                emit_plot(plot_parameters)
+                if plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
                 
                 results_data = list(zip(frequency, capacitance, conductance))
                 variables_list = ["F", "C", "G"]

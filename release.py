@@ -74,6 +74,14 @@ def get_changelog_entry(version):
 def main():
     print("=== Automatización de Release - Caracterizar ===\n")
 
+    print("0. Ejecutando tests automatizados...")
+    try:
+        subprocess.run([sys.executable, "-m", "pytest", "tests/"], check=True)
+        print("Todos los tests han pasado correctamente.\n")
+    except subprocess.CalledProcessError:
+        print("Error: Fallaron algunos tests. Por favor arréglalos antes de subir los cambios. Abortando release.")
+        return
+
     # 1. Sincronización Inicial y Detección
     print("Sincronizando con el repositorio remoto...")
     run_command("git fetch origin")

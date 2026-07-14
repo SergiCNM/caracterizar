@@ -26,7 +26,7 @@ from config.default.instruments import Keysight_E4990A
 from config.default.instruments import Keithley_2470
 from config.default.instruments import Keithley_2410
 from config.default.devices import *
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 
@@ -79,6 +79,8 @@ def load_CV_IV_external_parameters():
         CV_IV_external_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CV_IV_external_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CV_IV_external_parameters["plot"] = toml_info["plot"]
 
 
 def config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters):
@@ -430,7 +432,6 @@ try:
         if test_status.status == "STARTED":
             # Measure for each frequency
             for freq in freqs:
-                load_CV_IV_external_parameters()  # Reload parameters
                 CV_IV_external_parameters["FREQ"] = str(freq)
 
                 # Configure E4990A for spot measurement
@@ -451,7 +452,13 @@ try:
                     capacitance = np.array(capacitance)
                     conductance = np.array(conductance)
 
-                    # Save results
+                    plot_config = CV_IV_external_parameters.get("plot", {}).copy()
+                    plot_config["NAME"] = f"Plot CV_IV_external {freq}kHz (Die {dieActual} Module {moduleActual})"
+                    plot_config["TITLE"] = f"CV_IV_external {freq}kHz (Die {dieActual} Module {moduleActual})"
+
+                    results_data_dict = {"V": voltage.tolist(), "C": (capacitance * 1e12).tolist(), "G": (conductance * 1e9).tolist()}
+                    plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
+
                     main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
                         "status": meas_status,
                         "message": meas_message,
@@ -464,30 +471,11 @@ try:
                                 {"name": "G", "values": (conductance * 1e9).tolist(), "units": "nS"}
                             ]
                         },
-                        "plot_parameters": {
-                            "name": f"Plot CV_IV_external {freq}kHz (Die {dieActual} Module {moduleActual})",
-                            "x": voltage.tolist(),
-                            "y1": (capacitance * 1e12).tolist(),
-                            "y2": (conductance * 1e9).tolist(),
-                            "titles": {
-                                "title": f"CV_IV_external {freq}kHz (Die {dieActual} Module {moduleActual})",
-                                "left": "Capacitance",
-                                "bottom": "Voltage",
-                                "right": "Conductance"
-                            },
-                            "units": {
-                                "left": "pF",
-                                "bottom": "V",
-                                "right": "nS"
-                            },
-                            "showgrid": {"x": True, "y": True},
-                            "legend": False
-                        }
+                        "plot_parameters": plot_parameters
                     }
 
-                    plot_parameters = main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1][
-                        "plot_parameters"]
-                    emit_plot(plot_parameters)
+                    if plot_config.get("SHOW_PLOT", True):
+                        emit_plot(plot_parameters)
 
                     # Save to file
                     results_data = list(zip(voltage, capacitance, conductance))
@@ -518,7 +506,6 @@ try:
 
         # Measure for each frequency
         for freq in freqs:
-            load_CV_IV_external_parameters()
             CV_IV_external_parameters["FREQ"] = str(freq)
 
             if config_E4990A_for_spot_measurement(keysightE4990A, CV_IV_external_parameters):
@@ -530,27 +517,13 @@ try:
                     capacitance = np.array(capacitance)
                     conductance = np.array(conductance)
 
-                    plot_parameters = {
-                        "name": f"Plot CV_IV_external {freq}kHz",
-                        "x": voltage.tolist(),
-                        "y1": (capacitance * 1e12).tolist(),
-                        "y2": (conductance * 1e9).tolist(),
-                        "titles": {
-                            "title": f"CV_IV_external Measurement at {freq}kHz",
-                            "left": "Capacitance",
-                            "bottom": "Voltage",
-                            "right": "Conductance"
-                        },
-                        "units": {
-                            "left": "pF",
-                            "bottom": "V",
-                            "right": "nS"
-                        },
-                        "showgrid": {"x": True, "y": True},
-                        "legend": True
-                    }
+                    plot_config = CV_IV_external_parameters.get("plot", {}).copy()
+                    plot_config["TITLE"] = f"CV_IV_external Measurement at {freq}kHz"
 
-                    emit_plot(plot_parameters)
+                    results_data_dict = {"V": voltage.tolist(), "C": (capacitance * 1e12).tolist(), "G": (conductance * 1e9).tolist()}
+                    plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
+
+                    emit_plot(plot_parameters) if plot_config.get("SHOW_PLOT", True) else None
 
                     # Save to file
                     dieActual = 1

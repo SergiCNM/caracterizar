@@ -6,28 +6,29 @@ GROUP = "NanoNEMS"
 TEST_PRESET_GROUP_NAME = "IsVbulk"
 
 [output]
-variables = "Vs,Is,Ibulk,Vbulk"
-separator = "comma"
-prefix = "IV"
-suffix = ""
+VARIABLES = "Vs,Is,Ibulk,Vbulk"
+SEPARATOR = "comma"
+PREFIX = "IV"
+SUFFIX = ""
 
 [plot]
-name = "IV Measurement"
-title = "I-V Measurement"
-x_variable = "Vs"
-y1_variable = "Is"
-y2_variable = "Ibulk"
-left_label = "Is"
-right_label = "Ibulk"
-bottom_label = "Vs"
-left_units = "A"
-right_units = "A"
-bottom_units = "V"
-show_grid = false
-legend = true
-step_variable = ""
-step_label = ""
-step_units = "V"
+NAME = "IV Measurement"
+TITLE = "I-V Measurement"
+X_VARIABLE = "Vs"
+Y1_VARIABLE = "Is"
+Y2_VARIABLE = "Ibulk"
+LEFT_LABEL = "Is"
+RIGHT_LABEL = "Ibulk"
+BOTTOM_LABEL = "Vs"
+LEFT_UNITS = "A"
+RIGHT_UNITS = "A"
+BOTTOM_UNITS = "V"
+SHOW_GRID = false
+LEGEND = true
+STEP_VARIABLE = ""
+STEP_LABEL = ""
+STEP_UNITS = "V"
+SHOW_PLOT = true
 
 [options]
 separator = "comma,space,tab"

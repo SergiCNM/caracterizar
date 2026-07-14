@@ -15,6 +15,7 @@ tests/
 ├── __init__.py
 ├── conftest.py
 ├── test_common_save_results.py      # Tests for unified save functionality
+├── test_common_plot.py              # Tests for unified plot parameters generation
 ├── test_config.py                   # Configuration parsing tests
 ├── test_config_functions.py         # Configuration utility function tests
 ├── test_result_file.py              # Result file handling tests
@@ -33,6 +34,12 @@ This test file specifically validates the unified measurement results saving fun
 - `build_results_folder()`: Constructs standardized folder paths
 - `get_output_separator()`: Converts separator strings to actual characters
 - `save_results_to_file()`: Saves measurement data in columnated text format
+
+### Test Suite: `test_common_plot.py`
+
+This test file specifically validates the centralized plot generation functionality implemented in `config/default/tests/common.py`. It tests:
+
+- `get_plot_parameters()`: Generates the plot configuration dictionary dynamically from data and TOML inputs
 
 ## Environment Setup
 

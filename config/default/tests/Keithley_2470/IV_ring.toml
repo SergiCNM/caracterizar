@@ -2,8 +2,8 @@ title = "IV_ring parameters"
 
 [parameters]
 START = 0.0
-STOP = 300.0
-STEP = 2.0
+STOP = -500.0
+STEP = -5.0
 COMPLIANCE = 0.01
 HYSTERESIS = false
 WAIT_TIME = 1.0
@@ -17,7 +17,6 @@ SOURCE_DELAY = 0.1
 SENSE_COUNT = 2
 RES_MIN = 100.0
 RES_MAX = 120.0
-DISPLAY_GRAPH = false
 
 [options]
 RANGE = "AUTO,0.2,2,20,200,1000"
@@ -57,7 +56,23 @@ RES_MAX = "Maximum resistance for resistance measurement (applies to both pad an
 DISPLAY_GRAPH = "Display graph after measurement"
 
 [output]
-separator = "comma"
-prefix = "IV_ring"
-suffix = ""
-variables = "V,I_pad,I_ring,R_pad,R_ring"
+SEPARATOR = "comma"
+PREFIX = "IV_ring"
+SUFFIX = ""
+VARIABLES = "V,I_pad,I_ring,R_pad,R_ring"
+
+[plot]
+SHOW_PLOT = true
+NAME = "IV Measurement"
+TITLE = "IV ring plot"
+X_VARIABLE = "V"
+Y1_VARIABLE = "I_pad"
+Y2_VARIABLE = "I_ring"
+LEFT_LABEL = "I_pad"
+BOTTOM_LABEL = "Voltage"
+RIGHT_LABEL = "I_ring"
+LEFT_UNITS = "A"
+BOTTOM_UNITS = "V"
+RIGHT_UNITS = "A"
+SHOW_GRID = false
+LEGEND = true

@@ -5,7 +5,7 @@ import sys
 from PySide6.QtWidgets import QMessageBox
 
 from config.default.instruments import Keithley_4200
-from config.default.tests.common import save_results_to_file, build_results_folder
+from config.default.tests.common import save_results_to_file, build_results_folder, get_plot_parameters
 from config.functions import *
 import toml
 global test_status, measurement_status
@@ -36,6 +36,8 @@ def load_CW_parameters():
         CW_parameters = toml_info["parameters"]
         if "output" in toml_info:
             CW_parameters["output"] = toml_info["output"]
+        if "plot" in toml_info:
+            CW_parameters["plot"] = toml_info["plot"]
     else:
         print(f"File toml {filename_config} doesn't exist!")
 
@@ -73,40 +75,31 @@ try:
 
                 # Save and plot
                 meas_status = "meas_success"
-                main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
-                    "status": meas_status,
-                    "message": "",
-                    "contact_height": "",
-                    "variables": {
-                        "params": [],
-                        "data": [
-                            {"name": "f", "values": freq, "units": "Hz"},
-                            {"name": "C", "values": capacitance, "units": "F"},
-                            {"name": "G", "values": conductance, "units": "S"}
-                        ]
-                    },
-                    "plot_parameters": {
-                        "name": "Plot CW",
-                        "x": freq,
-                        "y1": capacitance,
-                        "y2": conductance,
-                        "titles": {
-                            "title": f"C-W Measurement Die {dieActual} Module {moduleActual}",
-                            "left": y_text_left,
-                            "bottom": x_text,
-                            "right": y_text_right
+                    plot_config = CW_parameters.get("plot", {})
+                    plot_config["LEFT_LABEL"] = y_text_left
+                    plot_config["RIGHT_LABEL"] = y_text_right
+                    plot_config["RIGHT_UNITS"] = "S" if CW_parameters.get("CIRCUIT_MODE", "").lower() == "parallel" else "Ohm"
+                    
+                    results_data_dict = {"f": freq, "C": capacitance, "G": conductance}
+                    plot_parameters = get_plot_parameters(results_data_dict, ["f", "C", "G"], plot_config)
+                    
+                    main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1] = {
+                        "status": meas_status,
+                        "message": "",
+                        "contact_height": "",
+                        "variables": {
+                            "params": [],
+                            "data": [
+                                {"name": "f", "values": freq, "units": "Hz"},
+                                {"name": "C", "values": capacitance, "units": "F"},
+                                {"name": "G", "values": conductance, "units": "S"}
+                            ]
                         },
-                        "units": {
-                            "left": "F",
-                            "bottom": "Hz",
-                            "right": "S" if CW_parameters["CIRCUIT_MODE"].lower() == "parallel" else "Ohm"
-                        },
-                        "showgrid": {"x": False, "y": False},
-                        "legend": False
+                        "plot_parameters": plot_parameters
                     }
-                }
 
-                emit_plot(main.waferwindow.meas_result[int(dieActual)-1][int(moduleActual)-1]["plot_parameters"])
+                    if plot_config.get("SHOW_PLOT", True):
+                        emit_plot(plot_parameters)
                 
                 results_data = list(zip(freq, capacitance, conductance))
                 variables_list = ["f", "C", "G"]
@@ -139,27 +132,16 @@ try:
 
             freq, capacitance, conductance = k4200.measure_CW(CW_parameters, timeout)
 
-            plot_parameters = {
-                "name": "Plot CW",
-                "x": freq,
-                "y1": capacitance,
-                "y2": conductance,
-                "titles": {
-                    "title": "C-W Measurement",
-                    "left": y_text_left,
-                    "bottom": x_text,
-                    "right": y_text_right
-                },
-                "units": {
-                    "left": "F",
-                    "bottom": "Hz",
-                    "right": "S" if CW_parameters["CIRCUIT_MODE"].lower() == "parallel" else "Ohm"
-                },
-                "showgrid": {"x": False, "y": False},
-                "legend": False
-            }
+            plot_config = CW_parameters.get("plot", {})
+            plot_config["LEFT_LABEL"] = y_text_left
+            plot_config["RIGHT_LABEL"] = y_text_right
+            plot_config["RIGHT_UNITS"] = "S" if CW_parameters.get("CIRCUIT_MODE", "").lower() == "parallel" else "Ohm"
+            
+            results_data_dict = {"f": freq, "C": capacitance, "G": conductance}
+            plot_parameters = get_plot_parameters(results_data_dict, ["f", "C", "G"], plot_config)
 
-            emit_plot(plot_parameters)
+            if plot_config.get("SHOW_PLOT", True):
+                emit_plot(plot_parameters)
 
             results_data = list(zip(freq, capacitance, conductance))
             variables_list = ["f", "C", "G"]

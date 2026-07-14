@@ -638,14 +638,25 @@ class MainWindow(QMainWindow):
             _static_ax = static_canvas.figure.subplots()
             # set grid
             if "showgrid" in plot_parameters:
-                if "x" in plot_parameters["showgrid"] and plot_parameters["showgrid"]["x"]:
-                    _static_ax.xaxis.grid(plot_parameters["showgrid"]["x"], color='gray')
-                if "y" in plot_parameters["showgrid"] and plot_parameters["showgrid"]["y"]:
-                    _static_ax.yaxis.grid(plot_parameters["showgrid"]["y"], color='gray')
+                if "x" in plot_parameters["showgrid"]:
+                    if plot_parameters["showgrid"]["x"]:
+                        _static_ax.xaxis.grid(True, color='gray')
+                    else:
+                        _static_ax.xaxis.grid(False)
+                if "y" in plot_parameters["showgrid"]:
+                    if plot_parameters["showgrid"]["y"]:
+                        _static_ax.yaxis.grid(True, color='gray')
+                    else:
+                        _static_ax.yaxis.grid(False)
                 # _static_ax.grid(True, color='gray')
 
             if "y2" in plot_parameters:
                 _static_ax2 = _static_ax.twinx()
+                if "showgrid" in plot_parameters:
+                    if "y" in plot_parameters["showgrid"] and not plot_parameters["showgrid"]["y"]:
+                        _static_ax2.yaxis.grid(False)
+                    if "x" in plot_parameters["showgrid"] and not plot_parameters["showgrid"]["x"]:
+                        _static_ax2.xaxis.grid(False)
 
             # set titles
             left_title = ""
@@ -2831,19 +2842,28 @@ class MainWindow(QMainWindow):
 
     def parameters_config(self):
         instrument_selected = self.get_instrument_selected()
-        if instrument_selected != "":
-            filename_parameters = os.path.join(self.getDirs("tests"), instrument_selected,
-                                               self.get_filename_test().replace("_test.py", ".toml"))
-            if os.path.exists(filename_parameters):
-                self.parameterwindow = ParametersWindow(filename_parameters)
-                if not self.parameterwindow.error:
-                    try:
-                        self.parameterwindow.show()
-                    except Exception as e:
-                        print(str(e))
-                else:
-                    retval = messageBox(self, "Error getting parameters from file", self.parameterwindow.error_message,
-                                        "critical")
+        test_selected = self.get_test_selected()
+        if instrument_selected == "" or test_selected == "":
+            messageBox(self, "Selection required",
+                       "Please select an instrument and a test to view test parameters.",
+                       "warning")
+            return
+        filename_parameters = os.path.join(self.getDirs("tests"), instrument_selected,
+                                           self.get_filename_test().replace("_test.py", ".toml"))
+        if os.path.exists(filename_parameters):
+            self.parameterwindow = ParametersWindow(filename_parameters)
+            if not self.parameterwindow.error:
+                try:
+                    self.parameterwindow.show()
+                except Exception as e:
+                    print(str(e))
+            else:
+                retval = messageBox(self, "Error getting parameters from file", self.parameterwindow.error_message,
+                                    "critical")
+        else:
+            messageBox(self, "File not found",
+                       f"Parameters file not found:\n{filename_parameters}",
+                       "warning")
 
     def instruments_config(self):
         instrument_name = ""
@@ -3123,6 +3143,7 @@ class MainWindow(QMainWindow):
                             if float(X) == 0.0 and float(Y) == 0.0:
                                 # if yes we go to ORIGIN
                                 X, Y = wafer.calculate_init_prober_movement()
+                                self.prober.move_chuck_xy("R", X, Y)
                             else:
                                 self.updateTextDescription("- Not in HOME position")
                                 if not auto:
@@ -3136,6 +3157,7 @@ class MainWindow(QMainWindow):
                                     self.prober.move_home()
                                     self.updateTextDescription("- Go to HOME position")
                                     X, Y = wafer.calculate_init_prober_movement()
+                                    self.prober.move_chuck_xy("R", X, Y)
                                 else:
                                     self.updateTextDescription("- Test aborted...")
                                     test_status.status = "ABORTED"
