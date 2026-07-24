@@ -67,10 +67,12 @@ class Estepa():
 
 	def close_connection(self):
 		# close the communication with the PostgreSQL
-		if not self.error:
-			# self.cur.close()
-			if self.conn is not None:
-				self.conn.close()
+		try:
+			if not self.error:
+				if self.conn is not None:
+					self.conn.close()
+		except Exception:
+			pass
 
 
 	def get_connect_string(self):

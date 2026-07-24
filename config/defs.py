@@ -1,5 +1,5 @@
 # Program constants
-version = 'v6.0 - Beta 2'
+# Version is now read from config/config.toml
 
 # BBDD connection
 mysqlhost = "localhost"

@@ -41,13 +41,14 @@ widgets = None
 # ///////////////////////////////////////////////////////////////
 import time
 # import hashlib # md5 pass generate
-import bcrypt
-import mysql.connector
-from mysql.connector import errorcode
+# import bcrypt  # no longer used (MySQL auth removed)
+# import mysql.connector  # no longer used (MySQL auth removed)
+# from mysql.connector import errorcode
 
 from screens.ui_login import Ui_LoginWindow
 from screens.ui_splash_screen import Ui_SplashScreen
 # from widgets.circular_progress.circular_progress import CircularProgress
+from modules.auth import authenticate
 
 # import images screen login
 import resources_rc
@@ -420,7 +421,7 @@ class MainWindow(QMainWindow):
         widgets.txtLimitMax.setText(str(self.config["estepa"]["limmax"]))
 
         # configuration labels for version and credits
-        widgets.version.setText(f"v{self.config['version']}")
+        widgets.version.setText(f"{self.username} - v{self.config['version']}")
         widgets.creditsLabel.setText(f"Developed by {self.config['author']}")
 
 
@@ -1594,10 +1595,13 @@ class MainWindow(QMainWindow):
             retval = messageBox(self, "Save graph", "No test selected!", "warning")
             return
         name_file = testname + "_" + widgets.txtLot.text() + "-" + widgets.txtWafer.text() + "_" + str(dieActual) + "_" + str(moduleActual)
+        # Ensure user results directory exists
+        user_results_dir = os.path.join(results_dir, self.username)
+        os.makedirs(user_results_dir, exist_ok=True)
         if layout.count() > 0:
             static_canvas = layout.itemAt(0).widget()
             fileName, _ = QFileDialog.getSaveFileName(self,
-                                                      "Save graph as...", results_dir + "/" + name_file + ".png",
+                                                      "Save graph as...", user_results_dir + "/" + name_file + ".png",
                                                       "PNG Files (*.png);; JPG Files (*.jpg);; All files (*.*)")
             if fileName:
                 try:
@@ -1647,12 +1651,16 @@ class MainWindow(QMainWindow):
         if run == "" or wafer == "" or parameter == "":
             retval = messageBox(self, "Problem saving " + texto, "Run, wafer or parameter is missing!", "warning")
         else:
+            # Ensure user results directory exists
+            user_results_dir = os.path.join(results_dir, self.username)
+            os.makedirs(user_results_dir, exist_ok=True)
+
             # save image
             if texto == "Wafermap" or texto == "Histogram" or texto == "Correlation" or texto == "Diagram":
                 if texto == "Diagram":
-                    name_file = results_dir + "/" + parameter + "_" + texto + ".png"
+                    name_file = user_results_dir + "/" + parameter + "_" + texto + ".png"
                 else:
-                    name_file = results_dir + "/" + run + "-" + wafer + "_" + parameter + "_" + texto + ".png"
+                    name_file = user_results_dir + "/" + run + "-" + wafer + "_" + parameter + "_" + texto + ".png"
                 try:
                     if texto == "Wafermap":
                         widgets.horizontalLayout_wafermap.itemAt(0).widget().figure.savefig(name_file, dpi=300)
@@ -1661,7 +1669,7 @@ class MainWindow(QMainWindow):
                     else:
                         texto = widgets.tabGraphs.tabText(1)
                         if texto == "Correlation":
-                            name_file = results_dir + "/" + run + "-" + wafer + "_" + parameters.replace(", ",
+                            name_file = user_results_dir + "/" + run + "-" + wafer + "_" + parameters.replace(", ",
                                                                                                          "-") + "_" + texto + ".png"
                         widgets.verticalLayout_histogram.itemAt(0).widget().figure.savefig(name_file, dpi=300)
                 except Exception as e:
@@ -1671,13 +1679,13 @@ class MainWindow(QMainWindow):
                 # save file
                 try:
                     if texto == "DataValues":
-                        name_file = results_dir + "/" + run + "-" + wafer + "_" + parameter + "_" + texto + ".dat"
+                        name_file = user_results_dir + "/" + run + "-" + wafer + "_" + parameter + "_" + texto + ".dat"
                         text_save = widgets.txtDataValues.toPlainText()
                     if texto == "ParametersResult":
-                        name_file = results_dir + "/" + run + "-" + wafer + "_" + texto + ".dat"
+                        name_file = user_results_dir + "/" + run + "-" + wafer + "_" + texto + ".dat"
                         text_save = widgets.txtParametersResult.toPlainText()
                     if texto == "Historical":
-                        name_file = results_dir + "/" + texto + ".dat"
+                        name_file = user_results_dir + "/" + texto + ".dat"
                         text_save = widgets.txtDataValuesConsult.toPlainText()
 
                     if name_file != "" and text_save != "":
@@ -2876,6 +2884,8 @@ class MainWindow(QMainWindow):
 
         # === Buscar ruta base de configuración ===
         base_config_path = os.path.join(os.getcwd(), "config", username)
+        if not os.path.exists(base_config_path):
+            base_config_path = os.path.join(os.getcwd(), "config", "default")
 
         # Intentar primero en instruments.toml
         instruments_path = os.path.join(base_config_path, "instruments.toml")
@@ -2923,6 +2933,8 @@ class MainWindow(QMainWindow):
 
         # === Buscar ruta base de configuración ===
         base_config_path = os.path.join(os.getcwd(), "config", username)
+        if not os.path.exists(base_config_path):
+            base_config_path = os.path.join(os.getcwd(), "config", "default")
 
         # Intentar carga en probers.toml
         probers_path = os.path.join(base_config_path, "probers.toml")
@@ -3423,9 +3435,16 @@ class MainWindow(QMainWindow):
             self.waferwindow.show()
 
     def getDirs(self, dirname):
-        # get Dirs from config.toml
+        # get Dirs from config.toml with fallback to default
         if dirname != "results":
-            return os.path.join(os.getcwd(), self.config["dirs"]["base"], self.username, self.config["dirs"][dirname])
+            user_dir = os.path.join(os.getcwd(), self.config["dirs"]["base"], self.username, self.config["dirs"][dirname])
+            if os.path.exists(user_dir):
+                return user_dir
+            default_dir = os.path.join(os.getcwd(), self.config["dirs"]["base"], "default", self.config["dirs"][dirname])
+            if os.path.exists(default_dir):
+                self.log_message("getDirs", f"User dir not found for '{dirname}', using default config", "WARNING")
+                return default_dir
+            return user_dir
         else:
             return os.path.join(os.getcwd(), self.config["dirs"][dirname], self.username)
 
@@ -3632,10 +3651,18 @@ class MainWindow(QMainWindow):
 
     def get_base_path(self, folder=""):
         global username
-        get_base_path = os.path.join(os.getcwd(), "config", username, folder)
+        user_path = os.path.join(os.getcwd(), "config", username, folder)
         if folder != "":
-            get_base_path = get_base_path + "/"
-        return get_base_path
+            user_path = user_path + "/"
+        if os.path.exists(user_path):
+            return user_path
+        default_path = os.path.join(os.getcwd(), "config", "default", folder)
+        if folder != "":
+            default_path = default_path + "/"
+        if os.path.exists(default_path):
+            self.log_message("get_base_path", f"User config not found for '{folder}', using default", "WARNING")
+            return default_path
+        return user_path
 
     def set_test_description(self):
         global widgets
@@ -3730,10 +3757,23 @@ class MainWindow(QMainWindow):
 # ///////////////////////////////////////////////////////////////
 
 class SplashScreen(QMainWindow):
-    def __init__(self):
+    def __init__(self, is_default=True, input_username="", input_password=""):
         QMainWindow.__init__(self)
         self.ui = Ui_SplashScreen()
         self.ui.setupUi(self)
+
+        # Set version from config.toml
+        try:
+            config_path = os.path.join(os.getcwd(), 'config', 'config.toml')
+            cfg = toml.load(config_path)
+            self.ui.version.setText(f"v{cfg['version']}")
+        except Exception:
+            pass
+
+        self.is_default = is_default
+        self.input_username = input_username
+        self.input_password = input_password
+        self.auth_result = None
 
         # REMOVE TITLE BAR
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -3743,8 +3783,7 @@ class SplashScreen(QMainWindow):
         self.progress = CircularProgress()
         self.progress.width = 270
         self.progress.height = 270
-        self.progress.value = 0  # init to 0%
-        # Fix the position
+        self.progress.value = 0
         self.progress.setFixedSize(self.progress.width, self.progress.height)
         self.progress.move(15, 15)
 
@@ -3756,162 +3795,101 @@ class SplashScreen(QMainWindow):
         self.progress.setParent(self.ui.centralwidget)
         self.progress.show()
 
-        # add DRROP SHADOW
-        self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(15)
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.shadow.setColor(QColor(0, 0, 0, 120))
-        self.setGraphicsEffect(self.shadow)
-
-        # TIMER (desactivado para control por login)
+        # TIMER
         self.timer = QTimer()
-        # Variables de control para el login
-        self.ok = 0
-        self.user_id = 0
-        self.password_db = ""
-        counter = 0
-        errorLogin = False
+        self.counter = 0
         self.timer.timeout.connect(self.update)
         self.timer.start(30)
         self.show()
 
-    # UPDATE PROGRESS BAR
     def update(self):
-        global counter
-        global username, password
-        global user_id_db, username_db, email_db
-        global errorLogin
-        global connection
+        if self.is_default:
+            self._update_default()
+        else:
+            self._update_user()
 
-        # pass for ssanchez in Labs table: Labs12345
+    def _update_default(self):
+        self.counter += 1
+        self.progress.set_value(self.counter)
 
-        # set value to progress bar
-        self.progress.set_value(counter)
-        # verify username exists
-        if counter == 0:
-            err_text = ""
-            try:
-                connection = mysql.connector.connect(host=mysqlhost, database=mysqldatabase, user=mysqluser,
-                                                     password=mysqlpassword)
-                if connection.is_connected():
-                    db_Info = connection.get_server_info()
-                    self.ui.lblStatus.setText("Connected to MySQL Server v." + db_Info)
-                else:
-                    self.ui.lblStatus.setText("Not connected to MySQL Server")
-                    errorLogin = True
+        if self.counter == 20:
+            self.ui.lblStatus.setText("Checking user folder...")
 
-            except mysql.connector.Error as err:
-                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                    err_text = "Something is wrong with your MySQL user/password"
-                elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                    err_text = "Database does not exist"
-                else:
-                    err_text = err
-                self.ui.lblStatus.setText("MySQL error: " + str(err_text))
-                print("MySQL error: " + str(err_text))
-                errorLogin = True
+        if self.counter == 40:
+            results_path = os.path.join(os.getcwd(), results_dir, "default")
+            if not os.path.exists(results_path):
+                os.makedirs(results_path, exist_ok=True)
+                self.ui.lblStatus.setText("Created results/default/ folder")
+            else:
+                self.ui.lblStatus.setText("User folder ready")
 
-        if counter == 33:
-            # USER VERIFY
-            if not errorLogin:
-                # try to connect to users table
-                try:
-                    cursor = connection.cursor()
-                    query = "SELECT count(*) as ok, id as user_id, password, username, email FROM users WHERE username='" + username + "' OR email='" + username + "' GROUP BY id"
-                    # password_hexhash = hashlib.sha512(password.encode()).hexdigest()
-                    cursor.execute(query)
-                    result = cursor.fetchall()
-                    for row in result:
-                        self.ok = row[0]
-                        self.user_id = row[1]
-                        self.password_db = row[2]
-                        user_id_db = row[1]
-                        username_db = row[3]
-                        email_db = row[4]
-                    if self.ok == 1:
-                        self.ui.lblStatus.setText("User exists!")
-                    elif str(self.ok) == "0":
-                        self.ui.lblStatus.setText("Sorry, user '" + username + "' doesn't exists!")
-                        errorLogin = True
-                    else:
-                        self.ui.lblStatus.setText("Error, more than one user!")
-                        errorLogin = True
-                except mysql.connector.Error as err:
-                    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                        err_text = "Something is wrong with your user name"
-                    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                        err_text = "Database does not exist"
-                    elif err.errno == 2003:
-                        err_text = "Can't connect to MySQL Server"
-                    else:
-                        err_text = err
-                    self.ui.lblStatus.setText("MySQL error: " + str(err_text))
-                    print("MySQL error: " + str(err_text))
-                    errorLogin = True
+        if self.counter == 60:
+            self.ui.lblStatus.setText("Preparing workspace...")
 
-        if counter == 50:
-            # PASSWORD VERIFY
-            if not errorLogin:
-                if bcrypt.checkpw(password.encode(), self.password_db.encode()):
-                    self.ui.lblStatus.setText("User login correctly!")
-                else:
-                    self.ui.lblStatus.setText("Password doesn't match!")
-                    errorLogin = True
-        if counter == 75:
-            if not errorLogin:
-                # user exists, verify active status
-                try:
-                    cursor = connection.cursor()
-                    query = "SELECT count(*) as ok, user_id FROM user_details WHERE user_id=" + str(
-                        self.user_id) + " and active=1 and disabled=0"
-                    cursor.execute(query)
-                    result = cursor.fetchall()
-                    for row in result:
-                        self.ok = row[0]
-                    if self.ok == 1:
-                        self.ui.lblStatus.setText("User is active!")
-                    else:
-                        self.ui.lblStatus.setText("Sorry, user is not active!")
-                        errorLogin = True
-                except mysql.connector.Error as err:
-                    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                        err_text = "Something is wrong with your user name or password"
-                    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                        err_text = "Database does not exist"
-                    else:
-                        err_text = err
-                    self.ui.lblStatus.setText("MySQL error: " + str(err_text))
-                    print("MySQL error: " + str(err_text))
-                    errorLogin = True
+        if self.counter == 80:
+            self.ui.lblStatus.setText("Loading configuration...")
 
-        if counter == 90:
-            connection.close()
-            self.ui.lblStatus.setText("MySQL connection is closed")
-        # CLOSE SPLASH SCREEN AND OPEN MAIN APP
-        if counter >= 100:
-            # stop timer
+        if self.counter >= 100:
             self.timer.stop()
-            # show main window
+            self.ui.lblStatus.setText("Entering as default user...")
             self.main = MainWindow()
             self.main.show()
-            # close splash screen
             self.close()
 
-        counter += 1
+    def _update_user(self):
+        global username
+        self.counter += 1
+        self.progress.set_value(self.counter)
 
-        if errorLogin:
-            self.ui.lblStatus.setStyleSheet("color: #ff5555");  # red color
-            self.progress.set_value(counter)  # para refresh
-            # Volvemos a pantalla login
+        if self.counter == 15:
+            self.ui.lblStatus.setText("Connecting to authentication server...")
+
+        if self.counter == 25:
+            self.ui.lblStatus.setText("Authenticating...")
+            self.auth_result = authenticate(self.input_username, self.input_password)
+
+        if self.counter == 45:
+            if self.auth_result and self.auth_result["success"]:
+                username = self.auth_result["username"]
+                self.ui.lblStatus.setText(f"Login OK: {username}")
+            else:
+                msg = self.auth_result["message"] if self.auth_result else "Unknown error"
+                self.ui.lblStatus.setText(f"Error: {msg}")
+                self.ui.lblStatus.setStyleSheet("color: #ff5555;")
+                self.timer.stop()
+                time.sleep(2)
+                self._go_back_to_login(msg)
+                return
+
+        if self.counter == 60:
+            self.ui.lblStatus.setText("Checking user folder...")
+
+        if self.counter == 70:
+            user_results_dir = os.path.join(os.getcwd(), results_dir, username)
+            if not os.path.exists(user_results_dir):
+                os.makedirs(user_results_dir, exist_ok=True)
+                self.ui.lblStatus.setText(f"Created results/{username}/ folder")
+            else:
+                self.ui.lblStatus.setText("User folder ready")
+
+        if self.counter == 85:
+            self.ui.lblStatus.setText("Preparing workspace...")
+
+        if self.counter >= 100:
             self.timer.stop()
-            time.sleep(3)
-            self.ui.lblStatus.setText("")
-            self.destroy()
-            self.login = LoginWindow()
-            self.login.show()
-            self.login.ui.username.setText(username)
-            self.login.ui.password.setText(password)
+            self.ui.lblStatus.setText(f"Welcome, {username}!")
+            self.main = MainWindow()
+            self.main.show()
+            self.close()
+
+    def _go_back_to_login(self, error_message):
+        self.close()
+        self.login = LoginWindow()
+        self.login.show()
+        self.login.ui.username.setText(self.input_username)
+        self.login.ui.radioUser.setChecked(True)
+        self.login.ui.lblStatus_login.setText(error_message)
+        self.login.ui.lblStatus_login.setStyleSheet("color: #ff5555;")
 
 
 # class LoginWindow(QMainWindow):
@@ -4016,15 +3994,58 @@ class LoginWindow(QMainWindow):
         self.ui.btnToggle.clicked.connect(self.toggle_password)
         self.ui.btnLogin.clicked.connect(self.login_function)
 
+        # Radio buttons
+        self.ui.radioDefault.toggled.connect(self.on_radio_toggled)
+        self.ui.radioDefault.setChecked(True)
+
         # Permitir arrastrar ventana desde cualquier zona superior
         self.dragPos = QPoint()
-        self.ui.frame.mouseMoveEvent = self.move_window  # añade un QWidget en QtDesigner llamado "title_bar"
+        self.ui.frame.mouseMoveEvent = self.move_window
 
         # Configurar valores por defecto
-        self.ui.username.setText("sergi.sanchez@imb-cnm.csic.es")
-        self.ui.version.setText(version)
+        self.ui.username.setText("")
+        self.ui.password.setText("")
+
+        # Set version from config.toml
+        try:
+            import toml
+            config_path = os.path.join(os.getcwd(), 'config', 'config.toml')
+            config = toml.load(config_path)
+            self.ui.version.setText(f"v{config['version']}")
+        except Exception:
+            self.ui.version.setText("")
+
+        # Initial state: default user selected, hide username/password
+        self._update_fields_visibility()
 
         self.show()
+
+    def _update_fields_visibility(self):
+        """Show/hide username and password fields based on radio button selection"""
+        is_default = self.ui.radioDefault.isChecked()
+        self.ui.username.setVisible(not is_default)
+        self.ui.password.setVisible(not is_default)
+        self.ui.label_2.setVisible(not is_default)
+        self.ui.label_3.setVisible(not is_default)
+        self.ui.label_8.setVisible(not is_default)
+        self.ui.label_9.setVisible(not is_default)
+        self.ui.btnToggle.setVisible(not is_default)
+        self.ui.lblStatus_login.setText("")
+        if is_default:
+            self.ui.btnLogin.setText("Enter")
+            self.setFixedSize(600, 460)
+            self.ui.btnLogin.setGeometry(170, 290, 250, 40)
+            self.ui.lblStatus_login.setGeometry(80, 350, 440, 60)
+            self.ui.version.setGeometry(490, 430, 100, 24)
+        else:
+            self.ui.btnLogin.setText("Log in")
+            self.setFixedSize(600, 700)
+            self.ui.btnLogin.setGeometry(170, 480, 250, 40)
+            self.ui.lblStatus_login.setGeometry(80, 540, 440, 60)
+            self.ui.version.setGeometry(490, 670, 100, 24)
+
+    def on_radio_toggled(self):
+        self._update_fields_visibility()
 
     # ---------------------------
     #  WINDOW ACTIONS
@@ -4045,20 +4066,17 @@ class LoginWindow(QMainWindow):
     #  MOVE WINDOW
     # ---------------------------
     def mousePressEvent(self, event):
-        """Guardar posición inicial al hacer clic"""
         if event.button() == Qt.LeftButton:
             self.dragPos = event.globalPosition().toPoint()
             event.accept()
 
     def mouseMoveEvent(self, event):
-        """Mover ventana si está presionado el botón izquierdo"""
         if event.buttons() == Qt.LeftButton:
             self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
             self.dragPos = event.globalPosition().toPoint()
             event.accept()
 
     def move_window(self, event):
-        """Permite arrastrar ventana desde el title_bar"""
         if event.buttons() == Qt.LeftButton:
             self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
             self.dragPos = event.globalPosition().toPoint()
@@ -4077,18 +4095,36 @@ class LoginWindow(QMainWindow):
     #  LOGIN ACTION
     # ---------------------------
     def login_function(self):
-        """Verifica las credenciales y muestra el splash screen"""
         global username, password, counter, errorLogin
-        username = self.ui.username.text()
-        password = self.ui.password.text()
 
-        self.splash = SplashScreen()
-        counter = 0
-        errorLogin = False
-        self.splash.show()
-        self.destroy()
-        self.splash.ui.version.setText(version)
-        self.splash.ui.lblStatus.setText("Verifying log in access...")
+        if self.ui.radioDefault.isChecked():
+            self.splash = SplashScreen(is_default=True)
+            self.splash.show()
+            self.destroy()
+        else:
+            input_username = self.ui.username.text().strip()
+            input_password = self.ui.password.text()
+
+            if not input_username or not input_password:
+                QMessageBox.warning(self, "Login", "Please enter username and password.")
+                return
+
+            self.splash = SplashScreen(
+                is_default=False,
+                input_username=input_username,
+                input_password=input_password
+            )
+            self.splash.show()
+            self.destroy()
+
+    def _get_version(self):
+        try:
+            import toml
+            config_path = os.path.join(os.getcwd(), 'config', 'config.toml')
+            config = toml.load(config_path)
+            return config['version']
+        except Exception:
+            return ""
 
 
 class MeasurementStatus(MainWindow):
@@ -4252,6 +4288,6 @@ class Canvas(QLabel):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(QPixmap("images/caracterizar.png")))
-    window = MainWindow()  # MainWindow or LoginWindow
+    window = LoginWindow()  # MainWindow or LoginWindow
     main = window
     sys.exit(app.exec())

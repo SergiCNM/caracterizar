@@ -2,6 +2,27 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.0.0] - 2026-07-24
+### Added
+- **Pantalla de login con autenticación de usuario**: Nuevo sistema de login con dos modos: usuario por defecto (sin autenticación) y usuario autenticado contra la API de SIAM (`https://www.cnm.es/users/siam/api/auth/login`). Cada usuario guarda resultados en su propia carpeta `results/<username>/`.
+- **Módulo `modules/auth.py`**: Función `authenticate()` que realiza POST a la API de SIAM usando `urllib` (stdlib). Maneja respuestas HTTP 200, 401, 403 y 404 con mensajes descriptivos para cada caso.
+- **Radio buttons en login**: Alternancia entre modo "Default" (entrada directa) y modo "User" (con campos usuario/contraseña). La ventana cambia de tamaño dinámicamente (600x460 vs 600x700).
+- **SplashScreen con verificaciones reales**: Durante la barra de progreso se ejecutan las comprobaciones reales (autenticación API, creación de carpetas de resultados, preparación del workspace).
+- **Fallback a `config/default/`**: Si el usuario no tiene configuración propia (instruments, probers, tests, etc.), se usa la carpeta `config/default/` como fallback.
+
+### Changed
+- **Versión leída desde `config.toml`**: Eliminada la versión hardcodeada en `defs.py` y en la pantalla de splash. Ahora se lee desde `config/config.toml`.
+- **Ventana de login mejorada**: Imágenes de usuario y contraseña, ventana sin borde con fondo translúcido, botón de toggle para mostrar/ocultar contraseña.
+- **`modules/estepa.py`**: `close_connection()` envuelto en try/except para evitar bloqueos al cerrar la aplicación.
+- **Nombre de usuario en título**: La ventana principal muestra `username - vX.X.X`.
+
+### Fixed
+- **SplashScreen no se cerraba**: Eliminado `time.sleep(0.5)` que bloqueaba el event loop de Qt impidiendo que la ventana se cerrara correctamente.
+- **Imports eliminados**: Removidos `bcrypt` y `mysql.connector` que causaban errores si no estaban instalados.
+
+### Removed
+- Eliminado `update_tomls.py` (script obsoleto).
+
 ## [2.6.0] - 2026-07-13
 ### Added
 - **`get_plot_parameters()` en `common.py`**: Nueva función que construye el diccionario `plot_parameters` a partir de datos de medición y configuración TOML. Soporta gráficas con series múltiples (step variable).
