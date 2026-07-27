@@ -2,6 +2,10 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.0.1] - 2026-07-27
+### Added
+- **Subida de imágenes para generación de scripts `.bat`**: Añadidos recursos de imagen necesarios para la creación automática de scripts `.bat` en los ordenadores del laboratorio.
+
 ## [3.0.0] - 2026-07-24
 ### Added
 - **Pantalla de login con autenticación de usuario**: Nuevo sistema de login con dos modos: usuario por defecto (sin autenticación) y usuario autenticado contra la API de SIAM (`https://www.cnm.es/users/siam/api/auth/login`). Cada usuario guarda resultados en su propia carpeta `results/<username>/`.

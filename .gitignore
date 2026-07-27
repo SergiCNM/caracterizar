@@ -2,6 +2,10 @@
 venv/
 DeepDetection-env/
 
+# IDEs
+.idea/
+.vscode/
+
 # Resultados y archivos temporales
 results/
 proves/
