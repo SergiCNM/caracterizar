@@ -2,6 +2,11 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.0.2] - 2026-09-10
+### Changed
+- **Common.py**: Ahora permite leer tanto diccionarios como arrays de medidas.
+- **Keysight_B1500LAN/Test_test.py**: Ahora permite leer tanto diccionarios como arrays de medidas.
+
 ## [3.0.1] - 2026-07-27
 ### Added
 - **Subida de imágenes para generación de scripts `.bat`**: Añadidos recursos de imagen necesarios para la creación automática de scripts `.bat` en los ordenadores del laboratorio.

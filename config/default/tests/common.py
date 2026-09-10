@@ -73,7 +73,7 @@ def save_results_to_file(results_data, variables_list, test_parameters, die, mod
             header_line = separator.join(variables_list)
             f.write(header_line + "\n")
         
-        if results_data and hasattr(results_data, '__len__') and len(results_data) > 0:
+        if results_data is not None and hasattr(results_data, '__len__') and len(results_data) > 0:
             if hasattr(results_data[0], '__len__'):
                 for row in results_data:
                     row_str = separator.join([str(v) for v in row])
@@ -94,30 +94,30 @@ def get_plot_parameters(results_data, variables_list, plot_config):
     :return: plot_parameters dict
     """
     plot_data = {}
-    for var_name in variables_list:
-        if hasattr(results_data, 'dtype') and var_name in results_data.dtype.names:
+    for i, var_name in enumerate(variables_list):
+        if hasattr(results_data, 'dtype') and results_data.dtype.names and var_name in results_data.dtype.names:
             plot_data[var_name] = list(results_data[var_name])
+        elif hasattr(results_data, 'dtype') and results_data.dtype.names and i < len(results_data.dtype.names):
+            actual_name = results_data.dtype.names[i]
+            plot_data[var_name] = list(results_data[actual_name])
         elif isinstance(results_data, dict) and var_name in results_data:
             plot_data[var_name] = list(results_data[var_name])
         elif hasattr(results_data, '__getitem__') and len(results_data) > 0:
-            idx = variables_list.index(var_name) if var_name in variables_list else 0
-            if idx < len(results_data):
-                # Try to handle it if it's a list of rows
-                if isinstance(results_data[0], (list, tuple)):
-                    plot_data[var_name] = [row[idx] for row in results_data]
-                else:
-                    plot_data[var_name] = [float(x) for x in results_data]
+            if hasattr(results_data[0], '__len__'):
+                plot_data[var_name] = [row[i] for row in results_data if i < len(row)]
+            else:
+                plot_data[var_name] = [float(x) for x in results_data]
 
-    x_var = plot_config.get("X_VARIABLE", variables_list[0] if len(variables_list) > 0 else None)
-    y1_var = plot_config.get("Y1_VARIABLE", variables_list[1] if len(variables_list) > 1 else None)
-    y2_var = plot_config.get("Y2_VARIABLE", variables_list[2] if len(variables_list) > 2 else None)
+    x_var = plot_config.get("X_VARIABLE", plot_config.get("x_variable", variables_list[0] if len(variables_list) > 0 else None))
+    y1_var = plot_config.get("Y1_VARIABLE", plot_config.get("y1_variable", variables_list[1] if len(variables_list) > 1 else None))
+    y2_var = plot_config.get("Y2_VARIABLE", plot_config.get("y2_variable", variables_list[2] if len(variables_list) > 2 else None))
 
     x_data = plot_data.get(x_var, []) if x_var else []
     y1_data = plot_data.get(y1_var, []) if y1_var else []
     y2_data = plot_data.get(y2_var, []) if y2_var else []
 
     plot_parameters = {
-        "name": plot_config.get("NAME", "Measurement"),
+        "name": plot_config.get("NAME", plot_config.get("name", "Measurement")),
         "x": x_data,
         "y1": y1_data,
         "y2": y2_data,
@@ -127,23 +127,23 @@ def get_plot_parameters(results_data, variables_list, plot_config):
             "data": [{"name": var, "values": plot_data.get(var, []), "units": ""} for var in variables_list]
         }],
         "titles": {
-            "title": plot_config.get("TITLE", "Measurement"),
-            "left": plot_config.get("LEFT_LABEL", "Y1"),
-            "bottom": plot_config.get("BOTTOM_LABEL", "X"),
-            "right": plot_config.get("RIGHT_LABEL", "Y2")
+            "title": plot_config.get("TITLE", plot_config.get("title", "Measurement")),
+            "left": plot_config.get("LEFT_LABEL", plot_config.get("left_label", "Y1")),
+            "bottom": plot_config.get("BOTTOM_LABEL", plot_config.get("bottom_label", "X")),
+            "right": plot_config.get("RIGHT_LABEL", plot_config.get("right_label", "Y2"))
         },
         "units": {
-            "left": plot_config.get("LEFT_UNITS", ""),
-            "bottom": plot_config.get("BOTTOM_UNITS", ""),
-            "right": plot_config.get("RIGHT_UNITS", "")
+            "left": plot_config.get("LEFT_UNITS", plot_config.get("left_units", "")),
+            "bottom": plot_config.get("BOTTOM_UNITS", plot_config.get("bottom_units", "")),
+            "right": plot_config.get("RIGHT_UNITS", plot_config.get("right_units", ""))
         },
-        "showgrid": {"x": plot_config.get("SHOW_GRID", False), "y": plot_config.get("SHOW_GRID", False), "y1": plot_config.get("SHOW_GRID", False)},
-        "legend": plot_config.get("LEGEND", True)
+        "showgrid": {"x": plot_config.get("SHOW_GRID", plot_config.get("show_grid", False)), "y": plot_config.get("SHOW_GRID", plot_config.get("show_grid", False)), "y1": plot_config.get("SHOW_GRID", plot_config.get("show_grid", False))},
+        "legend": plot_config.get("LEGEND", plot_config.get("legend", True))
     }
 
-    step_var = plot_config.get("STEP_VARIABLE")
-    sweep_var = plot_config.get("X_VARIABLE")
-    measure_var = plot_config.get("Y1_VARIABLE")
+    step_var = plot_config.get("STEP_VARIABLE", plot_config.get("step_variable"))
+    sweep_var = plot_config.get("X_VARIABLE", plot_config.get("x_variable"))
+    measure_var = plot_config.get("Y1_VARIABLE", plot_config.get("y1_variable"))
 
     if step_var and sweep_var and measure_var and hasattr(results_data, 'dtype'):
         if step_var in results_data.dtype.names and sweep_var in results_data.dtype.names and measure_var in results_data.dtype.names:
@@ -155,7 +155,7 @@ def get_plot_parameters(results_data, variables_list, plot_config):
                 series.append({
                     "x": list(results_data[sweep_var][mask]),
                     "y": list(results_data[measure_var][mask]),
-                    "label": f"{plot_config.get('STEP_LABEL', step_var)} = {val:.4g}{plot_config.get('STEP_UNITS', '')}"
+                    "label": f"{plot_config.get('STEP_LABEL', plot_config.get('step_label', step_var))} = {val:.4g}{plot_config.get('STEP_UNITS', plot_config.get('step_units', ''))}"
                 })
             plot_parameters["series"] = series
 
