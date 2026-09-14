@@ -1,15 +1,15 @@
 title = "Caracterizar"
-version = "3.0.2"
+version = "3.0.3"
 author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
 darkmode = true
 estepa = true
-txtprocess = "GAB"
-txtlot = "GAB"
+txtprocess = "20156"
+txtlot = "20156"
 txtwafer = "1"
-txtmask = "CNM004"
+txtmask = "GaN001"
 txttemperature = "25.0"
 txthumidity = "50"
 

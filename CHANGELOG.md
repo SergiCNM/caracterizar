@@ -2,6 +2,10 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.0.3] - 2026-09-15
+### Fixed
+- **Keysight_E4990A/CV_test.py**: Se ha arreglado la parte de cartografía que podía fallar al grabar ficheros y/o visualizar plots.
+
 ## [3.0.2] - 2026-09-10
 ### Changed
 - **Common.py**: Ahora permite leer tanto diccionarios como arrays de medidas.

@@ -3,15 +3,15 @@ width = 350
 
 [parameters]
 START = 0.0
-STOP = -10.0
-FREQ = "10"
-NUM_POINTS = 11
-LOGFREQ = true
-OSC = 500
-HYSTERESIS = false
+STOP = -20.0
+FREQ = "100"
+NUM_POINTS = 21
+LOGFREQ = false
+OSC = 30
+HYSTERESIS = true
 HYSTERESIS_TIME = 1
 WAIT_TIME = 5.0
-LIGHT = true
+LIGHT = false
 LIGHT_TIME = 3
 TEMPERATURE = 22.0
 AREA = 960400

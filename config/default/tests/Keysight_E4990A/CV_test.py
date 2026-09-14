@@ -251,10 +251,20 @@ try:
             # single measure
             for freq in freqs:
                 CV_parameters["FREQ"] = freq
+                # Default values (error case)
+                meas_status = "meas_error"
+                meas_message = "Error configuring instrument"
+                voltage = np.array([])
+                capacitance = np.array([])
+                conductance = np.array([])
+                results = {}
+                params = []
+
+                # If config OK, measure and overwrite defaults
                 if keysightE4990A.config_CV(CV_parameters):
                     voltage, capacitance, conductance, results = measure_CV_full(main, keysightE4990A, CV_parameters)
-                    params = []
-                    data = []
+                    meas_status = "meas_success"
+                    meas_message = ""
                     if CV_parameters["CALCULATE_PARAMS"]:
                         txt_result = "<br /><strong>Results: </strong><br />"
                         for clave in results:
@@ -263,36 +273,30 @@ try:
                             params.append({"name": clave, "value": str(results[clave])})
                         main.updateTextDescription(txt_result)
 
-
-                    meas_status = "meas_success"
-                    meas_message = ""
-                else:
-                    meas_status = "meas_error"
-                    meas_message = "Error configuring instrument"
-                # save results
-                    plot_config = CV_parameters.get("plot", {}).copy()
-                    plot_config["NAME"] = f"Plot CV Die {dieActual} Module {moduleActual}"
-                    plot_config["TITLE"] = f"Plot CV {CV_parameters['FREQ']}kHz (Die {dieActual} Module {moduleActual})"
-                    
-                    results_data_dict = {"V": voltage, "C": capacitance * 1e12, "G": conductance * 1e9}
-                    plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
-                    
-                    main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
-                        "status": meas_status,
-                        "message": meas_message,
-                        "contact_height": "",
-                        "variables": {
-                            "params": [],
-                            "data": [{"name": "V", "values": voltage, "units": "V"},
-                                     {"name": "C", "values": capacitance * 1e12, "units": "pF"},
-                                     {"name": "G", "values": conductance * 1E9, "units": "nS"}]
-                        },
-                        "plot_parameters": plot_parameters
-                    }
-
-                    if plot_config.get("SHOW_PLOT", True):
-                        emit_plot(plot_parameters)
+                # Always save results (success or error)
+                plot_config = CV_parameters.get("plot", {}).copy()
+                plot_config["NAME"] = f"Plot CV Die {dieActual} Module {moduleActual}"
+                plot_config["TITLE"] = f"Plot CV {CV_parameters['FREQ']}kHz (Die {dieActual} Module {moduleActual})"
                 
+                results_data_dict = {"V": voltage, "C": capacitance * 1e12, "G": conductance * 1e9}
+                plot_parameters = get_plot_parameters(results_data_dict, ["V", "C", "G"], plot_config)
+                
+                main.waferwindow.meas_result[int(dieActual) - 1][int(moduleActual) - 1] = {
+                    "status": meas_status,
+                    "message": meas_message,
+                    "contact_height": "",
+                    "variables": {
+                        "params": params,
+                        "data": [{"name": "V", "values": voltage, "units": "V"},
+                                 {"name": "C", "values": capacitance * 1e12, "units": "pF"},
+                                 {"name": "G", "values": conductance * 1E9, "units": "nS"}]
+                    },
+                    "plot_parameters": plot_parameters
+                }
+
+                if meas_status == "meas_success" and plot_config.get("SHOW_PLOT", True):
+                    emit_plot(plot_parameters)
+            
                 results_data = list(zip(voltage, capacitance, conductance))
                 variables_list = ["V", "C", "G"]
                 output_params = CV_parameters.get("output", {"separator": "comma", "prefix": f"CV{CV_parameters['FREQ']}kHz", "suffix": ""})
@@ -319,14 +323,11 @@ try:
             CV_parameters["FREQ"] = freq
             if keysightE4990A.config_CV(CV_parameters):
                 voltage, capacitance, conductance, results = measure_CV_full(main, keysightE4990A, CV_parameters)
-                params = []
-                data = []
                 if CV_parameters["CALCULATE_PARAMS"]:
                     txt_result = "<br /><strong>Results: </strong><br />"
                     for clave in results:
                         txt_result = txt_result + " <strong>- " + clave + "</strong> = " + str(
                             results[clave]) + "<br />"
-                        params.append({"name": clave, "value": str(results[clave])})
                     main.updateTextDescription(txt_result)
                 plot_config = CV_parameters.get("plot", {}).copy()
                 plot_config["TITLE"] = f"CV Measurement at {CV_parameters['FREQ']}kHz"
@@ -359,6 +360,9 @@ try:
                         wafer=main.ui.txtWafer.text()
                     )
                 )
+            else:
+                print(f"ERROR: No se pudo configurar CV para frecuencia {freq}")
+                keysightE4990A.stop()
 
     # Close instrument
     # keysightE4990A.close()
