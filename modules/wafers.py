@@ -548,7 +548,7 @@ class WaferWindow(QMainWindow):
         self.wafer_nmodules = wafer.nmodules
         self.wafer.init_chip = wafer.init_chip
         self.wafer.end_chip = wafer.end_chip
-        self.view_modules = wafer.nmodules # see last module (default)
+        self.view_modules = 0 # 0 = View All (default)
         self.max_size = 860 # MAX_SIZE w/h BUTTONS
         self.max_window_size = 1100 # MAX WINDOW SIZE w/h
 
@@ -638,14 +638,19 @@ class WaferWindow(QMainWindow):
         else:
             menu = self.menuBar().addMenu("Modules")
             self.actions = []
+            # "View All" option (first in menu)
+            self.action_view_all = QAction("View All",self)
+            self.action_view_all.setCheckable(True)
+            self.action_view_all.triggered.connect(self.viewAllModules)
+            self.action_view_all.setChecked(True)
+            menu.addAction(self.action_view_all)
+            menu.addSeparator()
             for i in range(1,self.wafer.nmodules+1):
                 self.actions.append("")
             for nmodule in range(1,self.wafer.nmodules+1):
                 self.actions[nmodule-1] = QAction("View module "+str(nmodule),self)
                 self.actions[nmodule-1].setCheckable(True)
                 self.actions[nmodule-1].triggered.connect(partial(self.viewModulesChange,nmodule))
-                if nmodule==self.wafer.nmodules:
-                    self.actions[nmodule-1].setChecked(True)
                 menu.addAction(self.actions[nmodule-1])
 
         #status_array = ["IDLE","SET ORIGIN","SET HOME","IN","OUT","MEAS"]
@@ -789,31 +794,80 @@ class WaferWindow(QMainWindow):
 
         return meas_result
 
-    def viewModulesChange(self,nmodule):
-        # unchecked all
+    @staticmethod
+    def _worse_state(a, b):
+        """Return the state with higher priority (worse = more urgent)."""
+        priority = {"out": 0, "in": 1, "meas": 2, "meas_selected": 2, "meas_success": 3, "meas_warning": 4, "meas_error": 5}
+        return a if priority.get(a, 0) >= priority.get(b, 0) else b
+
+    def _paint_buttons_for_module(self, nmodule):
+        """Paint buttons based on a single module's measurement results."""
+        for i in range(0, self.wafer_parameters["nchips"]):
+            x, y = self.wafer_parameters["wafer_positions"][i].split()
+            x2, y2 = change_coord_to_origin(-int(x), -int(y), self.wafer_parameters["real_origin_chip"]).split()
+            btn = self.centralWidget().findChild(QPushButton, get_btnName(x2, y2))
+            if btn:
+                status = self.meas_result[i][nmodule - 1]["status"]
+                if status in ("meas_success", "meas_warning", "meas_error"):
+                    btn.btnType = status
+                    btn.message = self.meas_result[i][nmodule - 1]["message"]
+                else:
+                    btn.btnType = "meas"
+
+    def _paint_buttons_for_all_modules(self):
+        """Paint buttons using worst state across all modules (View All)."""
+        nchips = self.wafer_parameters["nchips"]
+        nmodules = self.wafer.nmodules
+        for i in range(0, nchips):
+            x, y = self.wafer_parameters["wafer_positions"][i].split()
+            x2, y2 = change_coord_to_origin(-int(x), -int(y), self.wafer_parameters["real_origin_chip"]).split()
+            btn = self.centralWidget().findChild(QPushButton, get_btnName(x2, y2))
+            if btn:
+                worst = "meas"
+                worst_msg = ""
+                for m in range(nmodules):
+                    st = self.meas_result[i][m]["status"]
+                    if st in ("meas_success", "meas_warning", "meas_error"):
+                        worst = self._worse_state(worst, st)
+                        if st in ("meas_error", "meas_warning") and self.meas_result[i][m]["message"]:
+                            worst_msg = self.meas_result[i][m]["message"]
+                btn.btnType = worst
+                btn.message = worst_msg
+
+    def viewModulesChange(self, nmodule):
+        """Switch view to a specific module and restore init/end_chip highlight."""
         self.centralWidget().setUpdatesEnabled(False)
         try:
-            for actionModule in range (0,self.wafer.nmodules):
+            if hasattr(self, 'action_view_all'):
+                self.action_view_all.setChecked(False)
+            for actionModule in range(0, self.wafer.nmodules):
                 self.actions[actionModule].setChecked(False)
-            # check the selected module view
-            self.actions[nmodule-1].setChecked(True)
+            self.actions[nmodule - 1].setChecked(True)
             self.view_modules = nmodule
-            # print module view in buttons to measure
-            for i in range (0,self.wafer_parameters["nchips"]):
-                x , y = self.wafer_parameters["wafer_positions"][i].split()
-                x2, y2 = change_coord_to_origin(-int(x),-int(y),self.wafer_parameters["real_origin_chip"]).split()
-                btn = self.centralWidget().findChild(QPushButton,get_btnName(x2,y2))
-                meas_array = ["meas_success","meas_warning","meas_error"]
-                if btn:
-                    if self.meas_result[i][nmodule-1]["status"] in meas_array:
-                        btn.btnType = self.meas_result[i][nmodule-1]["status"]
-                        btn.message = self.meas_result[i][nmodule-1]["message"]
-                    else:
-                        btn.btnType = "meas"
+            self._paint_buttons_for_module(nmodule)
         finally:
             self.centralWidget().setUpdatesEnabled(True)
             self.centralWidget().update()
-            QApplication.processEvents()
+        # Restore init/end_chip highlight AFTER repaint
+        self.total_meas()
+        QApplication.processEvents()
+
+    def viewAllModules(self):
+        """Show combined worst-state view of all modules."""
+        self.centralWidget().setUpdatesEnabled(False)
+        try:
+            if hasattr(self, 'action_view_all'):
+                self.action_view_all.setChecked(True)
+            for actionModule in range(0, self.wafer.nmodules):
+                self.actions[actionModule].setChecked(False)
+            self.view_modules = 0  # 0 = all modules
+            self._paint_buttons_for_all_modules()
+        finally:
+            self.centralWidget().setUpdatesEnabled(True)
+            self.centralWidget().update()
+        # Restore init/end_chip highlight AFTER repaint
+        self.total_meas()
+        QApplication.processEvents()
 
 
     def closeEvent(self, event):
@@ -1894,7 +1948,7 @@ class CallButton:
             if self.waferwindow.widgets.txtOriginChip.text()!="":
                 real_coord = str(self.x - int(origin_coord_text_x)) + " " + str(self.y - int(origin_coord_text_y))
                 die = int(self.waferwindow.wafer_parameters["wafer_positions"].index(real_coord))
-                module = int(self.waferwindow.view_modules)-1
+                module = 0 if self.waferwindow.view_modules == 0 else int(self.waferwindow.view_modules) - 1
                 variables = self.waferwindow.meas_result[die][module]["variables"]
                 if variables!="" and isinstance(variables, dict) and "params" in variables and variables["params"]!="" and len(variables["params"])>0:
                     print("=> Variables for die: " + str(die+1) + " & module " + str(module+1) + ":")

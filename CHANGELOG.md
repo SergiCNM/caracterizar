@@ -2,6 +2,10 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.1.1] - 2026-09-23
+### Fixed
+- **Wafers.py**: Se ha arreglado la parte de módulos dentro de la pantalla de Wafermaps. Habían errores al visualizar el mapa cuando existen varios módulos.
+
 ## [3.1.0] - 2026-09-23
 ### Changed
 - **Wafermaps a formato TOML**: Todos los ficheros de wafermap `.py` han sido migrados a formato `.toml`. Se ha modificado `main.py`, `modules/wafermap_file.py` y `modules/wafers.py` para soportar el nuevo formato. Se ha eliminado el wafermap que se creaba en la raiz del proyecto (`deep_bidirectional.py` -> `deep_bidirectional_wafermap.toml`).
