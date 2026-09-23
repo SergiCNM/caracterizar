@@ -1,0 +1,13 @@
+wafer_name = "CAP 104"
+wafer_size = 4
+xsize = 2790.0
+ysize = 1950.0
+nchips = 1
+nmodules = 2
+origin_chip = "0 0"
+home_chip = "-6 -12"
+flat_orientation = 0
+wafer_positions = [ "0 0",]
+wafer_modules = [ "0.000000 0.000000", "100.000000 0.000000",]
+real_origin_chip = "-11 -3"
+navigation_options = [ "UPPER-LEFT", "BI-DIRECTIONAL", "ROW",]

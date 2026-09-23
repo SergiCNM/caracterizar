@@ -355,12 +355,41 @@ class Wafer(QMainWindow):
         return False
 
     def save_wafermap(self):
+        import toml
 
         dir_wafermaps = os.getcwd() + base_dir + wafermaps_dir + "/"
-        default_filename = f"{self.wafer_name}_wafermap.py" if self.wafer_name else ""
-        nameFile, _ = QFileDialog.getSaveFileName(self, 'Save wafermap', dir_wafermaps + default_filename,"Wafermaps (*.py)")
-        # and then you need to adjust wafer_parameters
-        texto = 'global wafer_parameters\n\
+        default_filename = f"{self.wafer_name}_wafermap.toml" if self.wafer_name else ""
+        nameFile, _ = QFileDialog.getSaveFileName(
+            self, 'Save wafermap', dir_wafermaps + default_filename,
+            "Wafermaps TOML (*.toml);;Wafermaps Python (*.py)")
+
+        if nameFile == "":
+            return
+
+        wafer_data = {
+            "wafer_name": self.wafer_name,
+            "wafer_size": self.wafer_size_inch,
+            "xsize": self.xsize,
+            "ysize": self.ysize,
+            "nchips": self.nchips,
+            "nmodules": self.nmodules,
+            "origin_chip": str(self.origin_chip),
+            "home_chip": str(self.home_chip),
+            "init_chip": self.init_chip,
+            "end_chip": self.end_chip,
+            "flat_orientation": self.flat_orientation,
+            "navigation_options": self.navigation_options,
+            "wafer_positions": self.wafer_positions,
+            "wafer_modules": self.wafer_modules,
+            "wafer_modules_name": self.wafer_modules_name,
+            "real_origin_chip": str(self.real_origin_chip),
+        }
+
+        if nameFile.endswith(".toml"):
+            with open(nameFile, 'w', encoding="utf-8") as f:
+                toml.dump(wafer_data, f)
+        else:
+            texto = 'global wafer_parameters\n\
 \n\
 \n\
 # Configuration wafer parameters\n\
@@ -409,12 +438,10 @@ wafer_parameters = {\n\
 "navigation_options": navigation_options\n\
 \n\
 }')
-
-        if nameFile!="":
-            # create texto
             with open(nameFile, 'w') as f:
                 f.write(texto)
-            retval = messageBox(self,"Save wafermap","Wafermap file saved!","info")
+
+        retval = messageBox(self, "Save wafermap", "Wafermap file saved!", "info")
 
 
 

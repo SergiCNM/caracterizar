@@ -2679,19 +2679,24 @@ class MainWindow(QMainWindow):
 
     def run(self, runfile, folder):
         # print(">> [run] runfile: " + runfile)
-        runfile = self.get_base_path(folder) + runfile
-        if os.path.exists(runfile):
-            with open(runfile, "r") as rnf:
-                try:
-                    content = rnf.read()
-                    exec(content)
-                except Exception as ex:
-                    retval = messageBox(self, "Problem executing file",
-                                        "Problem exists while exec file's content: " + runfile + "\n" + str(
-                                            type(ex)) + "\n" + str(ex), "critical")
-                    print(traceback.print_exc())
-                    if folder == "tests":
-                        self.change_state_process("STOP")
+        runfile_path = self.get_base_path(folder) + runfile
+        if os.path.exists(runfile_path):
+            try:
+                if runfile.endswith(".toml"):
+                    with open(runfile_path, "r", encoding="utf-8") as fp:
+                        global wafer_parameters
+                        wafer_parameters = toml.load(fp)
+                else:
+                    with open(runfile_path, "r") as rnf:
+                        content = rnf.read()
+                        exec(content)
+            except Exception as ex:
+                retval = messageBox(self, "Problem executing file",
+                                    "Problem exists while exec file's content: " + runfile_path + "\n" + str(
+                                        type(ex)) + "\n" + str(ex), "critical")
+                print(traceback.print_exc())
+                if folder == "tests":
+                    self.change_state_process("STOP")
 
         else:
             retval = messageBox(self, "Problem searching file", "File: '" + runfile + "' not found!", "critical")
@@ -3479,12 +3484,14 @@ class MainWindow(QMainWindow):
         contenido = os.listdir(dir_wafermaps)
         widgets.cmbWafermaps.clear()
         widgets.cmbWafermaps.addItem("Select wafermap")
-        
-        sorted_files = sorted([f for f in contenido if os.path.isfile(os.path.join(dir_wafermaps, f)) and f.endswith('_wafermap.py')])
+
+        sorted_files = sorted([f for f in contenido if os.path.isfile(os.path.join(dir_wafermaps, f))
+                               and (f.endswith('_wafermap.py') or f.endswith('_wafermap.toml'))])
 
         for fichero in sorted_files:
-            widgets.cmbWafermaps.addItem(fichero.replace("_wafermap.py", ""))
-            
+            name = fichero.replace("_wafermap.toml", "").replace("_wafermap.py", "")
+            widgets.cmbWafermaps.addItem(name)
+
         self.setup_searchable_combo(widgets.cmbWafermaps)
 
     def load_probers(self):
@@ -3602,7 +3609,15 @@ class MainWindow(QMainWindow):
         global widgets
         wafermap_selected = self.get_wafermap_selected()
         if wafermap_selected != "":
-            return wafermap_selected + "_wafermap.py"
+            base = wafermap_selected + "_wafermap"
+            dir_wafermaps = self.getDirs("wafermaps") + "/"
+            toml_path = os.path.join(dir_wafermaps, base + ".toml")
+            if os.path.exists(toml_path):
+                return base + ".toml"
+            py_path = os.path.join(dir_wafermaps, base + ".py")
+            if os.path.exists(py_path):
+                return base + ".py"
+            return base + ".toml"
         return ""
 
     def get_filename_prober(self):
@@ -3682,10 +3697,11 @@ class MainWindow(QMainWindow):
         wafermap_selected = self.get_wafermap_selected()
         widgets.pteWafermap.setPlainText("")
         if wafermap_selected != "":
-            # read file
             dir_wafermaps = self.getDirs("wafermaps") + "/"
-            namefile = dir_wafermaps + wafermap_selected + "_wafermap.py"
-            #namefile = namefile.replace("/", "\\")
+            base = wafermap_selected + "_wafermap"
+            namefile = os.path.join(dir_wafermaps, base + ".toml")
+            if not os.path.exists(namefile):
+                namefile = os.path.join(dir_wafermaps, base + ".py")
             f = open(namefile, "r")
             widgets.pteWafermap.setPlainText(f.read())
             f.close()

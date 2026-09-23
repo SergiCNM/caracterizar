@@ -1,0 +1,15 @@
+wafer_name = "CAP 6"
+wafer_size = 4.0
+xsize = 2790.0
+ysize = 1950.0
+xmax = 6
+ymax = 1
+nchips = 6
+nmodules = 2
+origin_chip = "0 0"
+home_chip = "-6 -12"
+real_origin_chip = "-10 -4"
+flat_orientation = 0
+navigation_options = ["UPPER-LEFT", "BI-DIRECTIONAL", "ROW"]
+wafer_positions = ["0 0", "-3 0", "-6 0", "-9 0", "-12 0", "-15 0"]
+wafer_modules = ["0.00 0.00", "1000.00 1000.00"]

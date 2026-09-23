@@ -1,0 +1,13 @@
+wafer_name = "CAP 3"
+wafer_size = 4
+xsize = 2790.0
+ysize = 1950.0
+nchips = 3
+nmodules = 1
+origin_chip = "0 0"
+home_chip = "0 0"
+flat_orientation = 0
+wafer_positions = [ "0 0", "-3 0", "-6 0",]
+wafer_modules = [ "0.0 0.0",]
+real_origin_chip = "-11 -6"
+navigation_options = [ "UPPER-LEFT", "BI-DIRECTIONAL", "ROW",]

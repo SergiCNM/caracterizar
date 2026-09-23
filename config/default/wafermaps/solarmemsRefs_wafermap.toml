@@ -1,0 +1,13 @@
+wafer_name = "SOLARMEMS REF"
+wafer_size = 4
+xsize = 5700.0
+ysize = 5800.0
+nchips = 5
+nmodules = 1
+origin_chip = "0 0"
+home_chip = "-1 2"
+flat_orientation = 0
+wafer_positions = [ "0 0", "-6 0", "-3 -5", "0 -10", "-6 -10",]
+wafer_modules = [ "0 0",]
+real_origin_chip = "-5 -3"
+navigation_options = [ "UPPER-LEFT", "UNI-DIRECTIONAL", "ROW",]

@@ -4,6 +4,7 @@
 import os
 import datetime
 import numpy as np
+import toml
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -20,7 +21,7 @@ class WafermapFile():
         self.error_message = ""
         self.path_to_file = path_to_file
         self.filename = os.path.basename(self.path_to_file)
-        self.mode_types = ["py", "ppg"]
+        self.mode_types = ["py", "ppg", "toml"]
         self.mode_type = self.filename.split(".")[-1]
         # wafer size mm & thickness
         self.wafer_size_inch = 0
@@ -123,6 +124,14 @@ class WafermapFile():
                     except:
                         self.error = True
                         self.error_message = "Problem executing file: Problem exists while exec file's content: " + path_to_file
+
+            elif self.mode_type == "toml":
+                with open(self.path_to_file, "r", encoding="utf-8") as fp:
+                    self.wafer_parameters = toml.load(fp)
+                self.wafer_size_inch = float(self.wafer_parameters["wafer_size"])
+                self.set_wafer_size()
+                if not "xmax" in self.wafer_parameters or not "ymax" in self.wafer_parameters:
+                    self.wafer_parameters["xmax"], self.wafer_parameters["ymax"] = self.get_xmax_ymax()
 
             elif self.mode_type == "ppg":
 
@@ -290,11 +299,22 @@ class WafermapFile():
                 except:
                     return [False, "Problem parsing ppg file!"]
 
+            if self.mode_type == "toml":
+                required_keys = [
+                    "wafer_name", "wafer_size", "xsize", "ysize",
+                    "nchips", "real_origin_chip", "origin_chip", "home_chip",
+                    "flat_orientation", "navigation_options",
+                    "wafer_positions", "wafer_modules"
+                ]
+                missing = [k for k in required_keys if k not in self.wafer_parameters]
+                if missing:
+                    return [False, f"Missing keys in TOML: {missing}"]
+
             if self.mode_type == "py":
                 verify_parameters = ["global wafer_parameters", "wafer_name =", "wafer_size =", "xsize =", "ysize =",
-                                     "nchips =", "real_origin_chip =", "origin_chip =", "home_chip =",
-                                     "flat_orientation =", "navigation_options =", "wafer_positions =",
-                                     "wafer_modules ="]
+                                      "nchips =", "real_origin_chip =", "origin_chip =", "home_chip =",
+                                      "flat_orientation =", "navigation_options =", "wafer_positions =",
+                                      "wafer_modules ="]
                 founded = 0
                 for line in self.lines:
                     for param in verify_parameters:

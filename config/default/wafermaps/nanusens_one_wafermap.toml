@@ -1,0 +1,13 @@
+wafer_name = "NANUSENS"
+wafer_size = 8
+xsize = 25056.0
+ysize = 31388.0
+nchips = 2
+nmodules = 4
+origin_chip = "0 0"
+home_chip = "0 0"
+flat_orientation = 0
+wafer_positions = [ "0 0", "-1 0",]
+wafer_modules = [ "0.0 0.0", "0.0 450.0", "-13599.0 -450.0", "0.0 450.0",]
+real_origin_chip = "-2 -1"
+navigation_options = [ "UPPER-LEFT", "UNI-DIRECTIONAL", "ROW",]

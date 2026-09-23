@@ -2,6 +2,11 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.1.0] - 2026-09-23
+### Changed
+- **Wafermaps a formato TOML**: Todos los ficheros de wafermap `.py` han sido migrados a formato `.toml`. Se ha modificado `main.py`, `modules/wafermap_file.py` y `modules/wafers.py` para soportar el nuevo formato. Se ha eliminado el wafermap que se creaba en la raiz del proyecto (`deep_bidirectional.py` -> `deep_bidirectional_wafermap.toml`).
+- **Scripts de wafermaps**: Se han añadido scripts `.py` en la carpeta `tools/` para generar y actualizar wafermaps en formato `.toml` mediante `convert_wafermaps.py`.
+
 ## [3.0.3] - 2026-09-15
 ### Fixed
 - **Keysight_E4990A/CV_test.py**: Se ha arreglado la parte de cartografía que podía fallar al grabar ficheros y/o visualizar plots.

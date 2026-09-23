@@ -1,5 +1,5 @@
 title = "Caracterizar"
-version = "3.0.3"
+version = "3.1.0"
 author = "Sergi Sànchez"
 
 [defaults]
@@ -8,7 +8,7 @@ darkmode = true
 estepa = true
 txtprocess = "20156"
 txtlot = "20156"
-txtwafer = "1"
+txtwafer = "TEST"
 txtmask = "GaN001"
 txttemperature = "25.0"
 txthumidity = "50"

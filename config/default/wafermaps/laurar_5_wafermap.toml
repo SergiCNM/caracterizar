@@ -1,0 +1,13 @@
+wafer_name = "LAURAR_5"
+wafer_size = 6
+xsize = 6600.0
+ysize = 5500.0
+nchips = 25
+nmodules = 1
+origin_chip = "0 0"
+home_chip = "0 0"
+flat_orientation = 0
+wafer_positions = [ "0 0", "-4 0", "-9 0", "-14 0", "-19 0", "0 -4", "-4 -4", "-9 -4", "-14 -4", "-19 -4", "0 -9", "-4 -9", "-9 -9", "-14 -9", "-19 -9", "0 -14", "-4 -14", "-9 -14", "-14 -14", "-19 -14", "0 -19", "-4 -19", "-9 -19", "-14 -19", "-19 -19",]
+wafer_modules = [ "0 0",]
+real_origin_chip = "-2 -4"
+navigation_options = [ "UPPER-LEFT", "UNI-DIRECTIONAL", "ROW",]

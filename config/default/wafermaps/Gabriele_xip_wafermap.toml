@@ -1,0 +1,16 @@
+wafer_name = "Gabriele_xip"
+wafer_size = 1
+xsize = 3070.0
+ysize = 3400.0
+nchips = 3
+nmodules = 16
+origin_chip = "0 0"
+home_chip = "0 0"
+init_chip = 1
+end_chip = 3
+flat_orientation = 0
+wafer_positions = [ "0 0", "-1 0", "-2 0",]
+wafer_modules = [ "0.0 0.0", "-730.0 0.0", "-730.0 0.0", "-730.0 0.0", "2190.0 800.0", "-730.0 0.0", "-730.0 0.0", "-730.0 0.0", "2190.0 950.0", "-730.0 0.0", "-730.0 0.0", "-730.0 0.0", "2190.0 800.0", "-730.0 0.0", "-730.0 0.0", "-730.0 0.0",]
+wafer_modules_name = [ "T1T", "T2T", "T3T", "T4T", "T1B", "T2B", "T3B", "T4B", "B1T", "B2T", "B3T", "B4T", "B1B", "B2B", "B3B", "B4B",]
+real_origin_chip = "-3 -3"
+navigation_options = [ "UPPER-LEFT", "UNI-DIRECTIONAL", "ROW",]

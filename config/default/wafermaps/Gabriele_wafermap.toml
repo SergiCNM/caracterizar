@@ -1,0 +1,16 @@
+wafer_name = "Gabriele"
+wafer_size = 4
+xsize = 15000.0
+ysize = 15000.0
+nchips = 24
+nmodules = 3
+origin_chip = "0 0"
+home_chip = "0 0"
+init_chip = 1
+end_chip = 24
+flat_orientation = 0
+wafer_positions = [ "0 0", "-1 0", "1 -1", "0 -1", "-1 -1", "-2 -1", "2 -2", "1 -2", "0 -2", "-1 -2", "-2 -2", "-3 -2", "2 -3", "1 -3", "0 -3", "-1 -3", "-2 -3", "-3 -3", "1 -4", "0 -4", "-1 -4", "-2 -4", "0 -5", "-1 -5",]
+wafer_modules = [ "0.0 0.0", "-3070.0 0.0", "-3070.0 0.0",]
+wafer_modules_name = [ "0 0", "0.000000 0.000000", "0.000000 0.000000",]
+real_origin_chip = "-2 -1"
+navigation_options = [ "UPPER-LEFT", "UNI-DIRECTIONAL", "ROW",]
