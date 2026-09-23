@@ -1,17 +1,18 @@
 title = "Caracterizar"
-version = "3.1.1"
+version = "3.2.0"
 author = "Sergi Sànchez"
 
 [defaults]
 debugmode = true
 darkmode = true
 estepa = true
-txtprocess = "20156"
-txtlot = "20156"
-txtwafer = "TEST"
-txtmask = "GaN001"
-txttemperature = "25.0"
-txthumidity = "50"
+txtprocess = "test"
+txtlot = "test"
+txtwafer = "1"
+txtmask = "CNM004"
+txttemperature = "25"
+txthumidity = "45"
+sendemail = false
 
 [dirs]
 base = "config"
@@ -58,3 +59,6 @@ author = "Sergi Sànchez"
 
 [wafermap]
 max_visible_buttons = 10000
+
+[email]
+api_url = "https://www.cnm.es/users/siam/api/email/process-notification"

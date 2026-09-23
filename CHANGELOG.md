@@ -2,6 +2,14 @@
 
 Todos los cambios importantes en este proyecto se documentan en este archivo.
 
+## [3.2.0] - 2026-09-24
+### Added
+- **Correo electrónico de notificación**: Se ha añadido una nueva función en `modules/email_notify.py` que permite enviar correos electrónicos con la información del dispositivo medido.
+
+### Changed
+- **`modules/ui_main.py`**: Se ha modificado el archivo para que pueda enviar correos electrónicos con la información del dispositivo medido.
+- **`main.py`**: Se ha modificado el archivo para que pueda enviar correos electrónicos con la información del dispositivo medido.
+
 ## [3.1.1] - 2026-09-23
 ### Fixed
 - **Wafers.py**: Se ha arreglado la parte de módulos dentro de la pantalla de Wafermaps. Habían errores al visualizar el mapa cuando existen varios módulos.

@@ -49,6 +49,7 @@ from screens.ui_login import Ui_LoginWindow
 from screens.ui_splash_screen import Ui_SplashScreen
 # from widgets.circular_progress.circular_progress import CircularProgress
 from modules.auth import authenticate
+from modules import email_notify
 
 # import images screen login
 import resources_rc
@@ -221,6 +222,24 @@ class ScriptRunner(QThread):
         finally:
             self.main_context.log_message("ScriptRunner.run", "Script finished", "INFO")
             self.finished.emit()
+
+
+class EmailWorker(QThread):
+    finished = Signal(str, str)  # (status: "success"/"error", message)
+
+    def __init__(self, payload, dat_filepath=None, api_url=None):
+        super().__init__()
+        self.payload = payload
+        self.dat_filepath = dat_filepath
+        self.api_url = api_url
+
+    def run(self):
+        result = email_notify.send_email_notification(self.payload, self.dat_filepath, self.api_url)
+        if result["success"]:
+            self.finished.emit("success", result["message"])
+        else:
+            self.finished.emit("error", result["message"])
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -483,6 +502,7 @@ class MainWindow(QMainWindow):
         widgets.chkDarkMode.stateChanged.connect(self.IsDarkMode)
         mpl_style(dark=self.IsDarkMode())
         widgets.chkDebugMode.stateChanged.connect(self.IsDebugMode)
+        widgets.chkSendEmail.stateChanged.connect(self.save_config_parameters_file)
 
         # TRICK
         widgets.btn_message.clicked.connect(self.test_status_reset)
@@ -551,6 +571,7 @@ class MainWindow(QMainWindow):
         widgets.chkDebugMode.setChecked(self.config["defaults"]["debugmode"])
         widgets.chkDarkMode.setChecked(self.config["defaults"]["darkmode"])
         widgets.chkViewEstepa.setChecked(self.config["defaults"]["estepa"])
+        widgets.chkSendEmail.setChecked(self.config["defaults"].get("sendemail", False))
         widgets.txtProcess.setText(self.config["defaults"]["txtprocess"])
         widgets.txtLot.setText(self.config["defaults"]["txtlot"])
         widgets.txtWafer.setText(self.config["defaults"]["txtwafer"])
@@ -608,6 +629,7 @@ class MainWindow(QMainWindow):
         self.config["defaults"]["txtmask"] = widgets.txtMask.text()
         self.config["defaults"]["txttemperature"] = widgets.txtTemperature.text()
         self.config["defaults"]["txthumidity"] = widgets.txtHumidity.text()
+        self.config["defaults"]["sendemail"] = widgets.chkSendEmail.isChecked()
         self.log_message("MainWindow.save_config_parameters_file", f"Saving config parameters to {self.path_config_file}", "INFO")
         toml_file = open(self.path_config_file, "w", encoding="utf-8")
         toml.dump(self.config, toml_file)
@@ -2408,6 +2430,44 @@ class MainWindow(QMainWindow):
         widgets.btnGoHome.setVisible(cartographic_measurement)
         self.load_wafermaps()
 
+    # ///////////////////////////////////////////////////////////////
+    # EMAIL NOTIFICATION HELPER
+    # ///////////////////////////////////////////////////////////////
+    def _send_email_notification(self, status, error_message=""):
+        global file_measurement, dieActual, end_chip, username
+        if not widgets.chkSendEmail.isChecked():
+            return
+        if username == "default":
+            return
+        payload = {
+            "username": username,
+            "process_name": widgets.txtProcess.text(),
+            "lot_name": widgets.txtLot.text(),
+            "wafer_name": widgets.txtWafer.text(),
+            "mask_name": widgets.txtMask.text(),
+            "instrument": widgets.cmbInstruments.currentText(),
+            "test": widgets.cmbTests.currentText(),
+            "prober": widgets.cmbProbers.currentText(),
+            "wafermap": widgets.cmbWafermaps.currentText(),
+            "temperature": widgets.txtTemperature.text(),
+            "humidity": widgets.txtHumidity.text(),
+            "status": status,
+            "message": error_message,
+            "dice_measured": str(dieActual),
+            "dice_total": str(end_chip),
+        }
+        dat_filepath = file_measurement.filename if file_measurement else None
+        api_url = self.config.get("email", {}).get("api_url", None)
+        self.email_worker = EmailWorker(payload, dat_filepath, api_url)
+        self.email_worker.finished.connect(self._on_email_finished)
+        self.email_worker.start()
+
+    def _on_email_finished(self, status, message):
+        if status == "success":
+            self.log_message("EmailWorker", f"Email sent: {message}", "SUCCESS")
+        else:
+            self.log_message("EmailWorker", f"Email failed: {message}", "WARNING")
+
     # BUTTONS CLICK on MEASUREMENTS PAGE
     # ///////////////////////////////////////////////////////////////
     def MeasurementClick(self):
@@ -2523,6 +2583,7 @@ class MainWindow(QMainWindow):
                                         self.updateTextDescription("START CARTOGRAPHIC MEASUREMENT")
                                         self.execute_cartographic_measurement(auto=auto_carto)
                                         self.updateTextDescription("FINISH CARTOGRAPHIC MEASUREMENT")
+                                        self._send_email_notification("success")
                                         QApplication.processEvents()
                                         
                                         # Set auto true for next iterations
@@ -2836,6 +2897,7 @@ class MainWindow(QMainWindow):
     def on_script_error(self, error_message):
         self.log_message("on_script_error", error_message, "ERROR")
         messageBox(self, "Error ejecutando script", error_message, "critical")
+        self._send_email_notification("error", error_message)
         self.change_state_process("STOP")
         self.toggle_widgets(True)
         self.script_running = False
@@ -3411,15 +3473,18 @@ class MainWindow(QMainWindow):
                     else:
                         self.updateTextDescription("=> Error checking vacuum")
                         retval = messageBox(self, "Error checking vacuum", "Vacuum not detected!", "critical")
+                        self._send_email_notification("error", "Vacuum not detected")
                         self.change_state_process("STOP")
                 else:
                     self.updateTextDescription("=> Error loading prober file")
                     retval = messageBox(self, "Error loading prober file", "Prober class doesn't exists!", "critical")
+                    self._send_email_notification("error", "Prober class doesn't exist")
                     self.change_state_process("STOP")
             except Exception as ex:
                 self.updateTextDescription("=> Error in cartographic process")
                 retval = messageBox(self, "Error in cartographic process", "Some error occurs during the process!\n" + str(ex),
                                     "critical")
+                self._send_email_notification("error", str(ex))
                 self.change_state_process("STOP")
         else:
             self.updateTextDescription("=> Error checking wafer parameters")
